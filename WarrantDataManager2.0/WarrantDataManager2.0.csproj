@@ -35,8 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DeriLib">
-      <HintPath>D:\WarrantIssueDataManager\WarrantIssueDataManager\bin\Debug\DeriLib.dll</HintPath>
+    <Reference Include="DeriLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=660c1e0ce20f06fc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\DeriLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
