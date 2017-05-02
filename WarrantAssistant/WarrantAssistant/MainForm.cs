@@ -938,7 +938,7 @@ namespace WarrantAssistant
                                   FROM [EDIS].[dbo].[ApplyTotalList] a
                                   LEFT JOIN [EDIS].[dbo].[ReIssueOfficial] b ON a.SerialNum=b.SerialNum
                                   LEFT JOIN [EDIS].[dbo].[WarrantPrices] c ON b.WarrantID=c.CommodityID
-                                  WHERE a.ApplyKind='2' AND a.Result>=a.EquivalentNum
+                                  WHERE a.ApplyKind='2' AND a.Result + 0.00001 >=a.EquivalentNum
                                   ORDER BY a.Market desc, a.SerialNum";
                 DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
                 int i = 3;

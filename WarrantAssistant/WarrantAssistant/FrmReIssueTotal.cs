@@ -165,7 +165,7 @@ namespace WarrantAssistant
                 double equivalentNum = Convert.ToDouble(e.Row.Cells["約當張數"].Value);
                 double result = e.Row.Cells["額度結果"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Row.Cells["額度結果"].Value);
 
-                if (result >= equivalentNum)
+                if (result+0.00001 >= equivalentNum)
                 {
                     e.Row.Cells["權證名稱"].Appearance.BackColor = Color.PaleGreen;
                 }
