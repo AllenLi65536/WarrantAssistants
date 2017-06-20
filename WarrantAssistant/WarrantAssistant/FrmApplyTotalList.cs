@@ -118,7 +118,7 @@ namespace WarrantAssistant
                     dr["標的代號"] = drv["UnderlyingID"].ToString();
                     dr["權證名稱"] = drv["WarrantName"].ToString();
                     dr["行使比例"] = Convert.ToDouble(drv["CR"]);
-                    dr["張數"] = Convert.ToDouble(drv["IssueNum"]);
+                    dr["張數"] = Convert.ToDouble(drv["IssueNum"]);                   
                     dr["約當張數"] = Convert.ToDouble(drv["EquivalentNum"]);
                     double result = drv["Result"] == DBNull.Value ? 0.0 : Convert.ToDouble(drv["Result"]);
                     result = Math.Floor(result);

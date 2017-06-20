@@ -571,7 +571,7 @@ namespace WarrantAssistant
 
         private void OfficiallyApply() {
             try {
-                CheckReason();
+                //CheckReason();
                 //if (!CheckData())
                 //   return;
 
@@ -585,7 +585,7 @@ namespace WarrantAssistant
 
                 string sql3 = "DELETE FROM [EDIS].[dbo].[ApplyTotalList] WHERE [UserID]='" + userID + "' AND [ApplyKind]='1'";
                 string sql4 = @"INSERT INTO [EDIS].[dbo].[ApplyTotalList] ([ApplyKind],[SerialNum],[Market],[UnderlyingID],[WarrantName],[CR] ,[IssueNum],[EquivalentNum],[Credit],[RewardCredit],[Type],[CP],[UseReward],[MarketTmr],[TraderID],[MDate],UserID)
-                                SELECT '1',a.SerialNumber, b.Market, a.UnderlyingID, a.TempName, a.R, a.IssueNum, (a.R*a.IssueNum), b.IssueCredit, b.RewardIssueCredit, a.Type, a.CP, a.UseReward,'N', a.TraderID, GETDATE(), a.UserID
+                                SELECT '1',a.SerialNumber, b.Market, a.UnderlyingID, a.TempName, a.R, a.IssueNum, ROUND(a.R*a.IssueNum, 2), b.IssueCredit, b.RewardIssueCredit, a.Type, a.CP, a.UseReward,'N', a.TraderID, GETDATE(), a.UserID
                                 FROM [EDIS].[dbo].[ApplyOfficial] a
                                 LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingSummary] b ON a.UnderlyingID=b.UnderlyingID";
                 sql4 += " WHERE a.[UserID]='" + userID + "'";

@@ -613,7 +613,7 @@ namespace WarrantAssistant
                                   FROM [EDIS].[dbo].[ApplyTotalList] a
                                   LEFT JOIN [EDIS].[dbo].[ApplyOfficial] b ON a.SerialNum=b.SerialNumber
                                   LEFT JOIN [EDIS].[dbo].[WarrantBasic] c ON a.WarrantName=c.WarrantName
-                                  ORDER BY a.Market desc, a.SerialNum";
+                                  ORDER BY a.Market desc, a.Type, a.CP, a.UnderlyingID, a.SerialNum";//a.SerialNum
                 DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
                 if (dv.Count > 0) {
                     foreach (DataRowView dr in dv) {
@@ -741,7 +741,7 @@ namespace WarrantAssistant
                                   LEFT JOIN [EDIS].[dbo].[WarrantPrices] b ON a.UnderlyingID=b.CommodityID
                                   LEFT JOIN [EDIS].[dbo].[ApplyOfficial] c ON a.SerialNum=c.SerialNumber
                                   WHERE a.ApplyKind='1' AND a.Result+0.00001 >= a.EquivalentNum
-                                  ORDER BY a.Market desc, a.SerialNum";
+                                  ORDER BY a.Market desc, a.Type, a.CP, a.UnderlyingID, a.SerialNum"; //a.SerialNum
                 DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
                 int i = 3;
                 if (dv.Count > 0) {

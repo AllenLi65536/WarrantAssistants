@@ -154,7 +154,7 @@ namespace WarrantAssistant
                                   LEFT JOIN [EDIS].[dbo].[ApplyTotalList] b ON a.SerialNumber=b.SerialNum
                                   LEFT JOIN [EDIS].[dbo].[WarrantPrices] c on a.UnderlyingID=c.CommodityID
                                 left join Underlying_TraderIssue d on a.UnderlyingID=d.UID 
-                                  ORDER BY b.Market desc, a.SerialNumber"; //or (a.UnderlyingID = 'IX0001' and d.UID ='TWA00')
+                                  ORDER BY b.Market desc, a.Type, a.CP, a.UnderlyingID, a.SerialNumber"; //or (a.UnderlyingID = 'IX0001' and d.UID ='TWA00')
 
                 DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 

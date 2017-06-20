@@ -71,9 +71,7 @@
     <Compile Include="FrmApplyTotalList.Designer.cs">
       <DependentUpon>FrmApplyTotalList.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmIssueByCurrent.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="FrmIssueByCurrent.cs" />
     <Compile Include="FrmIssueByCurrent.Designer.cs">
       <DependentUpon>FrmIssueByCurrent.cs</DependentUpon>
     </Compile>
@@ -83,21 +81,15 @@
     <Compile Include="FrmIssueTotal.Designer.cs">
       <DependentUpon>FrmIssueTotal.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmLog.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="FrmLog.cs" />
     <Compile Include="FrmLog.Designer.cs">
       <DependentUpon>FrmLog.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmLogIn.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="FrmLogIn.cs" />
     <Compile Include="FrmLogIn.Designer.cs">
       <DependentUpon>FrmLogIn.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmReIssue.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="FrmReIssue.cs" />
     <Compile Include="FrmReIssue.Designer.cs">
       <DependentUpon>FrmReIssue.cs</DependentUpon>
     </Compile>
@@ -120,27 +112,19 @@
     <Compile Include="FrmApply.Designer.cs">
       <DependentUpon>FrmApply.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmIssueCheck.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="FrmIssueCheck.cs" />
     <Compile Include="FrmIssueCheck.Designer.cs">
       <DependentUpon>FrmIssueCheck.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmIssueCheckPut.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="FrmIssueCheckPut.cs" />
     <Compile Include="FrmIssueCheckPut.Designer.cs">
       <DependentUpon>FrmIssueCheckPut.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmReIssuable.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="FrmReIssuable.cs" />
     <Compile Include="FrmReIssuable.Designer.cs">
       <DependentUpon>FrmReIssuable.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmReIssueInput.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="FrmReIssueInput.cs" />
     <Compile Include="FrmReIssueInput.Designer.cs">
       <DependentUpon>FrmReIssueInput.cs</DependentUpon>
     </Compile>
