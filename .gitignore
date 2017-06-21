@@ -74,7 +74,7 @@ artifacts/
 *.scc
 
 #License
-*.licx
+#*.licx
 
 # Chutzpah Test files
 _Chutzpah*
