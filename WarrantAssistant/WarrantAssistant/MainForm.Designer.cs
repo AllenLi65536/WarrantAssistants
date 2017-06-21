@@ -67,7 +67,6 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.ultraGrid1 = new Infragistics.Win.UltraWinGrid.UltraGrid();
             this.monthCalendar1 = new System.Windows.Forms.MonthCalendar();
-            this.權證發行評估報告ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -166,8 +165,7 @@
             this.發行條件輸入ToolStripMenuItem,
             this.增額條件輸入ToolStripMenuItem,
             this.代理人發行條件輸入ToolStripMenuItem,
-            this.代理人增額條件輸入ToolStripMenuItem,
-            this.權證發行評估報告ToolStripMenuItem});
+            this.代理人增額條件輸入ToolStripMenuItem});
             this.traderToolStripMenuItem.Name = "traderToolStripMenuItem";
             this.traderToolStripMenuItem.Size = new System.Drawing.Size(59, 21);
             this.traderToolStripMenuItem.Text = "交易員";
@@ -279,7 +277,7 @@
             // 詳細LOGToolStripMenuItem
             // 
             this.詳細LOGToolStripMenuItem.Name = "詳細LOGToolStripMenuItem";
-            this.詳細LOGToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.詳細LOGToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.詳細LOGToolStripMenuItem.Text = "詳細LOG";
             this.詳細LOGToolStripMenuItem.Click += new System.EventHandler(this.詳細LOGToolStripMenuItem_Click);
             // 
@@ -410,14 +408,6 @@
             this.monthCalendar1.Name = "monthCalendar1";
             this.monthCalendar1.TabIndex = 0;
             // 
-            // 權證發行評估報告ToolStripMenuItem
-            // 
-            this.權證發行評估報告ToolStripMenuItem.Enabled = false;
-            this.權證發行評估報告ToolStripMenuItem.Name = "權證發行評估報告ToolStripMenuItem";
-            this.權證發行評估報告ToolStripMenuItem.Size = new System.Drawing.Size(199, 22);
-            this.權證發行評估報告ToolStripMenuItem.Text = "權證發行評估報告";
-            this.權證發行評估報告ToolStripMenuItem.Click += new System.EventHandler(this.權證發行評估報告ToolStripMenuItem_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
@@ -494,7 +484,6 @@
         private System.Windows.Forms.ToolStripMenuItem 代理人增額條件輸入ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 增額上傳檔ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 已發權證條件發行ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 權證發行評估報告ToolStripMenuItem;
     }
 }
 
