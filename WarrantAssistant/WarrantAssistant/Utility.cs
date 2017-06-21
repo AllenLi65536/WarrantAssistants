@@ -138,7 +138,7 @@ namespace WarrantAssistant
         public string commandString = "";
         public List<SqlParameter> parameterList;
 
-        private bool isInitialOK = false;
+        //private bool isInitialOK = false;
         private SqlCommand cmd;
 
         public SQLCommandHelper(string connString, string commandString, List<SqlParameter> parameterList)
@@ -160,7 +160,7 @@ namespace WarrantAssistant
                 foreach (SqlParameter parameter in parameterList)
                     cmd.Parameters.Add(parameter);
 
-                isInitialOK = true;
+                //isInitialOK = true;
             }
             catch (Exception ex)
             {

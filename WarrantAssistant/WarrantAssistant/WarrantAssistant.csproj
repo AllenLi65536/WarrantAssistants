@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -33,11 +34,16 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DeriLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=660c1e0ce20f06fc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\DeriLib.dll</HintPath>
+    </Reference>
+    <Reference Include="EDLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EDLib.1.0.7-beta\lib\net40\EDLib.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\Net40\HtmlAgilityPack.dll</HintPath>
@@ -71,7 +77,9 @@
     <Compile Include="FrmApplyTotalList.Designer.cs">
       <DependentUpon>FrmApplyTotalList.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmIssueByCurrent.cs" />
+    <Compile Include="FrmIssueByCurrent.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmIssueByCurrent.Designer.cs">
       <DependentUpon>FrmIssueByCurrent.cs</DependentUpon>
     </Compile>
@@ -81,15 +89,21 @@
     <Compile Include="FrmIssueTotal.Designer.cs">
       <DependentUpon>FrmIssueTotal.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmLog.cs" />
+    <Compile Include="FrmLog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmLog.Designer.cs">
       <DependentUpon>FrmLog.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmLogIn.cs" />
+    <Compile Include="FrmLogIn.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmLogIn.Designer.cs">
       <DependentUpon>FrmLogIn.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmReIssue.cs" />
+    <Compile Include="FrmReIssue.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmReIssue.Designer.cs">
       <DependentUpon>FrmReIssue.cs</DependentUpon>
     </Compile>
@@ -112,19 +126,27 @@
     <Compile Include="FrmApply.Designer.cs">
       <DependentUpon>FrmApply.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmIssueCheck.cs" />
+    <Compile Include="FrmIssueCheck.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmIssueCheck.Designer.cs">
       <DependentUpon>FrmIssueCheck.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmIssueCheckPut.cs" />
+    <Compile Include="FrmIssueCheckPut.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmIssueCheckPut.Designer.cs">
       <DependentUpon>FrmIssueCheckPut.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmReIssuable.cs" />
+    <Compile Include="FrmReIssuable.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmReIssuable.Designer.cs">
       <DependentUpon>FrmReIssuable.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmReIssueInput.cs" />
+    <Compile Include="FrmReIssueInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmReIssueInput.Designer.cs">
       <DependentUpon>FrmReIssueInput.cs</DependentUpon>
     </Compile>
@@ -222,26 +244,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="ADODB">
-      <Guid>{2A75196C-D9EB-4129-B803-931327F72D5C}</Guid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>8</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-    <COMReference Include="CMADODB5">
-      <Guid>{2F4B083E-34AE-4AAB-AD94-AE0DFC4009D5}</Guid>
-      <VersionMajor>4</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

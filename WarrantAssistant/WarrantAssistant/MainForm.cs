@@ -32,7 +32,7 @@ namespace WarrantAssistant
         private void MainForm_Load(object sender, EventArgs e) {
             GlobalVar.mainForm = this;
             FrmLogIn frmLogin = new FrmLogIn();
-            if (!frmLogin.tryIPLogin()) {
+            if (!frmLogin.TryIPLogin()) {
                 MessageBox.Show("Auto login failed. Please e-mail your IP address to allen.li@kgi.com");
 
                 // Close();
@@ -1117,10 +1117,10 @@ namespace WarrantAssistant
         }
 
         private void 權證發行評估報告ToolStripMenuItem_Click(object sender, EventArgs e) {
-            string fileName = "D:\\權證發行_相關Excel\\上傳檔\\利害關係人整批查詢上傳格式範例.xls";
+            //string fileName = "D:\\權證發行_相關Excel\\上傳檔\\利害關係人整批查詢上傳格式範例.xls";
             Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
             app.Visible = true;
-            Workbook workBook = null;
+            //Workbook workBook = null;
         }
     }
 }

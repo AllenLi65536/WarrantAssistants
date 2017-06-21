@@ -24,10 +24,11 @@ namespace WarrantAssistant
             throw new Exception("Local IP Address Not Found!");
         }
 
-        public bool tryIPLogin() {
+        public bool TryIPLogin() {
             string IP = GetLocalIPAddress();
             string sqlTemp = "SELECT [UserGroup],[UserLevel],[UserName],[Deputy],[UserID] FROM [EDIS].[dbo].[User] WHERE IP = '" + IP + "'";
-            DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp , GlobalVar.loginSet.edisSqlConnString);
+            //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp , GlobalVar.loginSet.edisSqlConnString);
+            DataView dvTemp = EDLib.SQL.MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString).DefaultView;
             if (dvTemp.Count > 0) {
                 foreach (DataRowView drTemp in dvTemp) {
                     GlobalVar.globalParameter.userGroup = drTemp["UserGroup"].ToString();
