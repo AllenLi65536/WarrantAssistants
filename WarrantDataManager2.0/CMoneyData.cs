@@ -15,8 +15,7 @@ namespace WarrantDataManager2._0
         private Dictionary<string, CommodityData> data = new Dictionary<string, CommodityData>();
         private List<string> tw50Stocks = new List<string>();
 
-        public void loadData()
-        {
+        public void loadData() {
             getTW50Stcoks();
             loadCommodityData();
             getPricesAndPERatio();
@@ -30,33 +29,29 @@ namespace WarrantDataManager2._0
             updateIssueCheck();
         }
 
-        public void updateWarrantUnderlying()
-        {
+        public void updateWarrantUnderlying() {
             loadCommodityData();
             refreshCommodityBasics();
         }
 
-        public CommodityBasicList getCommodityBasics()
-        {
+        public CommodityBasicList getCommodityBasics() {
             CommodityBasicList cBL = new CommodityBasicList();
 
-            try
-            {
+            try {
                 string sql = "SELECT [股票代號], [股票名稱], isNull([上市上櫃],'1') 市場, IsNull([公司名稱], '') 公司名稱, IsNull([統一編號], '00000000') 統一編號 FROM [上市櫃公司基本資料] WHERE ";
-                List<string> datas=new List<string>();
+                List<string> datas = new List<string>();
                 //DataView dv = DeriLib.Util.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
                 DataTable dv = MSSQL.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
                 string cStr = "";
-                foreach(DataRowView dr in dv.Rows)
+                foreach (DataRow dr in dv.Rows)
                     cStr += "'" + dr["WRTCAN_CMONEY_ID"].ToString() + "',";
-                if (cStr.Length>0)
-                    cStr=cStr.Substring(0,cStr.Length-1);
+                if (cStr.Length > 0)
+                    cStr = cStr.Substring(0, cStr.Length - 1);
 
                 sql += "[股票代號] IN (" + cStr + ") ORDER BY [股票代號]";
                 ADODB.Recordset rs = cn.CMExecute(ref arg, srvLocation, cnPort, sql);
 
-                for (; !rs.EOF; rs.MoveNext())
-                {
+                for (; !rs.EOF; rs.MoveNext()) {
                     string cid = Convert.ToString(rs.Fields["股票代號"].Value);
                     string cnm = Convert.ToString(rs.Fields["股票名稱"].Value);
                     string mktN = Convert.ToString(rs.Fields["市場"].Value);
@@ -70,59 +65,49 @@ namespace WarrantDataManager2._0
                     string uid = Convert.ToString(rs.Fields["統一編號"].Value);
                     string fnm = Convert.ToString(rs.Fields["公司名稱"].Value);
 
-                    if (uid != null && cid != null && cnm != null && mkt!=null && fnm != null && uid != "00000000" && uid != "0" && uid != "" && !datas.Contains(uid))
-                    {
+                    if (uid != null && cid != null && cnm != null && mkt != null && fnm != null && uid != "00000000" && uid != "0" && uid != "" && !datas.Contains(uid)) {
                         CommodityBasic b = new CommodityBasic(cid, cnm, mkt, uid, fnm);
                         datas.Add(uid);
                         cBL.add(b);
                     }
                 }
 
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getCommodityBasics][" + ex.Message + "][" + ex.StackTrace + "]");
             }
 
             return cBL;
         }
 
-        private void loadCommodityData()
-        {
-            try
-            {
+        private void loadCommodityData() {
+            try {
                 data.Clear();
                 string sql = "SELECT UnderlyingID, UnderlyingIDCMoney, UnderlyingName FROM [WarrantUnderlying] WHERE StockType='DS' or StockType='DR' ORDER BY UnderlyingID";
                 //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
                 DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
-                foreach (DataRowView dr in dv.Rows)
-                {
+                foreach (DataRow dr in dv.Rows) {
                     string commodityID = dr["UnderlyingID"].ToString();
                     string commodityIDCMoney = dr["UnderlyingIDCMoney"].ToString();
                     string commodityName = dr["UnderlyingName"].ToString();
-                    
+
                     if (!data.ContainsKey(commodityID))
-                        data.Add(commodityID, new CommodityData(commodityID,commodityName, tw50Stocks.Contains(commodityIDCMoney)));
+                        data.Add(commodityID, new CommodityData(commodityID, commodityName, tw50Stocks.Contains(commodityIDCMoney)));
 
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_loadCommodityData][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
 
-        private void refreshCommodityBasics()
-        {
-            try
-            {
+        private void refreshCommodityBasics() {
+            try {
                 string sql = "SELECT [股票代號], [股票名稱], isNull([上市上櫃],'1') 市場, IsNull([公司名稱], '') 公司名稱, IsNull([統一編號], '00000000') 統一編號 FROM [上市櫃公司基本資料] WHERE ";
 
                 //DataView dv = DeriLib.Util.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
                 DataTable dv = MSSQL.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
                 string cStr = "";
-                foreach (DataRowView dr in dv.Rows)
+                foreach (DataRow dr in dv.Rows)
                     cStr += "'" + dr["WRTCAN_CMONEY_ID"].ToString() + "',";
                 if (cStr.Length > 0)
                     cStr = cStr.Substring(0, cStr.Length - 1);
@@ -140,8 +125,7 @@ namespace WarrantDataManager2._0
                 SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, cmdText, pars);
 
 
-                for (; !rs.EOF; rs.MoveNext())
-                {
+                for (; !rs.EOF; rs.MoveNext()) {
                     string commodityID = rs.Fields["股票代號"].Value;
                     string commodityName = rs.Fields["股票名稱"].Value;
                     string market = rs.Fields["市場"].Value;
@@ -157,26 +141,22 @@ namespace WarrantDataManager2._0
                     h.ExecuteCommand();
                 }
                 h.Dispose();
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_refreshIssuableUnderlyingData][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
 
-        private void getTW50Stcoks()
-        {
-            try
-            {
+        private void getTW50Stcoks() {
+            try {
                 tw50Stocks.Clear();
 
-                string sql = "select [標的代號] from ETF持股明細表 where 股票代號 = '0050' and 日期 = '"+GlobalVar.globalParameter.lastTradeDate.ToString("yyyyMMdd")+"'";
+                string sql = "select [標的代號] from ETF持股明細表 where 股票代號 = '0050' and 日期 = '" + GlobalVar.globalParameter.lastTradeDate.ToString("yyyyMMdd") + "'";
 
                 ADODB.Recordset rs = cn.CMExecute(ref arg, srvLocation, cnPort, sql);
 
-                for (; !rs.EOF; rs.MoveNext()) 
+                for (; !rs.EOF; rs.MoveNext())
                     tw50Stocks.Add(Convert.ToString(rs.Fields["標的代號"].Value));
-                
+
 
                 /*string URL = "http://www.twse.com.tw/ch/trading/indices/twco/tai50i.php";
                 
@@ -201,18 +181,14 @@ namespace WarrantDataManager2._0
                     string cid = htmlstr.Substring(0, htmlstr.IndexOf("</td>"));
                     tw50Stocks.Add(cid);
                 }*/
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getBigStocks][" + ex.Message + "][" + ex.StackTrace + "]");
             }
 
         }
 
-        private void getPricesAndPERatio()
-        {
-            try
-            {
+        private void getPricesAndPERatio() {
+            try {
                 string dStr = DateTime.Today.ToString("yyyyMMdd");
                 string qStr = DateTime.Today.AddMonths(-3).ToString("yyyyMMdd");
                 string yStr = DateTime.Today.AddYears(-1).ToString("yyyyMMdd");
@@ -237,34 +213,30 @@ namespace WarrantDataManager2._0
                     cStr += "'" + cID + "',";
 
                 //把最後一個逗點刪掉
-                if (cStr.Length>0)
-                    cStr=cStr.Substring(0,cStr.Length-1);
+                if (cStr.Length > 0)
+                    cStr = cStr.Substring(0, cStr.Length - 1);
 
                 sql += "[股票代號] IN (" + cStr + ") ORDER BY [股票代號], [日期]";
                 ADODB.Recordset rs = cn.CMExecute(ref arg, srvLocation, cnPort, sql);
 
-                for (; !rs.EOF; rs.MoveNext())
-                {
+                for (; !rs.EOF; rs.MoveNext()) {
                     string stockID = rs.Fields["股票代號"].Value;
                     string date = rs.Fields["日期"].Value;
                     double price = Convert.ToDouble(rs.Fields["收盤價"].Value);
                     double pe = Convert.ToDouble(rs.Fields["本益比"].Value);
 
                     CommodityData d = data[stockID];
-                    if (date == dDT.ToString("yyyyMMdd"))
-                    {
+                    if (date == dDT.ToString("yyyyMMdd")) {
                         d.peRatio = pe;
                         d.price = price;
-                    }
-                    else if (date == qDT.ToString("yyyyMMdd"))
+                    } else if (date == qDT.ToString("yyyyMMdd"))
                         d.priceQuarter = price;
                     else if (date == yDT.ToString("yyyyMMdd"))
                         d.priceYear = price;
 
                 }
 
-                foreach (CommodityData d in data.Values)
-                {
+                foreach (CommodityData d in data.Values) {
                     if (d.priceQuarter == 0)
                         d.returnQuarter = 0;
                     else
@@ -276,17 +248,13 @@ namespace WarrantDataManager2._0
                         d.returnYear = d.price / d.priceYear - 1.0;
                 }
 
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getPricesAndPERatio][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
 
-        private void getEarning()
-        {
-            try
-            {
+        private void getEarning() {
+            try {
                 string sql = "SELECT [年季], [股票代號], [合併淨損益(千)] FROM [季合併財報(損益單季)] WHERE [年季] IN (SELECT DISTINCT TOP 4 [年季] FROM [季合併財報(損益單季)] ORDER BY [年季] desc) AND ";
 
                 string cStr = "";
@@ -298,8 +266,7 @@ namespace WarrantDataManager2._0
                 sql += "[股票代號] IN (" + cStr + ") ORDER BY [股票代號], [年季]";
                 ADODB.Recordset rs = cn.CMExecute(ref arg, srvLocation, cnPort, sql);
 
-                for (; !rs.EOF; rs.MoveNext())
-                {
+                for (; !rs.EOF; rs.MoveNext()) {
                     string quarter = rs.Fields["年季"].Value;
                     string stockID = rs.Fields["股票代號"].Value;
                     double earning = Convert.ToDouble(rs.Fields["合併淨損益(千)"].Value);
@@ -307,17 +274,13 @@ namespace WarrantDataManager2._0
                     data[stockID].commodityEarning.addQuarterEarning(earning);
                 }
 
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getEarning][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
 
-        private void getDividendDates()
-        {
-            try
-            {
+        private void getDividendDates() {
+            try {
                 string sql = @"SELECT [年度], [股票代號], IsNull([現金股利合計(元)], 0) 現金股利, IsNull([股票股利合計(元)], 0) 股票股利, IsNull([除息日],'') 除息日, isNull([除權日],'') 除權日
                                FROM [股利政策表] WHERE [年度] = '" + DateTime.Today.AddYears(-1).Year.ToString() + "' AND ";
 
@@ -331,8 +294,7 @@ namespace WarrantDataManager2._0
 
                 ADODB.Recordset rs = cn.CMExecute(ref arg, srvLocation, cnPort, sql);
 
-                for (; !rs.EOF; rs.MoveNext())
-                {
+                for (; !rs.EOF; rs.MoveNext()) {
                     string stockID = rs.Fields["股票代號"].Value;
                     string ec = rs.Fields["除息日"].Value == null ? "" : rs.Fields["除息日"].Value;
                     string es = rs.Fields["除權日"].Value == null ? "" : rs.Fields["除權日"].Value;
@@ -344,17 +306,13 @@ namespace WarrantDataManager2._0
                     data[stockID].cashDividend = cd;
                     data[stockID].stockDividend = sd;
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
         }
 
-        private void getPublicOfferingAdjustDate()
-        {
-            try
-            {
+        private void getPublicOfferingAdjustDate() {
+            try {
                 string sql = "SELECT [年度], [股票代號], IsNull([現增除權日],'') 現增除權日 FROM [股利政策表] WHERE [年度] = '" + DateTime.Today.AddYears(-1).Year.ToString() + "' AND ";
 
                 string cStr = "";
@@ -366,25 +324,20 @@ namespace WarrantDataManager2._0
                 sql += "[股票代號] IN (" + cStr + ") ORDER BY [股票代號]";
                 ADODB.Recordset rs = cn.CMExecute(ref arg, srvLocation, cnPort, sql);
 
-                for (; !rs.EOF; rs.MoveNext())
-                {
+                for (; !rs.EOF; rs.MoveNext()) {
                     string stockID = rs.Fields["股票代號"].Value;
                     string es = rs.Fields["現增除權日"].Value == null ? "" : rs.Fields["現增除權日"].Value;
 
                     if (es != "") { data[stockID].exPODate = DateTime.ParseExact(es, "yyyyMMdd", null); }
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 Console.WriteLine("POD error:" + ex.Message);
                 Console.ReadLine();
             }
         }
 
-        private void getDisposeEndDate()
-        {
-            try
-            {
+        private void getDisposeEndDate() {
+            try {
                 string sql = "SELECT [年度], [股票代號], IsNull([處置時間迄],'') 處置結束日 FROM [處置股票] WHERE [年度] >= '" + DateTime.Today.AddMonths(-6).Year.ToString() + "' AND ";
 
                 string cStr = "";
@@ -396,30 +349,25 @@ namespace WarrantDataManager2._0
                 sql += "[股票代號] IN (" + cStr + ") ORDER BY [股票代號] ,[處置時間迄] ";
                 ADODB.Recordset rs = cn.CMExecute(ref arg, srvLocation, cnPort, sql);
 
-                for (; !rs.EOF; rs.MoveNext())
-                {
+                for (; !rs.EOF; rs.MoveNext()) {
                     string stockID = rs.Fields["股票代號"].Value;
                     string es = rs.Fields["處置結束日"].Value == null ? "" : rs.Fields["處置結束日"].Value;
 
-                    if (es != "") 
-                        data[stockID].disposeEndDate = DateTime.ParseExact(es, "yyyyMMdd", null); 
+                    if (es != "")
+                        data[stockID].disposeEndDate = DateTime.ParseExact(es, "yyyyMMdd", null);
                 }
-            }
-            catch (Exception ex)
-            { 
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getDisposeEndDates][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
 
-        private void getWatchStock()
-        {
-            try
-            {
+        private void getWatchStock() {
+            try {
                 //找到前六個交易日的日期
                 string dStr = "";
                 //DataView dv = DeriLib.Util.ExecSqlQry("SELECT TOP 6 CONVERT(VARCHAR, TradeDate,112) TD FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
                 DataTable dv = MSSQL.ExecSqlQry("SELECT TOP 6 CONVERT(VARCHAR, TradeDate,112) TD FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
-                foreach (DataRowView dr in dv.Rows)
+                foreach (DataRow dr in dv.Rows)
                     dStr += "'" + dr["TD"].ToString() + "',";
                 if (dStr.Length > 0)
                     dStr = dStr.Substring(0, dStr.Length - 1);
@@ -435,8 +383,7 @@ namespace WarrantDataManager2._0
                 sql += "[股票代號] IN (" + cStr + ") ORDER BY [股票代號]";
                 ADODB.Recordset rs = cn.CMExecute(ref arg, srvLocation, cnPort, sql);
 
-                for (; !rs.EOF; rs.MoveNext())
-                {
+                for (; !rs.EOF; rs.MoveNext()) {
                     string stockID = rs.Fields["股票代號"].Value;
                     CommodityData d = data[stockID];
 
@@ -445,17 +392,13 @@ namespace WarrantDataManager2._0
                     if (x != "")
                         d.watchCount++;
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getWatchStock][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
 
-        private void getWarningScore()
-        {
-            try
-            {
+        private void getWarningScore() {
+            try {
                 string sql = "SELECT [股票代號], [警示指標總符合數] FROM [月財務警示指標] WHERE [年月] = '" + DateTime.Today.ToString("yyyyMM") + "' AND ";
 
                 string cStr = "";
@@ -466,32 +409,27 @@ namespace WarrantDataManager2._0
 
                 sql += "[股票代號] IN (" + cStr + ") ORDER BY [股票代號]";
                 ADODB.Recordset rs = cn.CMExecute(ref arg, srvLocation, cnPort, sql);
-                
-                for (; !rs.EOF; rs.MoveNext())
-                {
+
+                for (; !rs.EOF; rs.MoveNext()) {
                     string stockID = rs.Fields["股票代號"].Value;
                     int w = Convert.ToInt32(rs.Fields["警示指標總符合數"].Value);
 
                     data[stockID].warningScore = w;
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getWarningScore][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
 
-        private void getAccNetIncome()
-        {
-            try
-            {
+        private void getAccNetIncome() {
+            try {
                 string sql = "";
                 DateTime dQ1 = new DateTime(DateTime.Today.Year, 5, 15);
                 DateTime dQ2 = new DateTime(DateTime.Today.Year, 8, 15);
                 DateTime dQ3 = new DateTime(DateTime.Today.Year, 11, 15);
                 DateTime dY = new DateTime(DateTime.Today.Year, 3, 31);
 
-                if(DateTime.Today<dY)
+                if (DateTime.Today < dY)
                     sql = "SELECT [股票代號], [股票名稱], IsNull([稅後純益累計(千)], 0) 稅後純益 FROM [季合併為主財報(損益累計)] WHERE [年季] = '" + (DateTime.Today.Year - 1).ToString() + "03' AND ";
                 else if (DateTime.Today < dQ1)
                     sql = "SELECT [股票代號], [股票名稱], IsNull([稅後純益累計(千)], 0) 稅後純益 FROM [季合併為主財報(損益累計)] WHERE [年季] = '" + (DateTime.Today.Year - 1).ToString() + "04' AND ";
@@ -511,22 +449,17 @@ namespace WarrantDataManager2._0
                 sql += "[股票代號] IN (" + cStr + ") ORDER BY [股票代號]";
                 ADODB.Recordset rs = cn.CMExecute(ref arg, srvLocation, cnPort, sql);
 
-                for (; !rs.EOF; rs.MoveNext())
-                {
+                for (; !rs.EOF; rs.MoveNext()) {
                     string stockID = rs.Fields["股票代號"].Value;
                     data[stockID].accNetIncome = Convert.ToDouble(rs.Fields["稅後純益"].Value);
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getAccNetIncome][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
 
-        private void updateIssueCheck()
-        {
-            try
-            {
+        private void updateIssueCheck() {
+            try {
                 SQLCommandHelper deleteIssueCheck = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, "DELETE FROM [WarrantIssueCheck]", new List<System.Data.SqlClient.SqlParameter>());
                 deleteIssueCheck.ExecuteCommand();
                 deleteIssueCheck.Dispose();
@@ -554,7 +487,7 @@ namespace WarrantDataManager2._0
 
                 string sqlIssueCheckPut = "INSERT INTO [WarrantIssueCheckPut] values (@UnderlyingID, @UnderlyingName, @MDate, @IsTW50Stocks, @PERatio, @SumEarning, @Price, @PriceQuarter, @PriceYear, @ReturnQuarter, @ReturnYear)";
                 List<System.Data.SqlClient.SqlParameter> parsPut = new List<System.Data.SqlClient.SqlParameter>();
-                
+
                 parsPut.Add(new System.Data.SqlClient.SqlParameter("@UnderlyingId", SqlDbType.VarChar));
                 parsPut.Add(new System.Data.SqlClient.SqlParameter("@UnderlyingName", SqlDbType.VarChar));
                 parsPut.Add(new System.Data.SqlClient.SqlParameter("@MDate", SqlDbType.DateTime));
@@ -570,8 +503,7 @@ namespace WarrantDataManager2._0
                 SQLCommandHelper insertIssueCheck = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlIssueCheck, pars);
                 SQLCommandHelper insertIssueCheckPut = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlIssueCheckPut, parsPut);
 
-                foreach (CommodityData d in data.Values)
-                {
+                foreach (CommodityData d in data.Values) {
                     d.checkPutIssueability();
 
                     insertIssueCheck.SetParameterValue("@UnderlyingID", d.commodityID);
@@ -615,17 +547,15 @@ namespace WarrantDataManager2._0
                     insertIssueCheckPut.SetParameterValue("@PriceYear", d.priceYear);
                     insertIssueCheckPut.SetParameterValue("@ReturnQuarter", d.returnQuarter);
                     insertIssueCheckPut.SetParameterValue("@ReturnYear", d.returnYear);
-                    
+
                     insertIssueCheckPut.ExecuteCommand();
                     insertIssueCheck.ExecuteCommand();
-                    
+
                 }
 
                 insertIssueCheck.Dispose();
                 insertIssueCheckPut.Dispose();
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_updateIssueCheck][" + ex.Message + "][" + ex.StackTrace + "]");
             }
 
@@ -633,14 +563,10 @@ namespace WarrantDataManager2._0
 
         #region IDisposable成元
 
-        public void Dispose()
-        {
-            try
-            {
+        public void Dispose() {
+            try {
                 cn = null;
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_Dispose][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
@@ -654,15 +580,13 @@ namespace WarrantDataManager2._0
         public double sumEarning = 0.0;
         private int sumCount = 0;
 
-        public CommodityEarning(CommodityData commodityData)
-        {
+        public CommodityEarning(CommodityData commodityData) {
             this.commodityData = commodityData;
             this.sumEarning = 0.0;
-            this.sumCount = 0;    
+            this.sumCount = 0;
         }
 
-        public void addQuarterEarning(double earning)
-        {
+        public void addQuarterEarning(double earning) {
             if (sumCount > 3)
                 return;
             sumEarning += earning;
@@ -673,27 +597,22 @@ namespace WarrantDataManager2._0
     public class CommodityBasicList
     {
         private List<CommodityBasic> cbList = new List<CommodityBasic>();
-        
-        public void add(CommodityBasic c)
-        {
+
+        public void add(CommodityBasic c) {
             if (!cbList.Contains(c))
                 cbList.Add(c);
         }
 
-        public void clear()
-        {
+        public void clear() {
             if (cbList.Count > 0)
                 cbList.Clear();
         }
 
-        public CommodityBasic getByCommodityID(string id)
-        {
+        public CommodityBasic getByCommodityID(string id) {
             CommodityBasic basic = null;
-            
-            foreach (CommodityBasic cb in cbList)
-            {
-                if (cb.commodityID == id)
-                {
+
+            foreach (CommodityBasic cb in cbList) {
+                if (cb.commodityID == id) {
                     basic = cb;
                     break;
                 }
@@ -702,14 +621,11 @@ namespace WarrantDataManager2._0
             return basic;
         }
 
-        public CommodityBasic getByUnifiedID(string id)
-        {
+        public CommodityBasic getByUnifiedID(string id) {
             CommodityBasic basic = null;
 
-            foreach (CommodityBasic cb in cbList)
-            {
-                if (cb.unifiedID == id)
-                {
+            foreach (CommodityBasic cb in cbList) {
+                if (cb.unifiedID == id) {
                     basic = cb;
                     break;
                 }
@@ -729,11 +645,10 @@ namespace WarrantDataManager2._0
         public string unifiedID = "";
         public string fullName = "";
 
-        public CommodityBasic(string commodityID, string commodityName, string market, string unifiedID, string fullName)
-        {
-            this.commodityID=commodityID;
-            this.commodityName=commodityName;
-            this.market=market;
+        public CommodityBasic(string commodityID, string commodityName, string market, string unifiedID, string fullName) {
+            this.commodityID = commodityID;
+            this.commodityName = commodityName;
+            this.market = market;
             this.unifiedID = unifiedID;
             this.fullName = fullName;
         }
@@ -741,8 +656,8 @@ namespace WarrantDataManager2._0
 
     public class CommodityData
     {
-        public string commodityID="";
-        public string commodityName="";
+        public string commodityID = "";
+        public string commodityName = "";
         public string commodityWarrantName = "";
 
         public bool isPutIssuable = true;
@@ -765,15 +680,14 @@ namespace WarrantDataManager2._0
 
         public double price = 0.0;
         public double priceQuarter = 0.0;
-        public double priceYear=0.0;
+        public double priceYear = 0.0;
         public double returnQuarter = 0.0;
         public double returnYear = 0.0;
         public double peRatio = 0.0;
 
         public CommodityEarning commodityEarning;
 
-        public CommodityData(string commodityID, string commodityName, bool isTW50Stocks)
-        {
+        public CommodityData(string commodityID, string commodityName, bool isTW50Stocks) {
             this.commodityID = commodityID;
             this.commodityName = commodityName;
             this.isTW50Stocks = isTW50Stocks;
@@ -781,19 +695,15 @@ namespace WarrantDataManager2._0
         }
 
         //Put不可發行時機(台灣50成分股不適用):1.季報酬不得高於50% 2.年報酬不得高於100% 3.本益比不得高於40 4.淨利需大於0
-        public void checkPutIssueability()
-        {
-            try
-            {
-                if (isTW50Stocks)
-                {
+        public void checkPutIssueability() {
+            try {
+                if (isTW50Stocks) {
                     isPutIssuable = true;
                     return;
                 }
-                
+
                 //如果價格資料不足
-                if (price == 0.0 || priceQuarter == 0.0 || priceYear == 0.0)
-                {
+                if (price == 0.0 || priceQuarter == 0.0 || priceYear == 0.0) {
                     isPutIssuable = false;
                     return;
                 }
@@ -801,27 +711,22 @@ namespace WarrantDataManager2._0
                 //returnQuarter = price / priceQuarter - 1.0;
                 //returnYear = price / priceYear - 1.0;
 
-                if (returnQuarter > 0.5 || returnYear > 1.0)
-                {
+                if (returnQuarter > 0.5 || returnYear > 1.0) {
                     isPutIssuable = false;
                     return;
                 }
 
-                if (peRatio > 40.0 || peRatio <= 0.0)
-                {
+                if (peRatio > 40.0 || peRatio <= 0.0) {
                     isPutIssuable = false;
                     return;
                 }
 
-                if (commodityEarning.sumEarning < 0.0)
-                {
+                if (commodityEarning.sumEarning < 0.0) {
                     isPutIssuable = false;
                     return;
                 }
 
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CommodityData_checkPutIssuability][" + ex.Message + "][" + ex.StackTrace + "]");
                 isPutIssuable = false;
             }
