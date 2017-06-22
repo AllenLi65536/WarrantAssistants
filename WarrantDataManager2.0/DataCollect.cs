@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
-using System.IO;
 using System.Windows.Forms;
 using System.Data;
 using System.Data.SqlClient;
+using EDLib.SQL;
 
 namespace WarrantDataManager2._0
 {
@@ -94,10 +91,11 @@ namespace WarrantDataManager2._0
                 conn.Close();
 
                 string sql = "SELECT [股票代號], isNull([上市上櫃],'1') 市場, IsNull([統一編號], '00000000') 統一編號 FROM [上市櫃公司基本資料] WHERE ";
-                DataView dv = DeriLib.Util.ExecSqlQry("SELECT [UnderlyingIDCMoney] FROM [WarrantUnderlying] ORDER BY [UnderlyingIDCMoney]", GlobalVar.loginSet.edisSqlConnString);
+                //DataView dv = DeriLib.Util.ExecSqlQry("SELECT [UnderlyingIDCMoney] FROM [WarrantUnderlying] ORDER BY [UnderlyingIDCMoney]", GlobalVar.loginSet.edisSqlConnString);
+                DataTable dv = MSSQL.ExecSqlQry("SELECT [UnderlyingIDCMoney] FROM [WarrantUnderlying] ORDER BY [UnderlyingIDCMoney]", GlobalVar.loginSet.edisSqlConnString);
 
                 string cStr = "";
-                foreach (DataRowView dr in dv)
+                foreach (DataRowView dr in dv.Rows)
                     cStr += "'" + dr["UnderlyingIDCMoney"].ToString() + "',";
                 if (cStr.Length > 0)
                     cStr = cStr.Substring(0, cStr.Length - 1);
@@ -294,7 +292,8 @@ namespace WarrantDataManager2._0
                            FROM [EDIS].[dbo].[WarrantUnderlyingCredit] a
                            LEFT JOIN [EDIS].[dbo].[WarrantReward] b on a.UnderlyingID=b.UnderlyingID
                            ORDER BY [UnderlyingID]";
-            DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+            //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+            DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
             string cmdText = "UPDATE [WarrantUnderlyingSummary] SET RewardIssueCredit=@RewardIssueCredit WHERE UnderlyingID=@UnderlyingID";
             List<System.Data.SqlClient.SqlParameter> pars = new List<System.Data.SqlClient.SqlParameter>();
@@ -302,7 +301,7 @@ namespace WarrantDataManager2._0
             pars.Add(new SqlParameter("@RewardIssueCredit", SqlDbType.Float));
             SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, cmdText, pars);
 
-            foreach (DataRowView dr in dv)
+            foreach (DataRowView dr in dv.Rows)
             {
                 string underlyingID = dr["UnderlyingID"].ToString();
                 double availableShares = Convert.ToDouble(dr["AvailableShares"]);
@@ -336,7 +335,8 @@ namespace WarrantDataManager2._0
                                   ,[WatchCount]
                                   ,[WarningScore]
                               FROM [EDIS].[dbo].[WarrantIssueCheck]";
-            DataView dv2 = DeriLib.Util.ExecSqlQry(sql2, GlobalVar.loginSet.edisSqlConnString);
+            //DataView dv2 = DeriLib.Util.ExecSqlQry(sql2, GlobalVar.loginSet.edisSqlConnString);
+            DataTable dv2 = MSSQL.ExecSqlQry(sql2, GlobalVar.loginSet.edisSqlConnString);
 
             string cmdText2 = "UPDATE [WarrantUnderlyingSummary] SET Issuable=@Issuable WHERE UnderlyingID=@UnderlyingID";
             List<System.Data.SqlClient.SqlParameter> pars2 = new List<System.Data.SqlClient.SqlParameter>();
@@ -344,7 +344,7 @@ namespace WarrantDataManager2._0
             pars2.Add(new SqlParameter("@Issuable", SqlDbType.VarChar));
             SQLCommandHelper h2 = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, cmdText2, pars2);
 
-            foreach (DataRowView dr2 in dv2)
+            foreach (DataRowView dr2 in dv2.Rows)
             {
                 bool issuable = true;
                 DateTime applyDate = DateTime.Today;

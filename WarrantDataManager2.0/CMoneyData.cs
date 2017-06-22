@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Data;
-using System.Web;
-using System.Net;
-using System.IO;
 using System.Windows.Forms;
+using EDLib.SQL;
 
 namespace WarrantDataManager2._0
 {
@@ -48,9 +44,10 @@ namespace WarrantDataManager2._0
             {
                 string sql = "SELECT [股票代號], [股票名稱], isNull([上市上櫃],'1') 市場, IsNull([公司名稱], '') 公司名稱, IsNull([統一編號], '00000000') 統一編號 FROM [上市櫃公司基本資料] WHERE ";
                 List<string> datas=new List<string>();
-                DataView dv = DeriLib.Util.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
+                //DataView dv = DeriLib.Util.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
+                DataTable dv = MSSQL.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
                 string cStr = "";
-                foreach(DataRowView dr in dv)
+                foreach(DataRowView dr in dv.Rows)
                     cStr += "'" + dr["WRTCAN_CMONEY_ID"].ToString() + "',";
                 if (cStr.Length>0)
                     cStr=cStr.Substring(0,cStr.Length-1);
@@ -96,9 +93,10 @@ namespace WarrantDataManager2._0
             {
                 data.Clear();
                 string sql = "SELECT UnderlyingID, UnderlyingIDCMoney, UnderlyingName FROM [WarrantUnderlying] WHERE StockType='DS' or StockType='DR' ORDER BY UnderlyingID";
-                DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
-                foreach (DataRowView dr in dv)
+                foreach (DataRowView dr in dv.Rows)
                 {
                     string commodityID = dr["UnderlyingID"].ToString();
                     string commodityIDCMoney = dr["UnderlyingIDCMoney"].ToString();
@@ -121,9 +119,10 @@ namespace WarrantDataManager2._0
             {
                 string sql = "SELECT [股票代號], [股票名稱], isNull([上市上櫃],'1') 市場, IsNull([公司名稱], '') 公司名稱, IsNull([統一編號], '00000000') 統一編號 FROM [上市櫃公司基本資料] WHERE ";
 
-                DataView dv = DeriLib.Util.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
+                //DataView dv = DeriLib.Util.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
+                DataTable dv = MSSQL.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
                 string cStr = "";
-                foreach (DataRowView dr in dv)
+                foreach (DataRowView dr in dv.Rows)
                     cStr += "'" + dr["WRTCAN_CMONEY_ID"].ToString() + "',";
                 if (cStr.Length > 0)
                     cStr = cStr.Substring(0, cStr.Length - 1);
@@ -219,14 +218,17 @@ namespace WarrantDataManager2._0
                 string yStr = DateTime.Today.AddYears(-1).ToString("yyyyMMdd");
 
                 //昨天，三個月前，一年前的交易日
-                DataView dDv = DeriLib.Util.ExecSqlQry("SELECT TOP 1 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<'" + dStr + "' ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
-                DataView qDv = DeriLib.Util.ExecSqlQry("SELECT TOP 1 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<'" + qStr + "' ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
-                DataView yDv = DeriLib.Util.ExecSqlQry("SELECT TOP 1 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<'" + yStr + "' ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
+                //DataView dDv = DeriLib.Util.ExecSqlQry("SELECT TOP 1 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<'" + dStr + "' ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
+                //DataView qDv = DeriLib.Util.ExecSqlQry("SELECT TOP 1 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<'" + qStr + "' ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
+                //DataView yDv = DeriLib.Util.ExecSqlQry("SELECT TOP 1 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<'" + yStr + "' ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
+                DataTable dDv = MSSQL.ExecSqlQry("SELECT TOP 1 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<'" + dStr + "' ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
+                DataTable qDv = MSSQL.ExecSqlQry("SELECT TOP 1 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<'" + qStr + "' ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
+                DataTable yDv = MSSQL.ExecSqlQry("SELECT TOP 1 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<'" + yStr + "' ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
 
                 //實際前一交易日，前三個月的交易日，前一年的交易日
-                DateTime dDT = Convert.ToDateTime(dDv[0]["TradeDate"]);
-                DateTime qDT = Convert.ToDateTime(qDv[0]["TradeDate"]);
-                DateTime yDT = Convert.ToDateTime(yDv[0]["TradeDate"]);
+                DateTime dDT = Convert.ToDateTime(dDv.Rows[0]["TradeDate"]);
+                DateTime qDT = Convert.ToDateTime(qDv.Rows[0]["TradeDate"]);
+                DateTime yDT = Convert.ToDateTime(yDv.Rows[0]["TradeDate"]);
 
                 string sql = "SELECT [日期], [股票代號], IsNull([收盤價],0) 收盤價, IsNull([本益比],0) 本益比 FROM [日收盤表排行] WHERE [日期] IN ('" + dDT.ToString("yyyyMMdd") + "','" + qDT.ToString("yyyyMMdd") + "','" + yDT.ToString("yyyyMMdd") + "') AND ";
 
@@ -415,8 +417,9 @@ namespace WarrantDataManager2._0
             {
                 //找到前六個交易日的日期
                 string dStr = "";
-                DataView dv = DeriLib.Util.ExecSqlQry("SELECT TOP 6 CONVERT(VARCHAR, TradeDate,112) TD FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
-                foreach (DataRowView dr in dv)
+                //DataView dv = DeriLib.Util.ExecSqlQry("SELECT TOP 6 CONVERT(VARCHAR, TradeDate,112) TD FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
+                DataTable dv = MSSQL.ExecSqlQry("SELECT TOP 6 CONVERT(VARCHAR, TradeDate,112) TD FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
+                foreach (DataRowView dr in dv.Rows)
                     dStr += "'" + dr["TD"].ToString() + "',";
                 if (dStr.Length > 0)
                     dStr = dStr.Substring(0, dStr.Length - 1);

@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 //using Microsoft.Office.Interop.Excel;
 //using Microsoft.Office.Interop;
-using System.Data.SqlClient;
-using System.Data;
-using System.IO;
 //using Oracle.DataAccess.Client;
-using System.Data.OleDb;
 
 namespace WarrantDataManager2._0
 {
