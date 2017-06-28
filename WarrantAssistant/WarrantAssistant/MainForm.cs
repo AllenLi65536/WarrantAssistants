@@ -14,7 +14,7 @@ namespace WarrantAssistant
 {
     public partial class MainForm:Form
     {
-        private delegate void ShowHandler();
+        //private delegate void ShowHandler();        
 
         public MainForm() {
             InitializeComponent();
@@ -35,11 +35,11 @@ namespace WarrantAssistant
             if (!frmLogin.TryIPLogin()) {
                 MessageBox.Show("Auto login failed. Please e-mail your IP address to allen.li@kgi.com");
 
-                // Close();
-                frmLogin.ShowDialog();
+                Close();
+                //frmLogin.ShowDialog();
             }
             if (!frmLogin.loginOK)
-                this.Close();
+                Close();
         }
 
         public void Start() {
@@ -71,14 +71,15 @@ namespace WarrantAssistant
                 for (;;) {
                     try {
                         if (ultraGrid1.InvokeRequired)
-                            ultraGrid1.Invoke(new ShowHandler(LoadUltraGrid1));
+                            ultraGrid1.Invoke(new System.Action(LoadUltraGrid1));
                         else
                             LoadUltraGrid1();
 
                         if (ultraGrid2.InvokeRequired)
-                            ultraGrid2.Invoke(new ShowHandler(LoadUltraGrid2));
+                            ultraGrid2.Invoke(new System.Action(LoadUltraGrid2));
                         else
                             LoadUltraGrid2();
+
                     } catch (Exception ex) {
                         MessageBox.Show("In main form routine work in for loop " + ex.Message);
                     }
@@ -154,66 +155,66 @@ namespace WarrantAssistant
 
         }
 
-        public void LoadUltraGrid1() {
+        private void LoadUltraGrid(System.Data.DataTable dt, string infoOrAnnounce) {
             try {
                 string sql = @"SELECT [MDate]
                                   ,[InformationContent]
                                   ,[MUser]
                               FROM [EDIS].[dbo].[InformationLog]
-                              WHERE InformationType='Info' ";
+                              WHERE InformationType='" + infoOrAnnounce + "'";
                 sql += "AND CONVERT(VARCHAR,Date,112) >='" + GlobalVar.globalParameter.lastTradeDate.ToString("yyyy-MM-dd") + "' ORDER BY MDate DESC";
                 DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
-                if (dtInfo.Rows.Count == dv.Count)
+                if (dt.Rows.Count == dv.Count)
                     return;
 
-                dtInfo.Rows.Clear();
+                dt.Rows.Clear();
                 foreach (DataRowView drv in dv) {
-                    DataRow dr = dtInfo.NewRow();
+                    DataRow dr = dt.NewRow();
 
                     DateTime md = Convert.ToDateTime(drv["MDate"]);
                     dr["時間"] = md.ToString("yyyy/MM/dd HH:mm:ss");
                     dr["內容"] = drv["InformationContent"].ToString();
                     dr["人員"] = drv["MUser"].ToString();
-
-                    dtInfo.Rows.Add(dr);
+                    dt.Rows.Add(dr);
                 }
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
         }
-
+        public void LoadUltraGrid1() {
+            LoadUltraGrid(dtInfo, "Info");
+        }
         public void LoadUltraGrid2() {
-            try {
-                string sql = @"SELECT [MDate]
-                                  ,[InformationContent]
-                                  ,[MUser]
-                              FROM [EDIS].[dbo].[InformationLog]
-                              WHERE InformationType='Announce' ";
-                sql += "AND CONVERT(VARCHAR,Date,112) >='" + GlobalVar.globalParameter.lastTradeDate.ToString("yyyy-MM-dd") + "' ORDER BY MDate DESC";
-                DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+            LoadUltraGrid(dtAnnounce, "Announce");
+        }
 
-                if (dtAnnounce.Rows.Count == dv.Count)
+        private void MenuItemClick<T>() where T : Form, new() {
+            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
+                if (iForm.GetType() == typeof(T)) {
+                    iForm.BringToFront();
                     return;
-
-                dtAnnounce.Rows.Clear();
-                foreach (DataRowView drv in dv) {
-                    DataRow dr = dtAnnounce.NewRow();
-
-                    DateTime md = Convert.ToDateTime(drv["MDate"]);
-                    dr["時間"] = md.ToString("yyyy/MM/dd HH:mm:ss");
-                    dr["內容"] = drv["InformationContent"].ToString();
-                    dr["人員"] = drv["MUser"].ToString();
-
-                    dtAnnounce.Rows.Add(dr);
                 }
-            } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
             }
+            T form = new T();
+            form.StartPosition = FormStartPosition.CenterScreen;
+            form.Show();
+        }
+        private void MenuItemClickDeputy<T>() where T : Form, new() {
+            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
+                if (iForm.GetType() == typeof(T)) {
+                    iForm.BringToFront();
+                    return;
+                }
+            }
+            T form = new T();
+            form.StartPosition = FormStartPosition.CenterScreen;
+            form.Show();
         }
 
         private void 標的SummaryToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmUnderlyingSummary frmUnderlyingSummary = null;
+            MenuItemClick<FrmUnderlyingSummary>();
+            /*FrmUnderlyingSummary frmUnderlyingSummary = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmUnderlyingSummary)) {
@@ -228,11 +229,12 @@ namespace WarrantAssistant
                 frmUnderlyingSummary = new FrmUnderlyingSummary();
                 frmUnderlyingSummary.StartPosition = FormStartPosition.CenterScreen;
                 frmUnderlyingSummary.Show();
-            }
+            }*/
         }
 
         private void 標的發行檢查ToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmIssueCheck frmIssueCheck = null;
+            MenuItemClick<FrmIssueCheck>();
+            /*FrmIssueCheck frmIssueCheck = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmIssueCheck)) {
@@ -247,11 +249,12 @@ namespace WarrantAssistant
                 frmIssueCheck = new FrmIssueCheck();
                 frmIssueCheck.StartPosition = FormStartPosition.CenterScreen;
                 frmIssueCheck.Show();
-            }
+            }*/
         }
 
         private void put發行檢查ToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmIssueCheckPut frmIssueCheckPut = null;
+            MenuItemClick<FrmIssueCheckPut>();
+            /*FrmIssueCheckPut frmIssueCheckPut = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmIssueCheckPut)) {
@@ -266,11 +269,12 @@ namespace WarrantAssistant
                 frmIssueCheckPut = new FrmIssueCheckPut();
                 frmIssueCheckPut.StartPosition = FormStartPosition.CenterScreen;
                 frmIssueCheckPut.Show();
-            }
+            }*/
         }
 
         private void 已發行權證ToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmWarrant frmWarrant = null;
+            MenuItemClick<FrmWarrant>();
+            /*FrmWarrant frmWarrant = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmWarrant)) {
@@ -285,11 +289,12 @@ namespace WarrantAssistant
                 frmWarrant = new FrmWarrant();
                 frmWarrant.StartPosition = FormStartPosition.CenterScreen;
                 frmWarrant.Show();
-            }
+            }*/
         }
 
         private void 可增額列表ToolStripMenuItem1_Click(object sender, EventArgs e) {
-            FrmReIssueInput frmReIssueInput = null;
+            MenuItemClick<FrmReIssueInput>();
+            /*FrmReIssueInput frmReIssueInput = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmReIssueInput)) {
@@ -304,11 +309,12 @@ namespace WarrantAssistant
                 frmReIssueInput = new FrmReIssueInput();
                 frmReIssueInput.StartPosition = FormStartPosition.CenterScreen;
                 frmReIssueInput.Show();
-            }
+            }*/
         }
 
         private void 可增額列表ToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmReIssuable frmReIssuable = null;
+            MenuItemClick<FrmReIssuable>();
+            /*FrmReIssuable frmReIssuable = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmReIssuable)) {
@@ -323,11 +329,12 @@ namespace WarrantAssistant
                 frmReIssuable = new FrmReIssuable();
                 frmReIssuable.StartPosition = FormStartPosition.CenterScreen;
                 frmReIssuable.Show();
-            }
+            }*/
         }
 
         private void 試算表ToolStripMenuItem_Click(object sender, EventArgs e) {
-            Frm71 frm71 = null;
+            MenuItemClick<Frm71>();
+            /*Frm71 frm71 = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(Frm71)) {
@@ -342,11 +349,12 @@ namespace WarrantAssistant
                 frm71 = new Frm71();
                 frm71.StartPosition = FormStartPosition.CenterScreen;
                 frm71.Show();
-            }
+            }*/
         }
 
         private void 發行條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmApply frmApply = null;
+            MenuItemClick<FrmApply>();
+            /*FrmApply frmApply = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmApply)) {
@@ -363,7 +371,7 @@ namespace WarrantAssistant
                 frmApply.userName = GlobalVar.globalParameter.userName;
                 frmApply.StartPosition = FormStartPosition.CenterScreen;
                 frmApply.Show();
-            }
+            }*/
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
@@ -376,20 +384,6 @@ namespace WarrantAssistant
             info = toolStripTextBox1.Text;
             if (info != "") {
                 GlobalUtility.logInfo("Announce", info);
-                /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                List<SqlParameter> psInfo = new List<SqlParameter>();
-                psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
-
-                SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                hInfo.SetParameterValue("@MDate", DateTime.Now);
-                hInfo.SetParameterValue("@InformationType", "Announce");
-                hInfo.SetParameterValue("@InformationContent", info);
-                hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                hInfo.ExecuteCommand();
-                hInfo.Dispose();*/
 
                 toolStripTextBox1.Text = "";
                 LoadUltraGrid2();//
@@ -397,7 +391,8 @@ namespace WarrantAssistant
         }
 
         private void 增額條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmReIssue frmReIssue = null;
+            MenuItemClick<FrmReIssue>();
+            /*FrmReIssue frmReIssue = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmReIssue)) {
@@ -414,11 +409,12 @@ namespace WarrantAssistant
                 frmReIssue.userName = GlobalVar.globalParameter.userName;
                 frmReIssue.StartPosition = FormStartPosition.CenterScreen;
                 frmReIssue.Show();
-            }
+            }*/
         }
 
         private void 搶額度總表含增額ToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmApplyTotalList frmApplyTotalList = null;
+            MenuItemClick<FrmApplyTotalList>();
+            /*FrmApplyTotalList frmApplyTotalList = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmApplyTotalList)) {
@@ -433,11 +429,12 @@ namespace WarrantAssistant
                 frmApplyTotalList = new FrmApplyTotalList();
                 frmApplyTotalList.StartPosition = FormStartPosition.CenterScreen;
                 frmApplyTotalList.Show();
-            }
+            }*/
         }
 
         private void 發行總表ToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmIssueTotal frmIssueTotal = null;
+            MenuItemClick<FrmIssueTotal>();
+            /*FrmIssueTotal frmIssueTotal = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmIssueTotal)) {
@@ -452,11 +449,12 @@ namespace WarrantAssistant
                 frmIssueTotal = new FrmIssueTotal();
                 frmIssueTotal.StartPosition = FormStartPosition.CenterScreen;
                 frmIssueTotal.Show();
-            }
+            }*/
         }
 
         private void 增額總表ToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmReIssueTotal frmReIssueTotal = null;
+            MenuItemClick<FrmReIssueTotal>();
+            /*FrmReIssueTotal frmReIssueTotal = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmReIssueTotal)) {
@@ -471,51 +469,41 @@ namespace WarrantAssistant
                 frmReIssueTotal = new FrmReIssueTotal();
                 frmReIssueTotal.StartPosition = FormStartPosition.CenterScreen;
                 frmReIssueTotal.Show();
-            }
+            }*/
         }
 
         private void 代理人發行條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmApply frmApplyDeputy = null;
-
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmApply)) {
-                    frmApplyDeputy = (FrmApply) iForm;
-                    break;
+                    iForm.BringToFront();
+                    return;
                 }
             }
+            FrmApply frmApplyDeputy = new FrmApply();
+            frmApplyDeputy.userID = GlobalVar.globalParameter.userDeputy;
+            frmApplyDeputy.StartPosition = FormStartPosition.CenterScreen;
+            frmApplyDeputy.Show();
 
-            if (frmApplyDeputy != null)
-                frmApplyDeputy.BringToFront();
-            else {
-                frmApplyDeputy = new FrmApply();
-                frmApplyDeputy.userID = GlobalVar.globalParameter.userDeputy;
-                frmApplyDeputy.StartPosition = FormStartPosition.CenterScreen;
-                frmApplyDeputy.Show();
-            }
         }
 
-        private void 代理人增額條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmReIssue frmReIssue = null;
-
+        private void 代理人增額條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {            
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmReIssue)) {
-                    frmReIssue = (FrmReIssue) iForm;
-                    break;
+                    iForm.BringToFront();
+                    return;
                 }
             }
 
-            if (frmReIssue != null)
-                frmReIssue.BringToFront();
-            else {
-                frmReIssue = new FrmReIssue();
-                frmReIssue.userID = GlobalVar.globalParameter.userDeputy;
-                frmReIssue.StartPosition = FormStartPosition.CenterScreen;
-                frmReIssue.Show();
-            }
+            FrmReIssue frmReIssue = new FrmReIssue();
+            frmReIssue.userID = GlobalVar.globalParameter.userDeputy;
+            frmReIssue.StartPosition = FormStartPosition.CenterScreen;
+            frmReIssue.Show();
+
         }
 
         private void 詳細LOGToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmLog frmLog = null;
+            MenuItemClick<FrmLog>();
+            /*FrmLog frmLog = null;
 
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmLog)) {
@@ -530,7 +518,7 @@ namespace WarrantAssistant
                 frmLog = new FrmLog();
                 frmLog.StartPosition = FormStartPosition.CenterScreen;
                 frmLog.Show();
-            }
+            }*/
         }
 
         private void 轉申請發行TXTToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -619,7 +607,7 @@ namespace WarrantAssistant
                             if (applyKind == "2")
                                 tseReissue++;
                         } else if (market == "OTC") {
-                             //otcWriter.WriteFile(writestr);
+                            //otcWriter.WriteFile(writestr);
                             otcWriter.WriteLine(writestr);
                             otcCount++;
                             if (useReward == "1")
@@ -631,30 +619,16 @@ namespace WarrantAssistant
                     }
                 }
 
-                if (tseWriter != null)                     
+                if (tseWriter != null)
                     tseWriter.Close();
-                    //tseWriter.Dispose(); 
-                if (otcWriter != null)                    
+                //tseWriter.Dispose(); 
+                if (otcWriter != null)
                     otcWriter.Close();
-                    //otcWriter.Dispose(); 
+                //otcWriter.Dispose(); 
 
                 string infoStr = "TSE 共" + tseCount + "檔，增額" + tseReissue + "檔，獎勵" + tseReward + "檔。\nOTC共" + otcCount + "檔，增額" + otcReissue + "檔，獎勵" + otcReward + "檔。";
 
                 GlobalUtility.logInfo("Info", "今日共申請" + (tseCount + otcCount) + "檔權證發行/增額");
-                /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                List<SqlParameter> psInfo = new List<SqlParameter>();
-                psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
-
-                SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                hInfo.SetParameterValue("@MDate", DateTime.Now);
-                hInfo.SetParameterValue("@InformationType", "Info");
-                hInfo.SetParameterValue("@InformationContent", "今日共申請"+(tseCount+otcCount)+"檔權證發行/增額");
-                hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                hInfo.ExecuteCommand();
-                hInfo.Dispose();*/
 
                 MessageBox.Show("轉TXT檔完成!\n" + infoStr);
 
@@ -838,21 +812,7 @@ namespace WarrantAssistant
                     if (app != null)
                         app.Quit();
 
-                    GlobalUtility.logInfo("Log", GlobalVar.globalParameter.userID + "產發行上傳檔");
-                    /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                    List<SqlParameter> psInfo = new List<SqlParameter>();
-                    psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                    psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                    psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                    psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
-
-                    SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                    hInfo.SetParameterValue("@MDate", DateTime.Now);
-                    hInfo.SetParameterValue("@InformationType", "Log");
-                    hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID + "產發行上傳檔");
-                    hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                    hInfo.ExecuteCommand();
-                    hInfo.Dispose();*/
+                    GlobalUtility.logInfo("Log", GlobalVar.globalParameter.userID + "產發行上傳檔");                 
 
                     MessageBox.Show("發行上傳檔完成!");
                 } else {
