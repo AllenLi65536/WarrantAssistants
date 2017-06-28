@@ -48,7 +48,7 @@ namespace WarrantDataManager2._0
         }
 
         private static void checkIsLevelA() {
-            DataTable isA = MSSQL.ExecSqlQry(@"select FLGDAT_FLGDSC from EDAISYS.dbo.FLAGDATAS "
+            DataTable isA = MSSQL.ExecSqlQry("select FLGDAT_FLGDSC from EDAISYS.dbo.FLAGDATAS "
                                          + " where FLGDAT_FLGVAR + 1911 = DATEPART(yyyy, GETDATE())"
                                          + " AND FLGDAT_FLGDTA = DATEPART(q, GETDATE())"
                                          + " AND FLGDAT_FLGNAM = 'WRT_MARKET_RATING'",

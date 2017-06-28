@@ -153,6 +153,10 @@ namespace WarrantDataManager2._0
                 string sql = "select [標的代號] from ETF持股明細表 where 股票代號 = '0050' and 日期 = '" + GlobalVar.globalParameter.lastTradeDate.ToString("yyyyMMdd") + "'";
 
                 ADODB.Recordset rs = cn.CMExecute(ref arg, srvLocation, cnPort, sql);
+                /*DataTable etf = CMoney.ExecCMoneyQry(sql);
+                foreach(DataRow row in etf.Rows) {
+                    tw50Stocks.Add(row["標的代號"].ToString());
+                }*/
 
                 for (; !rs.EOF; rs.MoveNext())
                     tw50Stocks.Add(Convert.ToString(rs.Fields["標的代號"].Value));
@@ -364,6 +368,7 @@ namespace WarrantDataManager2._0
         private void getWatchStock() {
             try {
                 //找到前六個交易日的日期
+                //WARNING!! Problems happen around Chinese new year!!
                 string dStr = "";
                 //DataView dv = DeriLib.Util.ExecSqlQry("SELECT TOP 6 CONVERT(VARCHAR, TradeDate,112) TD FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);
                 DataTable dv = MSSQL.ExecSqlQry("SELECT TOP 6 CONVERT(VARCHAR, TradeDate,112) TD FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate desc", GlobalVar.loginSet.tsquoteSqlConnString);

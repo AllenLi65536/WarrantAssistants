@@ -11,6 +11,7 @@ using Infragistics.Shared;
 using Infragistics.Win;
 using Infragistics.Win.UltraWinGrid;
 using System.Data.SqlClient;
+using EDLib.SQL;
 
 
 namespace WarrantAssistant
@@ -330,26 +331,18 @@ namespace WarrantAssistant
             string sql2 = @"SELECT [UnderlyingID]";
             sql2 += " FROM [EDIS].[dbo].[ApplyTempList] as A left join Underlying_TraderIssue as B on A.UnderlyingID = B.UID "; //or(A.UnderlyingID = 'IX0001' and B.UID ='TWA00')
             sql2 += " WHERE [UserID]='" + userID + "' AND [ConfirmChecked]='Y' and ((Reason=0  and A.CP='C') or (ReasonP = 0 and A.CP = 'P'))";//
-                        
-            DataTable noReason = new DataTable("noReason");
-            conn.Open();
-            SqlDataAdapter dataAdapter1 = new SqlDataAdapter(sql2, conn);
-            dataAdapter1.Fill(noReason);
-            conn.Close();
-            dataAdapter1.Dispose();
+
+            DataTable noReason = MSSQL.ExecSqlQry(sql2, conn);// new DataTable("noReason");            
             
             foreach (DataRow Row in noReason.Rows) {
                 MessageBox.Show(Row["UnderlyingID"] + " 未輸入發行原因");
                 undoneReason = false;
             }
-            /*foreach (Infragistics.Win.UltraWinGrid.UltraGridRow r in ultraGrid1.Rows) {
-                if (Convert.ToInt32(r.Cells["發行原因"].Value) == 0 ) { // && r.Cells["標的代號"].Value.ToString()!="IX0001"
-                    MessageBox.Show(r.Cells["標的代號"].Value + " 未輸入發行原因");
-                    undoneReason = false;
-                }
-            }*/
-
+           
             return undoneReason;
+        }
+        private void CheckRelation() {
+
         }
 
         private void UpdateData() {
@@ -572,8 +565,7 @@ namespace WarrantAssistant
         private void OfficiallyApply() {
             try {
                 //CheckReason();
-                //if (!CheckData())
-                //   return;
+                //CheckRelation();
 
                 UpdateData();
                 string sql1 = "DELETE FROM [EDIS].[dbo].[ApplyOfficial] WHERE [UserID]='" + userID + "'";

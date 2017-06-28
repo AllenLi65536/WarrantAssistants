@@ -52,14 +52,29 @@ namespace WarrantDataManager2._0
             try {
                 conn.Open();
                 //更新可發行標的代號，標的名稱，交易員代號，交易員名稱，標的全名
-
-                MSSQL.ExecSqlCmd(@"INSERT INTO [EDIS].[dbo].[WarrantUnderlying] (UnderlyingID, UnderlyingIDCMoney, UnderlyingName, TraderID, TraderName, StockType, FullName) 
+                /*MSSQL.ExecSqlCmd(@"INSERT INTO [EDIS].[dbo].[WarrantUnderlying] (UnderlyingID, UnderlyingIDCMoney, UnderlyingName, TraderID, TraderName, StockType, FullName) 
                                    SELECT a.[WRTCAN_STKID], a.[WRTCAN_CMONEY_ID], b.[FLGDAT_FLGDTA], ISNULL(c.[TraderAccount],'7643'), ISNULL(c.[TraderName],'Aaron'), a.[WRTCAN_STOCKTYPE], a.[WRTCAN_FULL_NAME] 
                                    FROM [10.7.0.52].[WAFT].[dbo].[V_CANDIDATE] a 
                                    LEFT JOIN [10.7.0.52].[WAFT].[dbo].[V_FLAGDATA_STOCK_UNDERLYING_NAME_LIST] b ON a.[WRTCAN_STKID]=b.[FLGDAT_FLGVAR] 
                                    LEFT JOIN [10.19.1.20].[EDIS].[dbo].[Underlying_Trader] c ON a.[WRTCAN_STKID]=c.UID COLLATE Chinese_Taiwan_Stroke_CI_AS
-                                   WHERE a.[WRTCAN_CAN_ISSUE]='1'", conn);
+                                   WHERE a.[WRTCAN_CAN_ISSUE]='1'", conn);*/
                 // LEFT JOIN [10.10.1.30].[EDIS].[dbo].[Underlying_TraderIssue] c ON a.[WRTCAN_STKID]=c.UID COLLATE Chinese_Taiwan_Stroke_CI_AS
+                MSSQL.ExecSqlCmd(@"INSERT INTO [EDIS].[dbo].[WarrantUnderlying] (UnderlyingID, UnderlyingIDCMoney, UnderlyingName, TraderID, TraderName, StockType, FullName) 
+select C.WRTCAN_STKID, C.WRTCAN_CMONEY_ID, C.WRTCAN_SHORT_NAME, C.TraderAssount, C.TraderName, C.WRTCAN_STOCKTYPE, C.WRTCAN_FULL_NAME from 
+(SELECT A.WRTCAN_STKID, A.WRTCAN_CMONEY_ID, A.WRTCAN_SHORT_NAME, ISNULL(B.TraderAccount,'7643') as TraderAssount, ISNULL(B.TraderName,'Aaron') as TraderName, A.WRTCAN_STOCKTYPE, A.WRTCAN_FULL_NAME,    
+    CASE WHEN (WRTCAN_STOCKTYPE = 'DI' OR WRTCAN_STOCKTYPE = 'DE') AND (AUT.FLGDAT_FLGVAR is null OR AUT.FLGDAT_FLGVAR = 0 OR AUT.FLGDAT_FLGVAR < CONVERT(VARCHAR, GETDATE(), 112)) THEN '未授權'                       
+    WHEN WRTCAN_STOCKTYPE = 'DS' AND A.WRTCAN_STKID IN('2883', '6005') THEN '未授權'
+    WHEN (WRTCAN_STOCKTYPE = 'DS' OR WRTCAN_STOCKTYPE = 'DR') AND A.WRTCAN_SOURCE = 'STOCK_A' AND (RATING.FLGDAT_FLGDSC <> 'A' OR RATING.FLGDAT_FLGDSC is null) THEN '非A級券商'               
+    ELSE '1'
+    END as CHECK_CAN_ISSUE
+FROM [10.7.0.52].[WAFT].[dbo].[CANDIDATE] as A WITH(NOLOCK)
+LEFT JOIN  [10.7.0.52].EDAISYS.dbo.FLAGDATAS as AUT WITH(NOLOCK)
+    ON WRTCAN_INSNBR = AUT.FLGDAT_FLGNBR AND AUT.FLGDAT_FLGNAM = 'WRT_AUTHORIZATION_MAINTAIN' AND AUT.FLGDAT_FLGNBR = A.WRTCAN_INSNBR 
+LEFT JOIN  [10.7.0.52].EDAISYS.dbo.FLAGDATAS as RATING WITH (NOLOCK)
+     ON RATING.FLGDAT_FLGVAR + 1911 = DATEPART(yyyy,GETDATE()) AND RATING.FLGDAT_FLGDTA = DATEPART(q,GETDATE()) AND RATING.FLGDAT_FLGNAM = 'WRT_MARKET_RATING'
+LEFT JOIN [10.19.1.20].[EDIS].[dbo].[Underlying_Trader] as B ON A.[WRTCAN_STKID]=B.UID COLLATE Chinese_Taiwan_Stroke_CI_AS
+WHERE A.WRTCAN_DATE = ( SELECT MAX(WRTCAN_DATE) FROM  [10.7.0.52].WAFT.dbo.CANDIDATE WHERE WRTCAN_VER = 1) AND A.WRTCAN_VER = 1)as C
+WHERE C.CHECK_CAN_ISSUE = '1'", conn);
 
 
                 //先預設市場是TSE，以免有些比對不到
@@ -172,21 +187,18 @@ namespace WarrantDataManager2._0
 
             conn.Open();
             MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantUnderlyingCredit (UnderlyingID, MDate, DataDate, Market, AvailableShares, IssuedPercent, CanIssue, CanFurthurIssue)
-                                            SELECT
-                                                QUOTA.ISUQTA_STKID, QUOTA.ISUQTA_CREATME, QUOTA.ISUQTA_DATE, SUBSTRING(QUOTA.ISUQTA_MKTTYPE,4,3), (QUOTA.ISUQTA_FOR_WARRANT_SHARES/1000), QUOTA.ISUQTA_ISSUED_PERCENT,
-                                                (CANDI.尚可發行額度- QUOTA.ISUQTA_ISSUED_PERCENT) / 100.0 * QUOTA.ISUQTA_FOR_WARRANT_SHARES / 1000.0,
-                                                (CANDI.增額發行額度- QUOTA.ISUQTA_ISSUED_PERCENT) / 100.0 * QUOTA.ISUQTA_FOR_WARRANT_SHARES / 1000.0
-                                            FROM 
-                                            [10.7.0.52].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] AS QUOTA,
-                                            (
-                                            SELECT
-                                                WRTCAN_STKID,
-                                                CASE WHEN WRTCAN_STOCKTYPE = 'DE' THEN 100 ELSE 22 END AS 尚可發行額度,
-                                                CASE WHEN WRTCAN_STOCKTYPE = 'DE' THEN 100 ELSE 30 END AS 增額發行額度
-                                                FROM [10.7.0.52].[WAFT].[dbo].[V_CANDIDATE]
-                                                ) AS CANDI
-                                            WHERE QUOTA.ISUQTA_DATE= ( SELECT MAX(ISUQTA_DATE) FROM [10.7.0.52].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] )
-                                            AND QUOTA.ISUQTA_STKID = CANDI.WRTCAN_STKID", conn);
+                               SELECT
+                                QUOTA.ISUQTA_STKID, QUOTA.ISUQTA_CREATME, QUOTA.ISUQTA_DATE, SUBSTRING(QUOTA.ISUQTA_MKTTYPE,4,3), (QUOTA.ISUQTA_FOR_WARRANT_SHARES/1000), QUOTA.ISUQTA_ISSUED_PERCENT,
+                                (CANDI.尚可發行額度- QUOTA.ISUQTA_ISSUED_PERCENT) / 100.0 * QUOTA.ISUQTA_FOR_WARRANT_SHARES / 1000.0,
+                                (CANDI.增額發行額度- QUOTA.ISUQTA_ISSUED_PERCENT) / 100.0 * QUOTA.ISUQTA_FOR_WARRANT_SHARES / 1000.0
+                               FROM [10.7.0.52].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] AS QUOTA,
+                               (SELECT
+                                    WRTCAN_STKID,
+                                    CASE WHEN WRTCAN_STOCKTYPE = 'DE' THEN 100 ELSE 22 END AS 尚可發行額度,
+                                    CASE WHEN WRTCAN_STOCKTYPE = 'DE' THEN 100 ELSE 30 END AS 增額發行額度
+                                FROM [10.7.0.52].[WAFT].[dbo].[V_CANDIDATE]) AS CANDI
+                                WHERE QUOTA.ISUQTA_DATE= ( SELECT MAX(ISUQTA_DATE) FROM [10.7.0.52].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] )
+                                AND QUOTA.ISUQTA_STKID = CANDI.WRTCAN_STKID", conn);
             MSSQL.ExecSqlCmd(sql, conn);
             conn.Close();
         }
@@ -213,12 +225,8 @@ namespace WarrantDataManager2._0
 
         private void insertWarrantUnderlyingSummary() {
             //更新標的代號，標的名稱，交易員代號，市場，額度，累計損益
-            /*SqlCommand cmd = new SqlCommand(@"INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssuedPercent, AccNetIncome)
-                                              SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), b.CanIssue, b.IssuedPercent, IsNull(c.AccNetIncome,0)
-                                              FROM [EDIS].[dbo].[WarrantUnderlying] a
-                                              LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingCredit] b on a.UnderlyingID=b.UnderlyingID
-                                              LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID", conn);
-            /*SqlCommand cmd = new SqlCommand(@"Update EDIS.dbo.WarrantUnderlyingSummary  set UnderlyingID=i.UnderlyingID , UnderlyingName=i.[UnderlyingName], TraderID = i.[TraderID], Market= i.[Market], PutIssuable= i.canIssueP, IssueCredit=i.canIssue, IssuedPercent=i.IssuedPercent, AccNetIncome=i.accNI
+            /*SqlCommand cmd = new SqlCommand(@"Update EDIS.dbo.WarrantUnderlyingSummary  set UnderlyingID=i.UnderlyingID , UnderlyingName=i.[UnderlyingName], TraderID = i.[TraderID], Market= i.[Market], PutIssuable= i.canIssueP,
+             *  IssueCredit=i.canIssue, IssuedPercent=i.IssuedPercent, AccNetIncome=i.accNI
                                                from (SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y') canIssueP, b.CanIssue canIssue, b.IssuedPercent, IsNull(c.AccNetIncome,0) accNI
                                               FROM [EDIS].[dbo].[WarrantUnderlying] a
                                               LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingCredit] b on a.UnderlyingID=b.UnderlyingID
@@ -226,10 +234,10 @@ namespace WarrantDataManager2._0
 
             conn.Open();
             MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssuedPercent, AccNetIncome)
-                                              SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), b.CanIssue, b.IssuedPercent, IsNull(c.AccNetIncome,0)
-                                              FROM [EDIS].[dbo].[WarrantUnderlying] a
-                                              LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingCredit] b on a.UnderlyingID=b.UnderlyingID
-                                              LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID", conn);
+                               SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), b.CanIssue, b.IssuedPercent, IsNull(c.AccNetIncome,0)
+                               FROM [EDIS].[dbo].[WarrantUnderlying] a
+                               LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingCredit] b on a.UnderlyingID=b.UnderlyingID
+                               LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID", conn);
 
             //更新獎勵額度
             string sql = @"SELECT a.[UnderlyingID], a.[AvailableShares], IsNull(b.[UsedRewardNum],0) UsedRewardNum
@@ -251,7 +259,7 @@ namespace WarrantDataManager2._0
                 double used = Convert.ToDouble(dr["UsedRewardNum"]);
                 double remainCredit = 0.0;
                 //若本季為A級券商
-                if (GlobalVar.globalParameter.isLevelA == true)
+                if (GlobalVar.globalParameter.isLevelA)
                     remainCredit = availableShares * GlobalVar.globalParameter.givenRewardPercent - used;
 
                 h.SetParameterValue("@UnderlyingID", underlyingID);
@@ -311,7 +319,7 @@ namespace WarrantDataManager2._0
                     issuable = true;
 
                 string issuablesString = "Y";
-                if (issuable == false)
+                if (!issuable)
                     issuablesString = "N";
 
                 h2.SetParameterValue("@UnderlyingID", underlyingID);

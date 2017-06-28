@@ -153,53 +153,6 @@ namespace WarrantAssistant
             grid.DisplayLayout.Bands[0].Columns["人員"].CellActivation = Activation.NoEdit;
 
         }
-        /*public void SetUltraGrid1() {
-            dtInfo.Columns.Add("時間", typeof(string));
-            dtInfo.Columns.Add("內容", typeof(string));
-            dtInfo.Columns.Add("人員", typeof(string));
-
-            ultraGrid1.DataSource = dtInfo;
-
-            ultraGrid1.DisplayLayout.Bands[0].Columns["時間"].Width = 60;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["人員"].Width = 30;
-            //ultraGrid1.DisplayLayout.Bands[0].Override.HeaderAppearance.TextHAlign = Infragistics.Win.HAlign.Left;
-            ultraGrid1.DisplayLayout.Bands[0].ColHeadersVisible = false;
-            ultraGrid1.DisplayLayout.AutoFitStyle = AutoFitStyle.ResizeAllColumns;
-            ultraGrid1.DisplayLayout.Override.CellAppearance.BorderAlpha = Alpha.Transparent;
-            ultraGrid1.DisplayLayout.Override.RowAppearance.BorderAlpha = Alpha.Transparent;
-            ultraGrid1.DisplayLayout.Bands[0].Columns[2].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Right;
-            ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
-            ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
-            ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.False;
-
-            ultraGrid1.DisplayLayout.Bands[0].Columns["時間"].CellActivation = Activation.NoEdit;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["內容"].CellActivation = Activation.NoEdit;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["人員"].CellActivation = Activation.NoEdit;
-        }
-
-        public void SetUltraGrid2() {
-            dtAnnounce.Columns.Add("時間", typeof(string));
-            dtAnnounce.Columns.Add("內容", typeof(string));
-            dtAnnounce.Columns.Add("人員", typeof(string));
-
-            ultraGrid2.DataSource = dtAnnounce;
-
-            ultraGrid2.DisplayLayout.Bands[0].Columns["時間"].Width = 60;
-            ultraGrid2.DisplayLayout.Bands[0].Columns["人員"].Width = 30;
-            //ultraGrid2.DisplayLayout.Bands[0].Override.HeaderAppearance.TextHAlign = Infragistics.Win.HAlign.Left;
-            ultraGrid2.DisplayLayout.Bands[0].ColHeadersVisible = false;
-            ultraGrid2.DisplayLayout.AutoFitStyle = AutoFitStyle.ResizeAllColumns;
-            ultraGrid2.DisplayLayout.Override.CellAppearance.BorderAlpha = Alpha.Transparent;
-            ultraGrid2.DisplayLayout.Override.RowAppearance.BorderAlpha = Alpha.Transparent;
-            ultraGrid2.DisplayLayout.Bands[0].Columns[2].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Right;
-            ultraGrid2.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
-            ultraGrid2.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
-            ultraGrid2.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.False;
-
-            ultraGrid2.DisplayLayout.Bands[0].Columns["時間"].CellActivation = Activation.NoEdit;
-            ultraGrid2.DisplayLayout.Bands[0].Columns["內容"].CellActivation = Activation.NoEdit;
-            ultraGrid2.DisplayLayout.Bands[0].Columns["人員"].CellActivation = Activation.NoEdit;
-        }*/
 
         public void LoadUltraGrid1() {
             try {
