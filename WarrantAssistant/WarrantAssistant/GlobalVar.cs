@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace WarrantAssistant
 {
-    
+
     public class GlobalVar
     {
         public static MainForm mainForm;
@@ -20,8 +20,7 @@ namespace WarrantAssistant
     }
     public class GlobalUtility
     {
-        public static void Start()
-        {
+        public static void Start() {
             loadLoginSet();
             loadGlobalParameters();
             //GlobalVar.errProcess = new ErrProcess();
@@ -33,7 +32,7 @@ namespace WarrantAssistant
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(T)) {
                     iForm.BringToFront();
-                    return (T)iForm;
+                    return (T) iForm;
                 }
             }
             T form = new T();
@@ -43,11 +42,81 @@ namespace WarrantAssistant
         }
 
         public static void SelectUnderlying(string underlyingID, DataGridView dataGridView1) {
-            for (int i = 0; i < dataGridView1.Rows.Count; i++) {                
-                if ((string) dataGridView1.Rows[i].Cells[0].Value == underlyingID) 
+            for (int i = 0; i < dataGridView1.Rows.Count; i++) {
+                if ((string) dataGridView1.Rows[i].Cells[0].Value == underlyingID) {
                     dataGridView1.CurrentCell = dataGridView1.Rows[i].Cells[0];//PROBLEM!!! Row[i-1]?
+                    //MessageBox.Show(underlyingID +" " + dataGridView1.Rows[i].Cells[0].Value + " " + dataGridView1.Rows[i - 1].Cells[0]);
+                }
             }
         }
+        public static void KeyDecoder(KeyEventArgs e, ref string enteredKey) {
+            if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back) {
+                if (enteredKey.Length > 0)
+                    enteredKey = enteredKey.Substring(0, enteredKey.Length - 1);
+            } else if (e.KeyCode == Keys.Escape)
+                enteredKey = "";
+            else {
+                if (e.KeyCode == Keys.NumPad0 || e.KeyCode == Keys.D0)
+                    enteredKey += "0";
+                else if (e.KeyCode == Keys.NumPad1 || e.KeyCode == Keys.D1)
+                    enteredKey += "1";
+                else if (e.KeyCode == Keys.NumPad2 || e.KeyCode == Keys.D2)
+                    enteredKey += "2";
+                else if (e.KeyCode == Keys.NumPad3 || e.KeyCode == Keys.D3)
+                    enteredKey += "3";
+                else if (e.KeyCode == Keys.NumPad4 || e.KeyCode == Keys.D4)
+                    enteredKey += "4";
+                else if (e.KeyCode == Keys.NumPad5 || e.KeyCode == Keys.D5)
+                    enteredKey += "5";
+                else if (e.KeyCode == Keys.NumPad6 || e.KeyCode == Keys.D6)
+                    enteredKey += "6";
+                else if (e.KeyCode == Keys.NumPad7 || e.KeyCode == Keys.D7)
+                    enteredKey += "7";
+                else if (e.KeyCode == Keys.NumPad8 || e.KeyCode == Keys.D8)
+                    enteredKey += "8";
+                else if (e.KeyCode == Keys.NumPad9 || e.KeyCode == Keys.D9)
+                    enteredKey += "9";
+                else if (e.KeyCode == Keys.B)
+                    enteredKey += "B";
+                else if (e.KeyCode == Keys.C)
+                    enteredKey += "C";
+                else if (e.KeyCode == Keys.P)
+                    enteredKey += "P";
+                else
+                    enteredKey += e.KeyCode.ToString();
+            }
+
+            /*if (e.KeyCode == Keys.NumPad0 || e.KeyCode == Keys.D0)
+                return '0';
+            else if (e.KeyCode == Keys.NumPad1 || e.KeyCode == Keys.D1)
+                return '1';
+            else if (e.KeyCode == Keys.NumPad2 || e.KeyCode == Keys.D2)
+                return '2';
+            else if (e.KeyCode == Keys.NumPad3 || e.KeyCode == Keys.D3)
+                return '3';
+            else if (e.KeyCode == Keys.NumPad4 || e.KeyCode == Keys.D4)
+                return '4';
+            else if (e.KeyCode == Keys.NumPad5 || e.KeyCode == Keys.D5)
+                return '5';
+            else if (e.KeyCode == Keys.NumPad6 || e.KeyCode == Keys.D6)
+                return '6';
+            else if (e.KeyCode == Keys.NumPad7 || e.KeyCode == Keys.D7)
+                return '7';
+            else if (e.KeyCode == Keys.NumPad8 || e.KeyCode == Keys.D8)
+                return '8';
+            else if (e.KeyCode == Keys.NumPad9 || e.KeyCode == Keys.D9)
+                return '9';
+            else if (e.KeyCode == Keys.B)
+                enteredKey += "B";
+            else if (e.KeyCode == Keys.C)
+                enteredKey += "C";
+            else if (e.KeyCode == Keys.P)
+                enteredKey += "P";
+            else
+                enteredKey += e.KeyCode.ToString();*/
+
+        }
+
         public static string GetHtml(string url) {
             string firstResponse = null;
             try {
@@ -71,23 +140,22 @@ namespace WarrantAssistant
         public static void LogInfo(string type, string content) {
             string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
             List<SqlParameter> psInfo = new List<SqlParameter>();
-            psInfo.Add(new SqlParameter("@MDate" , SqlDbType.DateTime));
-            psInfo.Add(new SqlParameter("@InformationType" , SqlDbType.VarChar));
-            psInfo.Add(new SqlParameter("@InformationContent" , SqlDbType.VarChar));
-            psInfo.Add(new SqlParameter("@MUser" , SqlDbType.VarChar));
+            psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
+            psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
+            psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
+            psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
 
-            SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString , sqlInfo , psInfo);
-            hInfo.SetParameterValue("@MDate" , DateTime.Now);
-            hInfo.SetParameterValue("@InformationType" , type);
-            hInfo.SetParameterValue("@InformationContent" , content);
-            hInfo.SetParameterValue("@MUser" , GlobalVar.globalParameter.userID);
+            SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
+            hInfo.SetParameterValue("@MDate", DateTime.Now);
+            hInfo.SetParameterValue("@InformationType", type);
+            hInfo.SetParameterValue("@InformationContent", content);
+            hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
             hInfo.ExecuteCommand();
             hInfo.Dispose();
 
         }
 
-        public static void loadLoginSet()
-        {
+        public static void loadLoginSet() {
             GlobalVar.loginSet = new LoginSet();
             GlobalVar.loginSet.edisSqlConnString = "SERVER=10.10.1.30;DATABASE=EDIS;UID=WarrantWeb;PWD=WarrantWeb";
             GlobalVar.loginSet.tsquoteSqlConnString = "SERVER=10.60.0.37;DATABASE=TsQuote;UID=WarrantWeb;PWD=WarrantWeb";
@@ -95,8 +163,7 @@ namespace WarrantAssistant
             GlobalVar.loginSet.warrantSysKeySqlConnString = "SERVER=10.7.0.52;DATABASE=EDAISYS;UID=eduser;PWD=eduser";
         }
 
-        public static void loadGlobalParameters()
-        {
+        public static void loadGlobalParameters() {
             if (GlobalVar.globalParameter == null)
                 GlobalVar.globalParameter = new GlobalParameter();
 
@@ -106,8 +173,7 @@ namespace WarrantAssistant
             getNextTradeDate();
             getLastTradeDate();
         }
-        private static void checkGlobal()
-        {
+        private static void checkGlobal() {
             DataView dv = DeriLib.Util.ExecSqlQry("SELECT [InterestRate],[GivenRewardPercent],[IsLevelA],[DayPerYear],[ResultTime] FROM [EDIS].[dbo].[Global]", GlobalVar.loginSet.edisSqlConnString);
             GlobalVar.globalParameter.interestRate = Convert.ToDouble(dv[0]["InterestRate"]);
             //A集券商獎勵額度目前為1%
@@ -118,8 +184,7 @@ namespace WarrantAssistant
             GlobalVar.globalParameter.resultTime = Convert.ToInt32(dv[0]["ResultTime"]);
 
         }
-        private static void checkIsTodayTradeDate()
-        {
+        private static void checkIsTodayTradeDate() {
             DataView dv = DeriLib.Util.ExecSqlQry("SELECT IsTrade FROM [TradeDate] WHERE CONVERT(VARCHAR, TradeDate, 112) = CONVERT(VARCHAR, GETDATE(), 112)", GlobalVar.loginSet.tsquoteSqlConnString);
             if (dv[0]["IsTrade"].ToString() == "Y")
                 GlobalVar.globalParameter.isTodayTradeDate = true;
@@ -127,40 +192,31 @@ namespace WarrantAssistant
                 GlobalVar.globalParameter.isTodayTradeDate = false;
         }
 
-        private static void getLastTradeDate()
-        {
-            try
-            {
+        private static void getLastTradeDate() {
+            try {
                 string sql = "SELECT TOP 1 TradeDate FROM TradeDate WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate desc";
                 DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
 
                 GlobalVar.globalParameter.lastTradeDate = Convert.ToDateTime(dv[0]["TradeDate"]);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[GlobalUtil_GetLastTradeDate][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
 
-        private static void getNextTradeDate()
-        {
-            try
-            {
+        private static void getNextTradeDate() {
+            try {
                 string sql = "SELECT TOP 3 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)>CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate";
                 DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
 
                 GlobalVar.globalParameter.nextTradeDate1 = Convert.ToDateTime(dv[0]["TradeDate"]);
                 GlobalVar.globalParameter.nextTradeDate2 = Convert.ToDateTime(dv[1]["TradeDate"]);
                 GlobalVar.globalParameter.nextTradeDate3 = Convert.ToDateTime(dv[2]["TradeDate"]);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[FrmIssueTable_GetNextTradeDate][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
 
-        public static void close()
-        {
+        public static void close() {
             if (GlobalVar.autoWork != null) { GlobalVar.autoWork.Dispose(); }
         }
     }
