@@ -57,7 +57,7 @@ namespace WarrantAssistant
             }
             catch (Exception ex)
             {
-                GlobalUtility.logInfo("Error", "InfoWork Error: " + ex.Message);
+                GlobalUtility.LogInfo("Error", "InfoWork Error: " + ex.Message);
                 /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                 List<SqlParameter> psInfo = new List<SqlParameter>();
                 psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
@@ -107,7 +107,7 @@ namespace WarrantAssistant
             }
             catch (Exception ex)
             {
-                GlobalUtility.logInfo("Error", "AnnounceWork Error: " + ex.Message);
+                GlobalUtility.LogInfo("Error", "AnnounceWork Error: " + ex.Message);
                 /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                 List<SqlParameter> psInfo = new List<SqlParameter>();
                 psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));

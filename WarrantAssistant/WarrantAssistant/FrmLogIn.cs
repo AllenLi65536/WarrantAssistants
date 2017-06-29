@@ -38,12 +38,12 @@ namespace WarrantAssistant
                     GlobalVar.globalParameter.userID = drTemp["UserID"].ToString();
                 }
                 loginOK = true;
-                GlobalUtility.logInfo("Log", GlobalVar.globalParameter.userID + " login.(IP)");
+                GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + " login.(IP)");
                 this.Close();
                 GlobalVar.mainForm.Start();
                 return true;
             }
-            GlobalUtility.logInfo("Log",IP+" login failed.");
+            GlobalUtility.LogInfo("Log",IP+" login failed.");
             return false;
         }
 
@@ -64,7 +64,7 @@ namespace WarrantAssistant
                     }
                     GlobalVar.globalParameter.userID = account;                    
                     loginOK = true;
-                    GlobalUtility.logInfo("Log", GlobalVar.globalParameter.userID + " login.(ID)");
+                    GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + " login.(ID)");
                     this.Close();
                     GlobalVar.mainForm.Start();
                 } else {
@@ -72,7 +72,7 @@ namespace WarrantAssistant
                     textBox2.Text = "";
                     textBox1.Text = "";
                     textBox1.Focus();
-                    GlobalUtility.logInfo("Log" , account + " login failed." + password);
+                    GlobalUtility.LogInfo("Log" , account + " login failed." + password);
                     Thread.Sleep(5000);
                     return;
                 }

@@ -319,7 +319,7 @@ namespace WarrantAssistant
 
                 toolStripLabel1.Text = DateTime.Now + "更新成功";
 
-                GlobalUtility.logInfo("Info", GlobalVar.globalParameter.userID + " 更新7-1試算表");
+                GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 更新7-1試算表");
                 /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                 List<SqlParameter> psInfo = new List<SqlParameter>();
                 psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
@@ -337,7 +337,7 @@ namespace WarrantAssistant
 
 
             } catch (Exception ex) {
-                GlobalUtility.logInfo("Exception", GlobalVar.globalParameter.userID + "7-1試算表" + ex.Message);
+                GlobalUtility.LogInfo("Exception", GlobalVar.globalParameter.userID + "7-1試算表" + ex.Message);
                 /*string sqlInfo = "INSERT INTO [InformationLog] values(@MDate, @InformationType, @InformationContent, @MUser)";
                 List<SqlParameter> psInfo = new List<SqlParameter>();
                 psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
@@ -431,12 +431,12 @@ namespace WarrantAssistant
             twseUrl = "http://siis.twse.com.tw/server-java/o_t150sa10?step=0&id=9200pd"+id+"&TYPEK=otc&key="+key;
             parsehtml(twseUrl);
 
-            GlobalUtility.logInfo("Info", GlobalVar.globalParameter.userID + " 下載7-1試算表");
+            GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 下載7-1試算表");
         }
 
         private void parsehtml(string url) {
 
-            string FirstResponse = GlobalUtility.getHtml(url);
+            string FirstResponse = GlobalUtility.GetHtml(url);
 
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(FirstResponse);            

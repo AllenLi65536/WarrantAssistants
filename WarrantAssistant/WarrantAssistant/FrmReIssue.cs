@@ -208,7 +208,7 @@ namespace WarrantAssistant
                 }
 
                 h.Dispose();
-                GlobalUtility.logInfo("Log", GlobalVar.globalParameter.userID + " 編輯/更新" + (i - 1) + "檔增額");
+                GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + " 編輯/更新" + (i - 1) + "檔增額");
                 /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                 List<SqlParameter> psInfo = new List<SqlParameter>();
                 psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
@@ -267,7 +267,7 @@ namespace WarrantAssistant
                 conn.Close();
 
                 toolStripLabel2.Text = DateTime.Now + "申請成功";
-                GlobalUtility.logInfo("Info", GlobalVar.globalParameter.userID + " 申請" + applyCount + "檔權證增額");
+                GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 申請" + applyCount + "檔權證增額");
                 /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                 List<SqlParameter> psInfo = new List<SqlParameter>();
                 psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
@@ -425,7 +425,7 @@ namespace WarrantAssistant
                     {
                         OfficiallyApply();
                         LoadData();
-                        GlobalUtility.logInfo("Announce", GlobalVar.globalParameter.userID + " 逾時申請" + applyCount + "檔權證增額");
+                        GlobalUtility.LogInfo("Announce", GlobalVar.globalParameter.userID + " 逾時申請" + applyCount + "檔權證增額");
                         /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                         List<SqlParameter> psInfo = new List<SqlParameter>();
                         psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));

@@ -29,15 +29,34 @@ namespace WarrantAssistant
             //GlobalVar.warrantPriceUpdator = new WarrantPriceUpdator();
             //GlobalVar.warrantPriceProcess = new WarrantPriceProcess();
         }
+        public static T MenuItemClick<T>() where T : Form, new() {
+            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
+                if (iForm.GetType() == typeof(T)) {
+                    iForm.BringToFront();
+                    return (T)iForm;
+                }
+            }
+            T form = new T();
+            form.StartPosition = FormStartPosition.CenterScreen;
+            form.Show();
+            return form;
+        }
 
-        public static string getHtml(string url) {
-            string FirstResponse = null;
+        public static void SelectUnderlying(string underlyingID, DataGridView dataGridView1) {
+            for (int i = 0; i < dataGridView1.Rows.Count; i++) {
+                string uID = (string) dataGridView1.Rows[i].Cells[0].Value;
+                if (uID == underlyingID)
+                    dataGridView1.CurrentCell = dataGridView1.Rows[i - 1].Cells[0];
+            }
+        }
+        public static string GetHtml(string url) {
+            string firstResponse = null;
             try {
                 WebRequest req = WebRequest.Create(url);
                 WebResponse resp = req.GetResponse();
                 Stream dataStream = resp.GetResponseStream();
                 StreamReader reader = new StreamReader(dataStream, System.Text.Encoding.Default);
-                FirstResponse = reader.ReadToEnd();
+                firstResponse = reader.ReadToEnd();
 
                 //Close connection
                 req.Abort();
@@ -47,10 +66,10 @@ namespace WarrantAssistant
             } catch (Exception err) {
                 MessageBox.Show(err.ToString());
             }
-            return FirstResponse;
+            return firstResponse;
         }
 
-        public static void logInfo(string type, string content) {
+        public static void LogInfo(string type, string content) {
             string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
             List<SqlParameter> psInfo = new List<SqlParameter>();
             psInfo.Add(new SqlParameter("@MDate" , SqlDbType.DateTime));

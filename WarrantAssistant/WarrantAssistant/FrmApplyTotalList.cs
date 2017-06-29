@@ -202,7 +202,7 @@ namespace WarrantAssistant
                 }
                 h2.Dispose();
 
-                GlobalUtility.logInfo("Info", GlobalVar.globalParameter.userID + " 更新搶額度總表");
+                GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 更新搶額度總表");
                 /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                 List<SqlParameter> psInfo = new List<SqlParameter>();
                 psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
@@ -511,7 +511,7 @@ namespace WarrantAssistant
                     frmIssueCheck.StartPosition = FormStartPosition.CenterScreen;
                     frmIssueCheck.Show();
                 }
-                frmIssueCheck.selectUnderlying(target);
+                frmIssueCheck.SelectUnderlying(target);
             }
         }
 
@@ -561,7 +561,7 @@ namespace WarrantAssistant
 
                 LoadData();
 
-                GlobalUtility.logInfo("Info", GlobalVar.globalParameter.userID + " 刪除一檔" + applyKind + ": " + warrantName);
+                GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 刪除一檔" + applyKind + ": " + warrantName);
                 /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                 List<SqlParameter> psInfo = new List<SqlParameter>();
                 psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));

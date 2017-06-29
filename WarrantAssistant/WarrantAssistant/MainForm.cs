@@ -56,9 +56,8 @@ namespace WarrantAssistant
             代理人發行條件輸入ToolStripMenuItem.Visible = false;
             代理人增額條件輸入ToolStripMenuItem.Visible = false;
 
-            // SetUltraGrid1();
+
             SetUltraGrid(dtInfo, ultraGrid1);
-            //SetUltraGrid2();
             SetUltraGrid(dtAnnounce, ultraGrid2);
 
             GlobalVar.autoWork = new AutoWork();
@@ -187,191 +186,38 @@ namespace WarrantAssistant
         }
         public void LoadUltraGrid2() {
             LoadUltraGrid(dtAnnounce, "Announce");
-        }
-
-        private void MenuItemClick<T>() where T : Form, new() {
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(T)) {
-                    iForm.BringToFront();
-                    return;
-                }
-            }
-            T form = new T();
-            form.StartPosition = FormStartPosition.CenterScreen;
-            form.Show();
-        }
-        private void MenuItemClickDeputy<T>() where T : Form, new() {
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(T)) {
-                    iForm.BringToFront();
-                    return;
-                }
-            }
-            T form = new T();
-            form.StartPosition = FormStartPosition.CenterScreen;
-            form.Show();
-        }
+        }               
 
         private void 標的SummaryToolStripMenuItem_Click(object sender, EventArgs e) {
-            MenuItemClick<FrmUnderlyingSummary>();
-            /*FrmUnderlyingSummary frmUnderlyingSummary = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmUnderlyingSummary)) {
-                    frmUnderlyingSummary = (FrmUnderlyingSummary) iForm;
-                    break;
-                }
-            }
-
-            if (frmUnderlyingSummary != null)
-                frmUnderlyingSummary.BringToFront();
-            else {
-                frmUnderlyingSummary = new FrmUnderlyingSummary();
-                frmUnderlyingSummary.StartPosition = FormStartPosition.CenterScreen;
-                frmUnderlyingSummary.Show();
-            }*/
+            GlobalUtility.MenuItemClick<FrmUnderlyingSummary>();
         }
 
         private void 標的發行檢查ToolStripMenuItem_Click(object sender, EventArgs e) {
-            MenuItemClick<FrmIssueCheck>();
-            /*FrmIssueCheck frmIssueCheck = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmIssueCheck)) {
-                    frmIssueCheck = (FrmIssueCheck) iForm;
-                    break;
-                }
-            }
-
-            if (frmIssueCheck != null)
-                frmIssueCheck.BringToFront();
-            else {
-                frmIssueCheck = new FrmIssueCheck();
-                frmIssueCheck.StartPosition = FormStartPosition.CenterScreen;
-                frmIssueCheck.Show();
-            }*/
+            GlobalUtility.MenuItemClick<FrmIssueCheck>();
         }
 
         private void put發行檢查ToolStripMenuItem_Click(object sender, EventArgs e) {
-            MenuItemClick<FrmIssueCheckPut>();
-            /*FrmIssueCheckPut frmIssueCheckPut = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmIssueCheckPut)) {
-                    frmIssueCheckPut = (FrmIssueCheckPut) iForm;
-                    break;
-                }
-            }
-
-            if (frmIssueCheckPut != null)
-                frmIssueCheckPut.BringToFront();
-            else {
-                frmIssueCheckPut = new FrmIssueCheckPut();
-                frmIssueCheckPut.StartPosition = FormStartPosition.CenterScreen;
-                frmIssueCheckPut.Show();
-            }*/
+            GlobalUtility.MenuItemClick<FrmIssueCheckPut>();
         }
 
         private void 已發行權證ToolStripMenuItem_Click(object sender, EventArgs e) {
-            MenuItemClick<FrmWarrant>();
-            /*FrmWarrant frmWarrant = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmWarrant)) {
-                    frmWarrant = (FrmWarrant) iForm;
-                    break;
-                }
-            }
-
-            if (frmWarrant != null)
-                frmWarrant.BringToFront();
-            else {
-                frmWarrant = new FrmWarrant();
-                frmWarrant.StartPosition = FormStartPosition.CenterScreen;
-                frmWarrant.Show();
-            }*/
+            GlobalUtility.MenuItemClick<FrmWarrant>();
         }
 
         private void 可增額列表ToolStripMenuItem1_Click(object sender, EventArgs e) {
-            MenuItemClick<FrmReIssueInput>();
-            /*FrmReIssueInput frmReIssueInput = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmReIssueInput)) {
-                    frmReIssueInput = (FrmReIssueInput) iForm;
-                    break;
-                }
-            }
-
-            if (frmReIssueInput != null)
-                frmReIssueInput.BringToFront();
-            else {
-                frmReIssueInput = new FrmReIssueInput();
-                frmReIssueInput.StartPosition = FormStartPosition.CenterScreen;
-                frmReIssueInput.Show();
-            }*/
+            GlobalUtility.MenuItemClick<FrmReIssueInput>();
         }
 
         private void 可增額列表ToolStripMenuItem_Click(object sender, EventArgs e) {
-            MenuItemClick<FrmReIssuable>();
-            /*FrmReIssuable frmReIssuable = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmReIssuable)) {
-                    frmReIssuable = (FrmReIssuable) iForm;
-                    break;
-                }
-            }
-
-            if (frmReIssuable != null)
-                frmReIssuable.BringToFront();
-            else {
-                frmReIssuable = new FrmReIssuable();
-                frmReIssuable.StartPosition = FormStartPosition.CenterScreen;
-                frmReIssuable.Show();
-            }*/
+            GlobalUtility.MenuItemClick<FrmReIssuable>();
         }
 
         private void 試算表ToolStripMenuItem_Click(object sender, EventArgs e) {
-            MenuItemClick<Frm71>();
-            /*Frm71 frm71 = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(Frm71)) {
-                    frm71 = (Frm71) iForm;
-                    break;
-                }
-            }
-
-            if (frm71 != null)
-                frm71.BringToFront();
-            else {
-                frm71 = new Frm71();
-                frm71.StartPosition = FormStartPosition.CenterScreen;
-                frm71.Show();
-            }*/
+            GlobalUtility.MenuItemClick<Frm71>();
         }
 
         private void 發行條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
-            MenuItemClick<FrmApply>();
-            /*FrmApply frmApply = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmApply)) {
-                    frmApply = (FrmApply) iForm;
-                    break;
-                }
-            }
-
-            if (frmApply != null)
-                frmApply.BringToFront();
-            else {
-                frmApply = new FrmApply();
-                frmApply.userID = GlobalVar.globalParameter.userID;
-                frmApply.userName = GlobalVar.globalParameter.userName;
-                frmApply.StartPosition = FormStartPosition.CenterScreen;
-                frmApply.Show();
-            }*/
+            GlobalUtility.MenuItemClick<FrmApply>();
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
@@ -383,7 +229,7 @@ namespace WarrantAssistant
             string info = "";
             info = toolStripTextBox1.Text;
             if (info != "") {
-                GlobalUtility.logInfo("Announce", info);
+                GlobalUtility.LogInfo("Announce", info);
 
                 toolStripTextBox1.Text = "";
                 LoadUltraGrid2();//
@@ -391,85 +237,19 @@ namespace WarrantAssistant
         }
 
         private void 增額條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
-            MenuItemClick<FrmReIssue>();
-            /*FrmReIssue frmReIssue = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmReIssue)) {
-                    frmReIssue = (FrmReIssue) iForm;
-                    break;
-                }
-            }
-
-            if (frmReIssue != null)
-                frmReIssue.BringToFront();
-            else {
-                frmReIssue = new FrmReIssue();
-                frmReIssue.userID = GlobalVar.globalParameter.userID;
-                frmReIssue.userName = GlobalVar.globalParameter.userName;
-                frmReIssue.StartPosition = FormStartPosition.CenterScreen;
-                frmReIssue.Show();
-            }*/
+            GlobalUtility.MenuItemClick<FrmReIssue>();
         }
 
         private void 搶額度總表含增額ToolStripMenuItem_Click(object sender, EventArgs e) {
-            MenuItemClick<FrmApplyTotalList>();
-            /*FrmApplyTotalList frmApplyTotalList = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmApplyTotalList)) {
-                    frmApplyTotalList = (FrmApplyTotalList) iForm;
-                    break;
-                }
-            }
-
-            if (frmApplyTotalList != null)
-                frmApplyTotalList.BringToFront();
-            else {
-                frmApplyTotalList = new FrmApplyTotalList();
-                frmApplyTotalList.StartPosition = FormStartPosition.CenterScreen;
-                frmApplyTotalList.Show();
-            }*/
+            GlobalUtility.MenuItemClick<FrmApplyTotalList>();
         }
 
         private void 發行總表ToolStripMenuItem_Click(object sender, EventArgs e) {
-            MenuItemClick<FrmIssueTotal>();
-            /*FrmIssueTotal frmIssueTotal = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmIssueTotal)) {
-                    frmIssueTotal = (FrmIssueTotal) iForm;
-                    break;
-                }
-            }
-
-            if (frmIssueTotal != null)
-                frmIssueTotal.BringToFront();
-            else {
-                frmIssueTotal = new FrmIssueTotal();
-                frmIssueTotal.StartPosition = FormStartPosition.CenterScreen;
-                frmIssueTotal.Show();
-            }*/
+            GlobalUtility.MenuItemClick<FrmIssueTotal>();
         }
 
         private void 增額總表ToolStripMenuItem_Click(object sender, EventArgs e) {
-            MenuItemClick<FrmReIssueTotal>();
-            /*FrmReIssueTotal frmReIssueTotal = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmReIssueTotal)) {
-                    frmReIssueTotal = (FrmReIssueTotal) iForm;
-                    break;
-                }
-            }
-
-            if (frmReIssueTotal != null)
-                frmReIssueTotal.BringToFront();
-            else {
-                frmReIssueTotal = new FrmReIssueTotal();
-                frmReIssueTotal.StartPosition = FormStartPosition.CenterScreen;
-                frmReIssueTotal.Show();
-            }*/
+            GlobalUtility.MenuItemClick<FrmReIssueTotal>();
         }
 
         private void 代理人發行條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -486,7 +266,7 @@ namespace WarrantAssistant
 
         }
 
-        private void 代理人增額條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {            
+        private void 代理人增額條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(FrmReIssue)) {
                     iForm.BringToFront();
@@ -501,24 +281,12 @@ namespace WarrantAssistant
 
         }
 
+        private void 已發權證條件發行ToolStripMenuItem_Click(object sender, EventArgs e) {
+            GlobalUtility.MenuItemClick<FrmIssueByCurrent>();
+        }
+
         private void 詳細LOGToolStripMenuItem_Click(object sender, EventArgs e) {
-            MenuItemClick<FrmLog>();
-            /*FrmLog frmLog = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmLog)) {
-                    frmLog = (FrmLog) iForm;
-                    break;
-                }
-            }
-
-            if (frmLog != null)
-                frmLog.BringToFront();
-            else {
-                frmLog = new FrmLog();
-                frmLog.StartPosition = FormStartPosition.CenterScreen;
-                frmLog.Show();
-            }*/
+            GlobalUtility.MenuItemClick<FrmLog>();
         }
 
         private void 轉申請發行TXTToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -628,7 +396,7 @@ namespace WarrantAssistant
 
                 string infoStr = "TSE 共" + tseCount + "檔，增額" + tseReissue + "檔，獎勵" + tseReward + "檔。\nOTC共" + otcCount + "檔，增額" + otcReissue + "檔，獎勵" + otcReward + "檔。";
 
-                GlobalUtility.logInfo("Info", "今日共申請" + (tseCount + otcCount) + "檔權證發行/增額");
+                GlobalUtility.LogInfo("Info", "今日共申請" + (tseCount + otcCount) + "檔權證發行/增額");
 
                 MessageBox.Show("轉TXT檔完成!\n" + infoStr);
 
@@ -812,7 +580,7 @@ namespace WarrantAssistant
                     if (app != null)
                         app.Quit();
 
-                    GlobalUtility.logInfo("Log", GlobalVar.globalParameter.userID + "產發行上傳檔");                 
+                    GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + "產發行上傳檔");
 
                     MessageBox.Show("發行上傳檔完成!");
                 } else {
@@ -888,21 +656,7 @@ namespace WarrantAssistant
                             app.Quit();
                     }
 
-                    GlobalUtility.logInfo("Log", GlobalVar.globalParameter.userID + "產增額上傳檔");
-                    /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                    List<SqlParameter> psInfo = new List<SqlParameter>();
-                    psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                    psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                    psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                    psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
-
-                    SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                    hInfo.SetParameterValue("@MDate", DateTime.Now);
-                    hInfo.SetParameterValue("@InformationType", "Log");
-                    hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID + "產增額上傳檔");
-                    hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                    hInfo.ExecuteCommand();
-                    hInfo.Dispose();*/
+                    GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + "產增額上傳檔");
 
                     MessageBox.Show("增額上傳檔完成!");
                 } else {
@@ -968,21 +722,7 @@ namespace WarrantAssistant
                     if (app != null)
                         app.Quit();
 
-                    GlobalUtility.logInfo("Log", GlobalVar.globalParameter.userID + "產關係人上傳檔");
-                    /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                    List<SqlParameter> psInfo = new List<SqlParameter>();
-                    psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                    psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                    psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                    psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
-
-                    SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                    hInfo.SetParameterValue("@MDate", DateTime.Now);
-                    hInfo.SetParameterValue("@InformationType", "Log");
-                    hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID + "產關係人上傳檔");
-                    hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                    hInfo.ExecuteCommand();
-                    hInfo.Dispose();*/
+                    GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + "產關係人上傳檔");
 
                     MessageBox.Show("關係人上傳檔完成!");
                 } else {
@@ -1004,36 +744,6 @@ namespace WarrantAssistant
                     app.Quit();
                 MessageBox.Show(ex.Message);
             }
-        }
-
-        private void 已發權證條件發行ToolStripMenuItem_Click(object sender, EventArgs e) {
-            FrmIssueByCurrent frmIssueByCurrent = null;
-
-            foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
-                if (iForm.GetType() == typeof(FrmIssueByCurrent)) {
-                    frmIssueByCurrent = (FrmIssueByCurrent) iForm;
-                    break;
-                }
-            }
-
-            if (frmIssueByCurrent != null)
-                frmIssueByCurrent.BringToFront();
-            else {
-                frmIssueByCurrent = new FrmIssueByCurrent();
-                frmIssueByCurrent.StartPosition = FormStartPosition.CenterScreen;
-                frmIssueByCurrent.Show();
-            }
-        }
-
-        private void 更新KeyToolStripMenuItem_Click(object sender, EventArgs e) {
-
-        }
-
-        private void 權證發行評估報告ToolStripMenuItem_Click(object sender, EventArgs e) {
-            //string fileName = "D:\\權證發行_相關Excel\\上傳檔\\利害關係人整批查詢上傳格式範例.xls";
-            Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
-            app.Visible = true;
-            //Workbook workBook = null;
         }
     }
 }

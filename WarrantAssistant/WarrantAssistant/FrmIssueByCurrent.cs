@@ -448,7 +448,7 @@ namespace WarrantAssistant
             h.ExecuteCommand();
             h.Dispose();
 
-            GlobalUtility.logInfo("Log", GlobalVar.globalParameter.userID + " " + WID + " 右鍵新增 " + underlyingID + underlyingName + " 一檔權證");
+            GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + " " + WID + " 右鍵新增 " + underlyingID + underlyingName + " 一檔權證");
             /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
             List<SqlParameter> psInfo = new List<SqlParameter>();
             psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));

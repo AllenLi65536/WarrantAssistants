@@ -541,7 +541,7 @@ namespace WarrantAssistant
                 }
 
                 h.Dispose();
-                GlobalUtility.logInfo("Log", GlobalVar.globalParameter.userID + " 編輯/更新" + (i - 1) + "檔發行");
+                GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + " 編輯/更新" + (i - 1) + "檔發行");
                 /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                 List<SqlParameter> psInfo = new List<SqlParameter>();
                 psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
@@ -640,7 +640,7 @@ namespace WarrantAssistant
                 h.Dispose();
 
                 toolStripLabel2.Text = DateTime.Now + "申請" + applyCount + "檔權證發行成功";
-                GlobalUtility.logInfo("Info", GlobalVar.globalParameter.userID + " 申請" + applyCount + "檔權證發行");
+                GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 申請" + applyCount + "檔權證發行");
                 /* string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                  List<SqlParameter> psInfo = new List<SqlParameter>();
                  psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
@@ -947,7 +947,7 @@ namespace WarrantAssistant
                     frmIssueCheck.StartPosition = FormStartPosition.CenterScreen;
                     frmIssueCheck.Show();
                 }
-                frmIssueCheck.selectUnderlying(target);
+                frmIssueCheck.SelectUnderlying(target);
             }
 
             if (e.Cell.Column.Key == "CP") {
@@ -968,7 +968,7 @@ namespace WarrantAssistant
                     frmIssueCheckPut.StartPosition = FormStartPosition.CenterScreen;
                     frmIssueCheckPut.Show();
                 }
-                frmIssueCheckPut.selectUnderlying(target);
+                frmIssueCheckPut.SelectUnderlying(target);
             }
         }
 
@@ -1149,7 +1149,7 @@ namespace WarrantAssistant
                     if (result == DialogResult.Yes) {
                         OfficiallyApply();
                         LoadData();
-                        GlobalUtility.logInfo("Announce", GlobalVar.globalParameter.userID + " 逾時申請" + applyCount + "檔權證發行");
+                        GlobalUtility.LogInfo("Announce", GlobalVar.globalParameter.userID + " 逾時申請" + applyCount + "檔權證發行");
                         /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                         List<SqlParameter> psInfo = new List<SqlParameter>();
                         psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));

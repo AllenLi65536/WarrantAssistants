@@ -185,7 +185,7 @@ namespace WarrantAssistant
                 h.Dispose();
                 toolStripLabel1.Text = DateTime.Now + "更新成功";
 
-                GlobalUtility.logInfo("Info", GlobalVar.globalParameter.userID + " 更新可增額列表");
+                GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 更新可增額列表");
                 /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                 List<SqlParameter> psInfo = new List<SqlParameter>();
                 psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
@@ -249,12 +249,12 @@ namespace WarrantAssistant
             twseUrl = "http://siis.twse.com.tw/server-java/t159sa04?step=1&id=9200pd" + id + "&TYPEK=otc&key=" + key + "&cDATE=" + aday + "&co_id=9200";
             parsehtml(twseUrl);
             //LoadData();    
-            GlobalUtility.logInfo("Info", GlobalVar.globalParameter.userID + " 下載可增額列表");
+            GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 下載可增額列表");
 
         }
         private void parsehtml(string url) {
 
-            string FirstResponse = GlobalUtility.getHtml(url);
+            string FirstResponse = GlobalUtility.GetHtml(url);
 
             HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(FirstResponse);

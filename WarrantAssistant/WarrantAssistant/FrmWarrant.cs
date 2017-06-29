@@ -9,30 +9,27 @@ using System.Windows.Forms;
 
 namespace WarrantAssistant
 {
-    public partial class FrmWarrant : Form
+    public partial class FrmWarrant:Form
     {
         private DataTable dataTable = new DataTable();
         private string enteredKey = "";
 
-        public FrmWarrant()
-        {
+        public FrmWarrant() {
             InitializeComponent();
         }
 
-        private void FrmWarrant_Load(object sender, EventArgs e)
-        {
+        private void FrmWarrant_Load(object sender, EventArgs e) {
             InitialGrid();
             loadData();
             toolStripComboBox1.Items.Add("0005986");
             toolStripComboBox1.Items.Add("0007643");
             toolStripComboBox1.Items.Add("0008570");
-            toolStripComboBox1.Items.Add("0008629");
+            //toolStripComboBox1.Items.Add("0008629");
             toolStripComboBox1.Items.Add("0008730");
-            
+
         }
 
-        private void InitialGrid()
-        {
+        private void InitialGrid() {
             dataTable.Columns.Add("WarrantID", typeof(string));
             dataTable.Columns.Add("WarrantName", typeof(string));
             dataTable.Columns.Add("UnderlyingID", typeof(string));
@@ -97,10 +94,7 @@ namespace WarrantAssistant
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         }
 
-        private void loadData()
-        {
-            dataTable.Rows.Clear();
-
+        private void loadData() {
             string sql = @"SELECT [WarrantID]
                                  ,[WarrantName]
                                  ,[UnderlyingID]
@@ -121,12 +115,12 @@ namespace WarrantAssistant
                              FROM [EDIS].[dbo].[WarrantBasic]
                              ORDER BY Market desc, UnderlyingID, ExpiryDate";
 
-            DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+            dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+            dataGridView1.DataSource = dataTable;
 
-            foreach (DataRowView drv in dv)
-            {
-                try
-                {
+            /*DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+            foreach (DataRowView drv in dv) {
+                try {
                     DataRow dr = dataTable.NewRow();
 
                     dr["WarrantID"] = drv["WarrantID"].ToString();
@@ -149,74 +143,49 @@ namespace WarrantAssistant
 
                     dataTable.Rows.Add(dr);
 
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     MessageBox.Show(ex.Message);
                 }
+            }*/
+        }
+
+        private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {
+            switch (dataGridView1.Columns[e.ColumnIndex].Name) {
+                case "WarrantType":
+                    string cellValue = (string) e.Value;
+                    if (cellValue != "一般型認購權證" && cellValue != "一般型認售權證")
+                        e.CellStyle.BackColor = Color.LightYellow;
+                    break;
+                case "isReward":
+                    if ((string) e.Value == "Y")
+                        e.CellStyle.BackColor = Color.LightYellow;
+                    break;
+                case "ExpiryDate":
+                    if ((DateTime) e.Value < DateTime.Today.AddDays(3))
+                        e.CellStyle.BackColor = Color.LightYellow;
+                    break;
+                    /*case "FurthurIssueNum":
+                        if ((double) e.Value > 0)
+                            e.CellStyle.BackColor = Color.LightYellow;
+                        break;*/
             }
         }
 
-        private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            if (this.dataGridView1.Columns[e.ColumnIndex].Name == "WarrantType")
-            {
-                string cellValue = (string)e.Value;
-                if (cellValue != "一般型認購權證" && cellValue !="一般型認售權證")
-                    e.CellStyle.BackColor = Color.LightYellow;
-            }
-
-            if (this.dataGridView1.Columns[e.ColumnIndex].Name == "isReward")
-            {
-                string cellValue = (string)e.Value;
-                if (cellValue == "Y")
-                    e.CellStyle.BackColor = Color.LightYellow;
-            }
-
-            if (this.dataGridView1.Columns[e.ColumnIndex].Name == "ExpiryDate")
-            {
-                DateTime cellValue = (DateTime)e.Value;
-                if (cellValue < DateTime.Today.AddDays(3))
-                    e.CellStyle.BackColor = Color.LightYellow;
-            }
-
-            if (this.dataGridView1.Columns[e.ColumnIndex].Name == "FurthurIssueNum")
-            {
-                double cellValue = (double)e.Value;
-                if (cellValue > 0)
-                    e.CellStyle.BackColor = Color.LightYellow;
-            }
+        public void SelectUnderlying(string underlyingID) {
+            GlobalUtility.SelectUnderlying(underlyingID, dataGridView1);
         }
 
-        public void selectUnderlying(string UnderlyingID)
-        {
-            for (int i = 0; i < dataGridView1.Rows.Count; i++)
-            {
-                string uID = (string)dataGridView1.Rows[i].Cells[0].Value;
-                if (uID == UnderlyingID)
-                    dataGridView1.CurrentCell = dataGridView1.Rows[i - 1].Cells[0];
-            }
-
-        }
-
-        private void dataGridView1_KeyDown(object sender, KeyEventArgs e)
-        {
-            try
-            {
-                if (e.KeyCode == Keys.Enter)
-                {
-                    selectUnderlying(enteredKey);
+        private void dataGridView1_KeyDown(object sender, KeyEventArgs e) {
+            try {
+                if (e.KeyCode == Keys.Enter) {
+                    SelectUnderlying(enteredKey);
                     enteredKey = "";
-                }
-                else if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back)
-                {
+                } else if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back) {
                     if (enteredKey.Length > 0)
                         enteredKey = enteredKey.Substring(0, enteredKey.Length - 1);
-                }
-                else if (e.KeyCode == Keys.Escape)
+                } else if (e.KeyCode == Keys.Escape)
                     enteredKey = "";
-                else
-                {
+                else {
                     if (e.KeyCode == Keys.NumPad0 || e.KeyCode == Keys.D0)
                         enteredKey += "0";
                     else if (e.KeyCode == Keys.NumPad1 || e.KeyCode == Keys.D1)
@@ -247,25 +216,18 @@ namespace WarrantAssistant
                         enteredKey += e.KeyCode.ToString();
                 }
 
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
-        {
+        private void toolStripButton1_Click(object sender, EventArgs e) {
             loadDataByUnderlying();
         }
 
-        private void loadDataByUnderlying()
-        {
+        private void loadDataByUnderlying() {
             string textBoxContent = toolStripTextBox1.Text;
-            if (textBoxContent !="")
-            {
-                dataTable.Rows.Clear();
-
+            if (textBoxContent != "") {
                 string sql = @"SELECT [WarrantID]
                                      ,[WarrantName]
                                      ,[UnderlyingID]
@@ -285,15 +247,15 @@ namespace WarrantAssistant
                                      ,[FurthurIssueNum]/1000 [FurthurIssueNum]
                                  FROM [EDIS].[dbo].[WarrantBasic] ";
 
-                sql+="WHERE [UnderlyingID]='"+ toolStripTextBox1.Text +"' ORDER BY ExpiryDate";
-                  
+                sql += "WHERE [UnderlyingID]='" + toolStripTextBox1.Text + "' ORDER BY ExpiryDate";
 
-                DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                dataGridView1.DataSource = dataTable;
 
-                foreach (DataRowView drv in dv)
-                {
-                    try
-                    {
+                /*DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+
+                foreach (DataRowView drv in dv) {
+                    try {
                         DataRow dr = dataTable.NewRow();
 
                         dr["WarrantID"] = drv["WarrantID"].ToString();
@@ -316,25 +278,18 @@ namespace WarrantAssistant
 
                         dataTable.Rows.Add(dr);
 
-                    }
-                    catch (Exception ex)
-                    {
+                    } catch (Exception ex) {
                         MessageBox.Show(ex.Message);
                     }
-                }
+                }*/
                 toolStripTextBox1.Text = "";
-            }
-            else
+            } else
                 loadData();
         }
 
-        private void loadDataByTrader()
-        {
+        private void loadDataByTrader() {
             string comboBoxContent = toolStripComboBox1.Text;
-            if (comboBoxContent != "")
-            {
-                dataTable.Rows.Clear();
-
+            if (comboBoxContent != "") {
                 string sql = @"SELECT [WarrantID]
                                      ,[WarrantName]
                                      ,[UnderlyingID]
@@ -356,13 +311,13 @@ namespace WarrantAssistant
 
                 sql += "WHERE [TraderID]='" + toolStripComboBox1.Text + "' ORDER BY UnderlyingID, ExpiryDate";
 
+                dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                dataGridView1.DataSource = dataTable;
 
-                DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                /*DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
-                foreach (DataRowView drv in dv)
-                {
-                    try
-                    {
+                foreach (DataRowView drv in dv) {
+                    try {
                         DataRow dr = dataTable.NewRow();
 
                         dr["WarrantID"] = drv["WarrantID"].ToString();
@@ -385,53 +340,38 @@ namespace WarrantAssistant
 
                         dataTable.Rows.Add(dr);
 
-                    }
-                    catch (Exception ex)
-                    {
+                    } catch (Exception ex) {
                         MessageBox.Show(ex.Message);
                     }
-                }
+                }*/
                 toolStripComboBox1.Text = "";
 
-            }
-            else
+            } else
                 loadData();
         }
 
-        private void toolStripTextBox1_KeyDown(object sender, KeyEventArgs e)
-        {
-            try
-            {
+        private void toolStripTextBox1_KeyDown(object sender, KeyEventArgs e) {
+            try {
                 if (e.KeyCode == Keys.Enter)
                     loadDataByUnderlying();
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
         }
 
-        private void dataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
-        {
-            foreach (DataGridViewRow row in dataGridView1.Rows)
-            {
+        private void dataGridView1_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e) {
+            foreach (DataGridViewRow row in dataGridView1.Rows) {
                 row.HeaderCell.Value = (row.Index + 1).ToString();
             }
         }
 
-        private void toolStripComboBox1_KeyDown(object sender, KeyEventArgs e)
-        {
-            try
-            {
+        private void toolStripComboBox1_KeyDown(object sender, KeyEventArgs e) {
+            try {
                 if (e.KeyCode == Keys.Enter)
                     loadDataByTrader();
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
         }
-
- 
     }
 }

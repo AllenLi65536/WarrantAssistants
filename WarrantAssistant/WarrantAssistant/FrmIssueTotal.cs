@@ -271,7 +271,7 @@ namespace WarrantAssistant
                 }
                 h.Dispose();
 
-                GlobalUtility.logInfo("Info", GlobalVar.globalParameter.userID + " 更新發行總表");
+                GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 更新發行總表");
                 /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
                 List<SqlParameter> psInfo = new List<SqlParameter>();
                 psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
@@ -608,7 +608,7 @@ namespace WarrantAssistant
                     frmIssueCheck.StartPosition = FormStartPosition.CenterScreen;
                     frmIssueCheck.Show();
                 }
-                frmIssueCheck.selectUnderlying(target);
+                frmIssueCheck.SelectUnderlying(target);
             }
 
             if (e.Cell.Column.Key == "CP") {
@@ -629,7 +629,7 @@ namespace WarrantAssistant
                     frmIssueCheckPut.StartPosition = FormStartPosition.CenterScreen;
                     frmIssueCheckPut.Show();
                 }
-                frmIssueCheckPut.selectUnderlying(target);
+                frmIssueCheckPut.SelectUnderlying(target);
             }
         }
 
