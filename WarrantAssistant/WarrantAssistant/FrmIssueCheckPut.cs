@@ -15,26 +15,11 @@ namespace WarrantAssistant
         }
 
         private void FrmIssueCheckPut_Load(object sender, EventArgs e) {
+            LoadData();
             InitialGrid();
-            loadData();
         }
 
         private void InitialGrid() {
-            dataTable.Columns.Add("UnderlyingID", typeof(string));
-            dataTable.Columns.Add("UnderlyingName", typeof(string));
-            dataTable.Columns.Add("IsTW50Stocks", typeof(string));
-            dataTable.Columns.Add("PERatio", typeof(double));
-            dataTable.Columns.Add("SumEarning", typeof(double));
-            dataTable.Columns.Add("Price", typeof(double));
-            dataTable.Columns.Add("PriceQuarter", typeof(double));
-            dataTable.Columns.Add("PriceYear", typeof(double));
-            dataTable.Columns.Add("ReturnQuarter", typeof(double));
-            dataTable.Columns.Add("ReturnYear", typeof(double));
-
-            dataTable.PrimaryKey = new DataColumn[] { dataTable.Columns["UnderlyingID"] };
-
-            dataGridView1.DataSource = dataTable;
-
             dataGridView1.Columns[0].HeaderText = "標的代號";
             dataGridView1.Columns[1].HeaderText = "標的名稱";
             dataGridView1.Columns[2].HeaderText = "台灣50成分股";
@@ -54,7 +39,7 @@ namespace WarrantAssistant
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         }
 
-        private void loadData() {
+        private void LoadData() {
             string sql = @"SELECT [UnderlyingID]
                                  ,[UnderlyingName]
                                  ,[IsTW50Stocks]
@@ -72,30 +57,6 @@ namespace WarrantAssistant
                 row["ReturnQuarter"] = Math.Round((double) row["ReturnQuarter"], 2);
                 row["ReturnYear"] = Math.Round((double) row["ReturnYear"], 2);
             }
-
-            /*DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
-
-            foreach (DataRowView drv in dv) {
-                try {
-                    DataRow dr = dataTable.NewRow();
-
-                    dr["UnderlyingID"] = drv["UnderlyingID"].ToString();
-                    dr["UnderlyingName"] = drv["UnderlyingName"].ToString();
-                    dr["IsTW50Stocks"] = drv["IsTW50Stocks"].ToString();
-                    dr["PERatio"] = Convert.ToDouble(drv["PERatio"]);
-                    dr["SumEarning"] = Convert.ToDouble(drv["SumEarning"]);
-                    dr["Price"] = Convert.ToDouble(drv["Price"]);
-                    dr["PriceQuarter"] = Convert.ToDouble(drv["PriceQuarter"]);
-                    dr["PriceYear"] = Convert.ToDouble(drv["PriceYear"]);
-                    dr["ReturnQuarter"] = Math.Round(Convert.ToDouble(drv["ReturnQuarter"]), 2);
-                    dr["ReturnYear"] = Math.Round(Convert.ToDouble(drv["ReturnYear"]), 2);
-
-                    dataTable.Rows.Add(dr);
-
-                } catch (Exception ex) {
-                    MessageBox.Show(ex.Message);
-                }
-            }*/
         }
 
         private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {

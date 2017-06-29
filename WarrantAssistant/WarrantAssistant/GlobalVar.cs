@@ -43,10 +43,9 @@ namespace WarrantAssistant
         }
 
         public static void SelectUnderlying(string underlyingID, DataGridView dataGridView1) {
-            for (int i = 0; i < dataGridView1.Rows.Count; i++) {
-                string uID = (string) dataGridView1.Rows[i].Cells[0].Value;
-                if (uID == underlyingID)
-                    dataGridView1.CurrentCell = dataGridView1.Rows[i - 1].Cells[0];
+            for (int i = 0; i < dataGridView1.Rows.Count; i++) {                
+                if ((string) dataGridView1.Rows[i].Cells[0].Value == underlyingID) 
+                    dataGridView1.CurrentCell = dataGridView1.Rows[i].Cells[0];//PROBLEM!!! Row[i-1]?
             }
         }
         public static string GetHtml(string url) {

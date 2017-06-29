@@ -19,8 +19,8 @@ namespace WarrantAssistant
         }
 
         private void FrmWarrant_Load(object sender, EventArgs e) {
+            LoadData();
             InitialGrid();
-            loadData();
             toolStripComboBox1.Items.Add("0005986");
             toolStripComboBox1.Items.Add("0007643");
             toolStripComboBox1.Items.Add("0008570");
@@ -30,59 +30,38 @@ namespace WarrantAssistant
         }
 
         private void InitialGrid() {
-            dataTable.Columns.Add("WarrantID", typeof(string));
-            dataTable.Columns.Add("WarrantName", typeof(string));
-            dataTable.Columns.Add("UnderlyingID", typeof(string));
-            dataTable.Columns.Add("UnderlyingName", typeof(string));
-            dataTable.Columns.Add("Market", typeof(string));
-            dataTable.Columns.Add("TraderID", typeof(string));
-            dataTable.Columns.Add("WarrantType", typeof(string));
-            dataTable.Columns.Add("K", typeof(double));
-            dataTable.Columns.Add("T", typeof(int));
-            dataTable.Columns.Add("exeRatio", typeof(double));
-            dataTable.Columns.Add("HV", typeof(double));
-            dataTable.Columns.Add("IV", typeof(double));
-            dataTable.Columns.Add("IssuePrice", typeof(double));
-            dataTable.Columns.Add("isReward", typeof(string));
-            dataTable.Columns.Add("ExpiryDate", typeof(DateTime));
-            dataTable.Columns.Add("IssueNum", typeof(double));
-            dataTable.Columns.Add("FurthurIssueNum", typeof(double));
-
-            dataTable.PrimaryKey = new DataColumn[] { dataTable.Columns["WarrantID"] };
-
-            dataGridView1.DataSource = dataTable;
-
             dataGridView1.Columns[0].HeaderText = "權證代號";
-            dataGridView1.Columns[0].Width = 80;
             dataGridView1.Columns[1].HeaderText = "權證名稱";
-            dataGridView1.Columns[1].Width = 120;
             dataGridView1.Columns[2].HeaderText = "標的代號";
-            dataGridView1.Columns[2].Width = 80;
             dataGridView1.Columns[3].HeaderText = "標的名稱";
-            dataGridView1.Columns[3].Width = 100;
             dataGridView1.Columns[4].HeaderText = "市場";
-            dataGridView1.Columns[4].Width = 80;
             dataGridView1.Columns[5].HeaderText = "交易員";
-            dataGridView1.Columns[5].Width = 80;
             dataGridView1.Columns[6].HeaderText = "權證型態";
-            dataGridView1.Columns[6].Width = 110;
             dataGridView1.Columns[7].HeaderText = "履約價";
-            dataGridView1.Columns[7].Width = 80;
             dataGridView1.Columns[8].HeaderText = "存續期間";
-            dataGridView1.Columns[8].Width = 80;
             dataGridView1.Columns[9].HeaderText = "行使比例";
-            dataGridView1.Columns[9].Width = 80;
             dataGridView1.Columns[10].HeaderText = "避險Vol";
-            dataGridView1.Columns[10].Width = 80;
             dataGridView1.Columns[11].HeaderText = "發行Vol";
-            dataGridView1.Columns[11].Width = 80;
             dataGridView1.Columns[12].HeaderText = "發行價格";
-            dataGridView1.Columns[12].Width = 80;
             dataGridView1.Columns[13].HeaderText = "獎勵額度";
-            dataGridView1.Columns[13].Width = 80;
             dataGridView1.Columns[14].HeaderText = "到期日";
             dataGridView1.Columns[15].HeaderText = "發行張數";
             dataGridView1.Columns[16].HeaderText = "增額張數";
+
+            dataGridView1.Columns[0].Width = 80;
+            dataGridView1.Columns[1].Width = 120;
+            dataGridView1.Columns[2].Width = 80;
+            dataGridView1.Columns[3].Width = 100;
+            dataGridView1.Columns[4].Width = 80;
+            dataGridView1.Columns[5].Width = 80;
+            dataGridView1.Columns[6].Width = 110;
+            dataGridView1.Columns[7].Width = 80;
+            dataGridView1.Columns[8].Width = 80;
+            dataGridView1.Columns[9].Width = 80;
+            dataGridView1.Columns[10].Width = 80;
+            dataGridView1.Columns[11].Width = 80;
+            dataGridView1.Columns[12].Width = 80;
+            dataGridView1.Columns[13].Width = 80;
 
             dataGridView1.Columns[15].DefaultCellStyle.Format = "###,###";
             dataGridView1.Columns[16].DefaultCellStyle.Format = "###,###";
@@ -94,7 +73,7 @@ namespace WarrantAssistant
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         }
 
-        private void loadData() {
+        private void LoadData() {
             string sql = @"SELECT [WarrantID]
                                  ,[WarrantName]
                                  ,[UnderlyingID]
@@ -117,36 +96,6 @@ namespace WarrantAssistant
 
             dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
             dataGridView1.DataSource = dataTable;
-
-            /*DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
-            foreach (DataRowView drv in dv) {
-                try {
-                    DataRow dr = dataTable.NewRow();
-
-                    dr["WarrantID"] = drv["WarrantID"].ToString();
-                    dr["WarrantName"] = drv["WarrantName"].ToString();
-                    dr["UnderlyingID"] = drv["UnderlyingID"].ToString();
-                    dr["UnderlyingName"] = drv["UnderlyingName"].ToString();
-                    dr["Market"] = drv["Market"].ToString();
-                    dr["TraderID"] = drv["TraderID"].ToString();
-                    dr["WarrantType"] = drv["WarrantType"].ToString();
-                    dr["K"] = Convert.ToDouble(drv["K"]);
-                    dr["T"] = Convert.ToInt32(drv["T"]);
-                    dr["exeRatio"] = Convert.ToDouble(drv["exeRatio"]);
-                    dr["HV"] = Convert.ToDouble(drv["HV"]);
-                    dr["IV"] = Convert.ToDouble(drv["IV"]);
-                    dr["IssuePrice"] = Convert.ToDouble(drv["IssuePrice"]);
-                    dr["isReward"] = drv["isReward"].ToString();
-                    dr["ExpiryDate"] = Convert.ToDateTime(drv["ExpiryDate"]);
-                    dr["IssueNum"] = Convert.ToDouble(drv["IssueNum"]);
-                    dr["FurthurIssueNum"] = Convert.ToDouble(drv["FurthurIssueNum"]);
-
-                    dataTable.Rows.Add(dr);
-
-                } catch (Exception ex) {
-                    MessageBox.Show(ex.Message);
-                }
-            }*/
         }
 
         private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {
@@ -250,41 +199,10 @@ namespace WarrantAssistant
                 sql += "WHERE [UnderlyingID]='" + toolStripTextBox1.Text + "' ORDER BY ExpiryDate";
 
                 dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
-                dataGridView1.DataSource = dataTable;
-
-                /*DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
-
-                foreach (DataRowView drv in dv) {
-                    try {
-                        DataRow dr = dataTable.NewRow();
-
-                        dr["WarrantID"] = drv["WarrantID"].ToString();
-                        dr["WarrantName"] = drv["WarrantName"].ToString();
-                        dr["UnderlyingID"] = drv["UnderlyingID"].ToString();
-                        dr["UnderlyingName"] = drv["UnderlyingName"].ToString();
-                        dr["Market"] = drv["Market"].ToString();
-                        dr["TraderID"] = drv["TraderID"].ToString();
-                        dr["WarrantType"] = drv["WarrantType"].ToString();
-                        dr["K"] = Convert.ToDouble(drv["K"]);
-                        dr["T"] = Convert.ToInt32(drv["T"]);
-                        dr["exeRatio"] = Convert.ToDouble(drv["exeRatio"]);
-                        dr["HV"] = Convert.ToDouble(drv["HV"]);
-                        dr["IV"] = Convert.ToDouble(drv["IV"]);
-                        dr["IssuePrice"] = Convert.ToDouble(drv["IssuePrice"]);
-                        dr["isReward"] = drv["isReward"].ToString();
-                        dr["ExpiryDate"] = Convert.ToDateTime(drv["ExpiryDate"]);
-                        dr["IssueNum"] = Convert.ToDouble(drv["IssueNum"]);
-                        dr["FurthurIssueNum"] = Convert.ToDouble(drv["FurthurIssueNum"]);
-
-                        dataTable.Rows.Add(dr);
-
-                    } catch (Exception ex) {
-                        MessageBox.Show(ex.Message);
-                    }
-                }*/
+                dataGridView1.DataSource = dataTable;                
                 toolStripTextBox1.Text = "";
             } else
-                loadData();
+                LoadData();
         }
 
         private void loadDataByTrader() {
@@ -313,41 +231,9 @@ namespace WarrantAssistant
 
                 dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
                 dataGridView1.DataSource = dataTable;
-
-                /*DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
-
-                foreach (DataRowView drv in dv) {
-                    try {
-                        DataRow dr = dataTable.NewRow();
-
-                        dr["WarrantID"] = drv["WarrantID"].ToString();
-                        dr["WarrantName"] = drv["WarrantName"].ToString();
-                        dr["UnderlyingID"] = drv["UnderlyingID"].ToString();
-                        dr["UnderlyingName"] = drv["UnderlyingName"].ToString();
-                        dr["Market"] = drv["Market"].ToString();
-                        dr["TraderID"] = drv["TraderID"].ToString();
-                        dr["WarrantType"] = drv["WarrantType"].ToString();
-                        dr["K"] = Convert.ToDouble(drv["K"]);
-                        dr["T"] = Convert.ToInt32(drv["T"]);
-                        dr["exeRatio"] = Convert.ToDouble(drv["exeRatio"]);
-                        dr["HV"] = Convert.ToDouble(drv["HV"]);
-                        dr["IV"] = Convert.ToDouble(drv["IV"]);
-                        dr["IssuePrice"] = Convert.ToDouble(drv["IssuePrice"]);
-                        dr["isReward"] = drv["isReward"].ToString();
-                        dr["ExpiryDate"] = Convert.ToDateTime(drv["ExpiryDate"]);
-                        dr["IssueNum"] = Convert.ToDouble(drv["IssueNum"]);
-                        dr["FurthurIssueNum"] = Convert.ToDouble(drv["FurthurIssueNum"]);
-
-                        dataTable.Rows.Add(dr);
-
-                    } catch (Exception ex) {
-                        MessageBox.Show(ex.Message);
-                    }
-                }*/
                 toolStripComboBox1.Text = "";
-
             } else
-                loadData();
+                LoadData();
         }
 
         private void toolStripTextBox1_KeyDown(object sender, KeyEventArgs e) {

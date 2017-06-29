@@ -17,21 +17,6 @@ namespace WarrantAssistant
         }
 
         private void InitialGrid() {
-            dataTable.Columns.Add("UnderlyingID", typeof(string));
-            dataTable.Columns.Add("UnderlyingName", typeof(string));
-            dataTable.Columns.Add("TraderID", typeof(string));
-            dataTable.Columns.Add("Market", typeof(string));
-            dataTable.Columns.Add("Issuable", typeof(string));
-            dataTable.Columns.Add("PutIssuable", typeof(string));
-            dataTable.Columns.Add("IssuedPercent", typeof(double));
-            dataTable.Columns.Add("IssueCredit", typeof(double));
-            dataTable.Columns.Add("RewardIssueCredit", typeof(double));
-            dataTable.Columns.Add("AccNetIncome", typeof(string));
-
-            dataTable.PrimaryKey = new DataColumn[] { dataTable.Columns["UnderlyingID"] };
-
-            dataGridView1.DataSource = dataTable;
-
             dataGridView1.Columns[0].HeaderText = "標的代號";
             dataGridView1.Columns[1].HeaderText = "標的名稱";
             dataGridView1.Columns[2].HeaderText = "交易員";
@@ -60,7 +45,7 @@ namespace WarrantAssistant
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         }
 
-        private void loadData() {
+        private void LoadData() {
             string sql = "SELECT [UnderlyingID], [UnderlyingName], [TraderID], [Market], [Issuable], [PutIssuable], IsNull([IssueCredit],0) [IssueCredit], IsNull([IssuedPercent],0) [IssuedPercent], IsNull([RewardIssueCredit],0) [RewardIssueCredit], CASE WHEN [AccNetIncome]<0 THEN 'Y' ELSE 'N' END AccNetIncome FROM [EDIS].[dbo].[WarrantUnderlyingSummary] ORDER BY Market desc, UnderlyingID";
 
             dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
@@ -68,31 +53,11 @@ namespace WarrantAssistant
             foreach (DataRow row in dataTable.Rows) {
                 row["IssuedPercent"] = Math.Round((double) row["IssuedPercent"], 2);
             }
-            /*DataTable dv = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
-            foreach (DataRow drv in dv.Rows) {
-                try {
-                    DataRow dr = dataTable.NewRow();
-                    dr["UnderlyingID"] = drv["UnderlyingID"].ToString();
-                    dr["UnderlyingName"] = drv["UnderlyingName"].ToString();
-                    dr["TraderID"] = drv["TraderID"].ToString();
-                    dr["Market"] = drv["Market"].ToString();
-                    dr["Issuable"] = drv["Issuable"].ToString();
-                    dr["PutIssuable"] = drv["PutIssuable"].ToString();
-                    dr["IssueCredit"] = Math.Floor(Convert.ToDouble(drv["IssueCredit"]));
-                    dr["IssuedPercent"] = Math.Round(Convert.ToDouble(drv["IssuedPercent"]), 2);
-                    dr["RewardIssueCredit"] = Math.Floor(Convert.ToDouble(drv["RewardIssueCredit"]));
-                    dr["AccNetIncome"] = drv["AccNetIncome"].ToString();
-                    dataTable.Rows.Add(dr);
-
-                } catch (Exception ex) {
-                    MessageBox.Show(ex.Message);
-                }
-            }*/
         }
 
         private void FrmUnderlyingSummary_Load(object sender, EventArgs e) {
+            LoadData();
             InitialGrid();
-            loadData();
         }
 
         private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {

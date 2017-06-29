@@ -15,22 +15,6 @@ namespace WarrantAssistant
         }
 
         private void InitialGrid() {
-            dataTable.Columns.Add("UnderlyingID", typeof(string));
-            dataTable.Columns.Add("UnderlyingName", typeof(string));
-            dataTable.Columns.Add("CashDividend", typeof(double));
-            dataTable.Columns.Add("StockDividend", typeof(double));
-            dataTable.Columns.Add("CashDividendDate", typeof(DateTime));
-            dataTable.Columns.Add("StockDividendDate", typeof(DateTime));
-            dataTable.Columns.Add("PublicOfferingDate", typeof(DateTime));
-            dataTable.Columns.Add("DisposeEndDate", typeof(DateTime));
-            dataTable.Columns.Add("WatchCount", typeof(int));
-            dataTable.Columns.Add("WarningScore", typeof(int));
-            dataTable.Columns.Add("AccNetIncome", typeof(double));
-
-            dataTable.PrimaryKey = new DataColumn[] { dataTable.Columns["UnderlyingID"] };
-
-            dataGridView1.DataSource = dataTable;
-
             dataGridView1.Columns[0].HeaderText = "標的代號";
             dataGridView1.Columns[1].HeaderText = "標的名稱";
             dataGridView1.Columns[2].HeaderText = "現金股利";
@@ -51,7 +35,7 @@ namespace WarrantAssistant
             dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
         }
 
-        private void loadData() {
+        private void LoadData() {
             string sql = @"SELECT [UnderlyingID]
                                  ,[UnderlyingName]
                                  ,[CashDividend] as CashDividend
@@ -70,33 +54,11 @@ namespace WarrantAssistant
                 row["CashDividend"] = Math.Round((double) row["CashDividend"], 3);
                 row["StockDividend"] = Math.Round((double) row["StockDividend"], 3);
             }
-
-            /*DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
-            foreach (DataRowView drv in dv) {
-                try {
-                    DataRow dr = dataTable.NewRow();
-                    dr["UnderlyingID"] = drv["UnderlyingID"].ToString();
-                    dr["UnderlyingName"] = drv["UnderlyingName"].ToString();
-                    dr["CashDividend"] = Math.Round(Convert.ToDouble(drv["CashDividend"]), 3);
-                    dr["StockDividend"] = Math.Round(Convert.ToDouble(drv["StockDividend"]), 3);
-                    dr["CashDividendDate"] = Convert.ToDateTime(drv["CashDividendDate"]);
-                    dr["StockDividendDate"] = Convert.ToDateTime(drv["StockDividendDate"]);
-                    dr["PublicOfferingDate"] = Convert.ToDateTime(drv["PublicOfferingDate"]);
-                    dr["DisposeEndDate"] = Convert.ToDateTime(drv["DisposeEndDate"]);
-                    dr["WatchCount"] = Convert.ToInt32(drv["WatchCount"]);
-                    dr["WarningScore"] = Convert.ToInt32(drv["WarningScore"]);
-                    dr["AccNetIncome"] = Convert.ToDouble(drv["AccNetIncome"]);
-                    dataTable.Rows.Add(dr);
-
-                } catch (Exception ex) {
-                    MessageBox.Show(ex.Message);
-                }
-            }*/
         }
 
         private void FrmIssueCheck_Load(object sender, EventArgs e) {
+            LoadData();
             InitialGrid();
-            loadData();
         }
 
         private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {
