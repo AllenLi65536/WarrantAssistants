@@ -22,7 +22,7 @@ namespace WarrantAssistant
         public SqlConnection conn = new SqlConnection(GlobalVar.loginSet.edisSqlConnString);
         private DataTable dt = new DataTable();
         private bool isEdit = false;
-        public string userID;
+        public string userID = GlobalVar.globalParameter.userID;
         public string userName;
         private int applyCount = 0;
 
