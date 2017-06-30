@@ -42,12 +42,9 @@ namespace WarrantAssistant
         }
 
         public static void SelectUnderlying(string underlyingID, DataGridView dataGridView1) {
-            for (int i = 0; i < dataGridView1.Rows.Count; i++) {
-                if ((string) dataGridView1.Rows[i].Cells[0].Value == underlyingID) {
-                    dataGridView1.CurrentCell = dataGridView1.Rows[i].Cells[0];//PROBLEM!!! Row[i-1]?
-                    //MessageBox.Show(underlyingID +" " + dataGridView1.Rows[i].Cells[0].Value + " " + dataGridView1.Rows[i - 1].Cells[0]);
-                }
-            }
+            for (int i = 0; i < dataGridView1.Rows.Count; i++)
+                if ((string) dataGridView1.Rows[i].Cells[0].Value == underlyingID)
+                    dataGridView1.CurrentCell = dataGridView1.Rows[i].Cells[0];
         }
         public static void KeyDecoder(KeyEventArgs e, ref string enteredKey) {
             if (e.KeyCode == Keys.Delete || e.KeyCode == Keys.Back) {
@@ -85,36 +82,7 @@ namespace WarrantAssistant
                 else
                     enteredKey += e.KeyCode.ToString();
             }
-
-            /*if (e.KeyCode == Keys.NumPad0 || e.KeyCode == Keys.D0)
-                return '0';
-            else if (e.KeyCode == Keys.NumPad1 || e.KeyCode == Keys.D1)
-                return '1';
-            else if (e.KeyCode == Keys.NumPad2 || e.KeyCode == Keys.D2)
-                return '2';
-            else if (e.KeyCode == Keys.NumPad3 || e.KeyCode == Keys.D3)
-                return '3';
-            else if (e.KeyCode == Keys.NumPad4 || e.KeyCode == Keys.D4)
-                return '4';
-            else if (e.KeyCode == Keys.NumPad5 || e.KeyCode == Keys.D5)
-                return '5';
-            else if (e.KeyCode == Keys.NumPad6 || e.KeyCode == Keys.D6)
-                return '6';
-            else if (e.KeyCode == Keys.NumPad7 || e.KeyCode == Keys.D7)
-                return '7';
-            else if (e.KeyCode == Keys.NumPad8 || e.KeyCode == Keys.D8)
-                return '8';
-            else if (e.KeyCode == Keys.NumPad9 || e.KeyCode == Keys.D9)
-                return '9';
-            else if (e.KeyCode == Keys.B)
-                enteredKey += "B";
-            else if (e.KeyCode == Keys.C)
-                enteredKey += "C";
-            else if (e.KeyCode == Keys.P)
-                enteredKey += "P";
-            else
-                enteredKey += e.KeyCode.ToString();*/
-
+            e.Handled = true;
         }
 
         public static string GetHtml(string url) {

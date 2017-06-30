@@ -8,8 +8,8 @@ namespace WarrantAssistant
 {
     public partial class FrmUnderlyingSummary:Form
     {
-        public SqlConnection conn = new SqlConnection(GlobalVar.loginSet.edisSqlConnString);
-        private DataTable dataTable = new DataTable();
+        //public SqlConnection conn = new SqlConnection(GlobalVar.loginSet.edisSqlConnString);
+        private DataTable dataTable;
         private string enteredKey = "";
 
         public FrmUnderlyingSummary() {
@@ -23,8 +23,8 @@ namespace WarrantAssistant
             dataGridView1.Columns[3].HeaderText = "市場";
             dataGridView1.Columns[4].HeaderText = "是否可發";
             dataGridView1.Columns[5].HeaderText = "Put發行檢查";
-            dataGridView1.Columns[7].HeaderText = "今日額度";
             dataGridView1.Columns[6].HeaderText = "已發行(%)";
+            dataGridView1.Columns[7].HeaderText = "今日額度";
             dataGridView1.Columns[8].HeaderText = "獎勵額度";
             dataGridView1.Columns[9].HeaderText = "是否虧損";
 
@@ -46,7 +46,7 @@ namespace WarrantAssistant
         }
 
         private void LoadData() {
-            string sql = "SELECT [UnderlyingID], [UnderlyingName], [TraderID], [Market], [Issuable], [PutIssuable], IsNull([IssueCredit],0) [IssueCredit], IsNull([IssuedPercent],0) [IssuedPercent], IsNull([RewardIssueCredit],0) [RewardIssueCredit], CASE WHEN [AccNetIncome]<0 THEN 'Y' ELSE 'N' END AccNetIncome FROM [EDIS].[dbo].[WarrantUnderlyingSummary] ORDER BY Market desc, UnderlyingID";
+            string sql = "SELECT [UnderlyingID], [UnderlyingName], [TraderID], [Market], [Issuable], [PutIssuable], IsNull([IssuedPercent],0) [IssuedPercent], IsNull([IssueCredit],0) [IssueCredit],  IsNull([RewardIssueCredit],0) [RewardIssueCredit], CASE WHEN [AccNetIncome]<0 THEN 'Y' ELSE 'N' END AccNetIncome FROM [EDIS].[dbo].[WarrantUnderlyingSummary] ORDER BY Market desc, UnderlyingID";
 
             dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
             dataGridView1.DataSource = dataTable;
@@ -96,7 +96,7 @@ namespace WarrantAssistant
         }
 
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e) {
-            string target = (string) dataGridView1.Rows[e.RowIndex].Cells[0].Value;            
+            string target = (string) dataGridView1.Rows[e.RowIndex].Cells[0].Value;
             switch (dataGridView1.Columns[e.ColumnIndex].Name) {
                 case "Issuable":
                     GlobalUtility.MenuItemClick<FrmIssueCheck>().SelectUnderlying(target);

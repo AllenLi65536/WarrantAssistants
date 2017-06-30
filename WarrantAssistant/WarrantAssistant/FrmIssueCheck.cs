@@ -7,7 +7,7 @@ namespace WarrantAssistant
 {
     public partial class FrmIssueCheck:Form
     {
-        private DataTable dataTable = new DataTable();
+        private DataTable dataTable;
         private string enteredKey = "";
 
         public FrmIssueCheck() {

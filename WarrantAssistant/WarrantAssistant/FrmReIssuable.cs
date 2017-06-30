@@ -7,7 +7,7 @@ namespace WarrantAssistant
 {
     public partial class FrmReIssuable:Form
     {
-        private DataTable dt = new DataTable();
+        private DataTable dt;
 
         public FrmReIssuable() {
             InitializeComponent();

@@ -1,46 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Diagnostics;
-using Infragistics.Shared;
 using Infragistics.Win;
 using Infragistics.Win.UltraWinGrid;
 using System.Data.SqlClient;
+using EDLib.SQL;
 
 namespace WarrantAssistant
 {
-    public partial class FrmReIssue : Form
+    public partial class FrmReIssue:Form
     {
         public SqlConnection conn = new SqlConnection(GlobalVar.loginSet.edisSqlConnString);
         private DataTable dt = new DataTable();
         private bool isEdit = false;
-        public string userID;
-        public string userName;
+        public string userID = GlobalVar.globalParameter.userID;
+        public string userName = GlobalVar.globalParameter.userName;
         private int applyCount = 0;
 
-        public FrmReIssue()
-        {
-            userID = GlobalVar.globalParameter.userID;
-            userName = GlobalVar.globalParameter.userName;
+        public FrmReIssue() {
             InitializeComponent();
         }
 
-        private void FrmReIssue_Load(object sender, EventArgs e)
-        {
+        private void FrmReIssue_Load(object sender, EventArgs e) {
             toolStripLabel1.Text = "使用者: " + userName;
             toolStripLabel2.Text = "";
-            InitialGrid();
             LoadData();
+            InitialGrid();
         }
 
-        private void InitialGrid()
-        {
-            dt.Columns.Add("權證代號", typeof(string));
+        private void InitialGrid() {
+            /*dt.Columns.Add("WarrantID", typeof(string));
             dt.Columns.Add("增額張數", typeof(double));
             dt.Columns.Add("明日上市", typeof(string));
             dt.Columns.Add("確認", typeof(bool));
@@ -54,53 +45,51 @@ namespace WarrantAssistant
             dt.Columns.Add("今日額度(%)", typeof(double));
             dt.Columns.Add("獎勵額度", typeof(double));
             dt.Columns.Add("交易員", typeof(string));
+            ultraGrid1.DataSource = dt;*/
 
-            ultraGrid1.DataSource = dt;
+            UltraGridBand band0 = ultraGrid1.DisplayLayout.Bands[0];
 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["交易員"].Hidden = true;
+            band0.Columns["TraderID"].Hidden = true;
 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["增額張數"].Format = "###,###";
-            ultraGrid1.DisplayLayout.Bands[0].Columns["約當張數"].Format = "###,###";
-            ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵額度"].Format = "###,###";
+            band0.Columns["ReIssueNum"].Format = "###,###";
+            band0.Columns["EquivalentNum"].Format = "###,###";
+            band0.Columns["RewardIssueCredit"].Format = "###,###";
 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["明日上市"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.DropDownList;
+            band0.Columns["MarketTmr"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.DropDownList;
 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["權證代號"].Width = 100;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["增額張數"].Width = 100;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["明日上市"].Width = 100;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["確認"].Width = 70; 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵"].Width = 70;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["權證價格"].Width = 70;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["標的代號"].Width = 70;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["權證名稱"].Width = 150;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["行使比例"].Width = 73;
+            band0.Columns["WarrantID"].Width = 100;
+            band0.Columns["ReIssueNum"].Width = 100;
+            band0.Columns["MarketTmr"].Width = 100;
+            band0.Columns["ConfirmChecked"].Width = 70;
+            band0.Columns["isReward"].Width = 70;
+            band0.Columns["MPrice"].Width = 70;
+            band0.Columns["UnderlyingID"].Width = 70;
+            band0.Columns["WarrantName"].Width = 150;
+            band0.Columns["exeRatio"].Width = 73;
 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵"].CellAppearance.BackColor = Color.LightGray;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["權證價格"].CellAppearance.BackColor = Color.LightGray;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["標的代號"].CellAppearance.BackColor = Color.LightGray;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["權證名稱"].CellAppearance.BackColor = Color.LightGray;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["行使比例"].CellAppearance.BackColor = Color.LightGray;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["約當張數"].CellAppearance.BackColor = Color.LightGray;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["今日額度(%)"].CellAppearance.BackColor = Color.LightGray;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵額度"].CellAppearance.BackColor = Color.LightGray;
+            band0.Columns["isReward"].CellAppearance.BackColor = Color.LightGray;
+            band0.Columns["MPrice"].CellAppearance.BackColor = Color.LightGray;
+            band0.Columns["UnderlyingID"].CellAppearance.BackColor = Color.LightGray;
+            band0.Columns["WarrantName"].CellAppearance.BackColor = Color.LightGray;
+            band0.Columns["exeRatio"].CellAppearance.BackColor = Color.LightGray;
+            band0.Columns["EquivalentNum"].CellAppearance.BackColor = Color.LightGray;
+            band0.Columns["IssuedPercent"].CellAppearance.BackColor = Color.LightGray;
+            band0.Columns["RewardIssueCredit"].CellAppearance.BackColor = Color.LightGray;
 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["明日上市"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Center;
-            ultraGrid1.DisplayLayout.Bands[0].Override.HeaderAppearance.TextHAlign = Infragistics.Win.HAlign.Left;
-            
+            band0.Columns["MarketTmr"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Center;
+            band0.Override.HeaderAppearance.TextHAlign = Infragistics.Win.HAlign.Left;
+
             SetButton();
         }
 
-        private void LoadData()
-        {
-            try
-            {
-                dt.Rows.Clear();
+        private void LoadData() {
+            try {                
                 string sql = @"SELECT a.WarrantID
                                   ,a.ReIssueNum
                                   ,a.MarketTmr
-                                  ,CASE WHEN a.ConfirmChecked='Y' THEN 1 ELSE 0 END ConfirmChecked
-                                  ,IsNull(c.MPrice,ISNull(c.BPrice,IsNull(c.APrice,0))) MPrice
+                                  ,CASE WHEN a.ConfirmChecked='Y' THEN 1 ELSE 0 END ConfirmChecked                                  
                                   ,CASE WHEN b.isReward='1' THEN 'Y' ELSE 'N' END isReward
+                                  ,IsNull(c.MPrice,ISNull(c.BPrice,IsNull(c.APrice,0))) MPrice
                                   ,b.UnderlyingID
                                   ,b.WarrantName
                                   ,IsNull(b.exeRatio,0) exeRatio
@@ -115,14 +104,30 @@ namespace WarrantAssistant
                 sql += "WHERE a.UserID='" + userID + "' ";
                 sql += "ORDER BY a.MDate";
 
-                DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                dt = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                ultraGrid1.DataSource = dt;
 
-                foreach (DataRowView drv in dv)
-                {
+                dt.Columns[0].Caption = "權證代號";
+                dt.Columns[1].Caption = "增額張數";
+                dt.Columns[2].Caption = "明日上市";
+                dt.Columns[3].Caption = "確認";
+                dt.Columns[4].Caption = "獎勵";
+                dt.Columns[5].Caption = "權證價格";
+                dt.Columns[6].Caption = "標的代號";
+                dt.Columns[7].Caption = "權證名稱";
+                dt.Columns[8].Caption = "行使比例";
+                dt.Columns[9].Caption = "約當張數";
+                dt.Columns[10].Caption = "今日額度(%)";
+                dt.Columns[11].Caption = "獎勵額度";
+                dt.Columns[12].Caption = "交易員";
+
+                /*DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+
+                foreach (DataRowView drv in dv) {
                     DataRow dr = dt.NewRow();
 
                     string warrantID = drv["WarrantID"].ToString();
-                    dr["權證代號"] = warrantID;
+                    dr["WarrantID"] = warrantID;
                     double reIssueNum = Convert.ToDouble(drv["ReIssueNum"]);
                     dr["增額張數"] = reIssueNum;
                     string marketTmr = drv["MarketTmr"].ToString();
@@ -135,32 +140,29 @@ namespace WarrantAssistant
                     dr["標的代號"] = drv["UnderlyingID"].ToString();
                     dr["權證名稱"] = drv["WarrantName"].ToString();
                     double cr = Convert.ToDouble(drv["exeRatio"]);
-                    dr["行使比例"] = cr;
+                    dr["exeRatio"] = cr;
                     dr["約當張數"] = Convert.ToDouble(drv["EquivalentNum"]);
-                    dr["今日額度(%)"] = Math.Round(Convert.ToDouble(drv["IssuedPercent"]), 2);
-                    double rewardCredit = (double)drv["RewardIssueCredit"];
+                    dr["IssuedPercent"] = Math.Round(Convert.ToDouble(drv["IssuedPercent"]), 2);
+                    double rewardCredit = (double) drv["RewardIssueCredit"];
                     rewardCredit = Math.Floor(rewardCredit);
                     dr["獎勵額度"] = rewardCredit;
                     dr["交易員"] = drv["TraderID"].ToString();
 
                     dt.Rows.Add(dr);
-                }
-            }
-            catch (Exception ex)
-            {
+                }*/
+            } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
         }
 
-        private void UpdateData()
-        {
-            try
-            {
-                SqlCommand cmd = new SqlCommand("DELETE FROM [ReIssueTempList] WHERE UserID='" + userID + "'", conn);
+        private void UpdateData() {
+            try {
+                MSSQL.ExecSqlCmd("DELETE FROM [ReIssueTempList] WHERE UserID='" + userID + "'", conn);
+                /*SqlCommand cmd = new SqlCommand("DELETE FROM [ReIssueTempList] WHERE UserID='" + userID + "'", conn);
                 conn.Open();
                 cmd.ExecuteNonQuery();
                 cmd.Dispose();
-                conn.Close();
+                conn.Close();*/
 
                 string sql = @"INSERT INTO [ReIssueTempList] (SerialNum, WarrantID, ReIssueNum, MarketTmr, ConfirmChecked, TraderID, MDate, UserID) ";
                 sql += "VALUES(@SerialNum, @WarrantID, @ReIssueNum, @MarketTmr, @ConfirmChecked, @TraderID, @MDate, @UserID)";
@@ -178,22 +180,19 @@ namespace WarrantAssistant
 
                 int i = 1;
                 applyCount = 0;
-                foreach (Infragistics.Win.UltraWinGrid.UltraGridRow r in ultraGrid1.Rows)
-                {
+                foreach (Infragistics.Win.UltraWinGrid.UltraGridRow r in ultraGrid1.Rows) {
                     string serialNumber = DateTime.Today.ToString("yyyyMMdd") + userID + "02" + i.ToString("0#");
-                    string warrantID = r.Cells["權證代號"].Value.ToString();
-                    double reIssueNum = Convert.ToDouble(r.Cells["增額張數"].Value);
-                    string marketTmr = r.Cells["明日上市"].Value==DBNull.Value? "Y": r.Cells["明日上市"].Value.ToString();
-                    string traderID = r.Cells["交易員"].Value == DBNull.Value ? userID : r.Cells["交易員"].Value.ToString();
+                    string warrantID = r.Cells["WarrantID"].Value.ToString();
+                    double reIssueNum = Convert.ToDouble(r.Cells["ReIssueNum"].Value);
+                    string marketTmr = r.Cells["MarketTmr"].Value == DBNull.Value ? "Y" : r.Cells["MarketTmr"].Value.ToString();
+                    string traderID = r.Cells["TraderID"].Value == DBNull.Value ? userID : r.Cells["TraderID"].Value.ToString();
                     bool confirmed = false;
-                    confirmed = r.Cells["確認"].Value == DBNull.Value ? false : Convert.ToBoolean(r.Cells["確認"].Value);
+                    confirmed = r.Cells["ConfirmChecked"].Value == DBNull.Value ? false : Convert.ToBoolean(r.Cells["ConfirmChecked"].Value);
                     string confirmChecked = "N";
-                    if (confirmed == true)
-                    {
+                    if (confirmed) {
                         confirmChecked = "Y";
                         applyCount++;
-                    }
-                    else
+                    } else
                         confirmChecked = "N";
 
                     h.SetParameterValue("@SerialNum", serialNumber);
@@ -211,32 +210,14 @@ namespace WarrantAssistant
 
                 h.Dispose();
                 GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + " 編輯/更新" + (i - 1) + "檔增額");
-                /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                List<SqlParameter> psInfo = new List<SqlParameter>();
-                psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
 
-                SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                hInfo.SetParameterValue("@MDate", DateTime.Now);
-                hInfo.SetParameterValue("@InformationType", "Log");
-                hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID + " 編輯/更新" + (i - 1) + "檔增額");
-                hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                hInfo.ExecuteCommand();
-                hInfo.Dispose();*/
-
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
         }
 
-        private void OfficiallyApply()
-        {
-            try
-            {
+        private void OfficiallyApply() {
+            try {
                 UpdateData();
                 string sql1 = "DELETE FROM [EDIS].[dbo].[ReIssueOfficial] WHERE [UserID]='" + userID + "'";
                 string sql2 = @"INSERT INTO [EDIS].[dbo].[ReIssueOfficial] ([SerialNum],[UnderlyingID],[WarrantID],[WarrantName],[exeRatio],[ReIssueNum],[UseReward],[MarketTmr],[TraderID],[MDate],UserID)
@@ -252,60 +233,49 @@ namespace WarrantAssistant
                                 LEFT JOIN [EDIS].[dbo].[WarrantBasic] c ON a.WarrantID=c.WarrantID";
                 sql4 += " WHERE a.[UserID]='" + userID + "'";
 
-                SqlCommand cmd1 = new SqlCommand(sql1, conn);
+                /*SqlCommand cmd1 = new SqlCommand(sql1, conn);
                 SqlCommand cmd2 = new SqlCommand(sql2, conn);
                 SqlCommand cmd3 = new SqlCommand(sql3, conn);
-                SqlCommand cmd4 = new SqlCommand(sql4, conn);
+                SqlCommand cmd4 = new SqlCommand(sql4, conn);*/
 
                 conn.Open();
-                cmd1.ExecuteNonQuery();
+                MSSQL.ExecSqlCmd(sql1, conn);
+                MSSQL.ExecSqlCmd(sql2, conn);
+                MSSQL.ExecSqlCmd(sql3, conn);
+                MSSQL.ExecSqlCmd(sql4, conn);
+
+                /*cmd1.ExecuteNonQuery();
                 cmd1.Dispose();
                 cmd2.ExecuteNonQuery();
                 cmd2.Dispose();
                 cmd3.ExecuteNonQuery();
                 cmd3.Dispose();
                 cmd4.ExecuteNonQuery();
-                cmd4.Dispose();
+                cmd4.Dispose();*/
                 conn.Close();
 
                 toolStripLabel2.Text = DateTime.Now + "申請成功";
                 GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 申請" + applyCount + "檔權證增額");
-                /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                List<SqlParameter> psInfo = new List<SqlParameter>();
-                psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
 
-                SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                hInfo.SetParameterValue("@MDate", DateTime.Now);
-                hInfo.SetParameterValue("@InformationType", "Info");
-                hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID + " 申請" + applyCount + "檔權證增額");
-                hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                hInfo.ExecuteCommand();
-                hInfo.Dispose();*/
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
         }
 
-        private void SetButton()
-        {
-            if (isEdit)
-            {
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.TemplateOnBottom;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.True;
+        private void SetButton() {
+            UltraGridBand band0 = ultraGrid1.DisplayLayout.Bands[0];
+            if (isEdit) {
+                band0.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.TemplateOnBottom;
+                band0.Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
+                band0.Override.AllowDelete = Infragistics.Win.DefaultableBoolean.True;
 
-                ultraGrid1.DisplayLayout.Bands[0].Columns["權證代號"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["增額張數"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["明日上市"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["權證價格"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["權證名稱"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["行使比例"].CellActivation = Activation.AllowEdit;
+                band0.Columns["WarrantID"].CellActivation = Activation.AllowEdit;
+                band0.Columns["ReIssueNum"].CellActivation = Activation.AllowEdit;
+                band0.Columns["MarketTmr"].CellActivation = Activation.AllowEdit;
+                band0.Columns["isReward"].CellActivation = Activation.AllowEdit;
+                band0.Columns["MPrice"].CellActivation = Activation.AllowEdit;
+                band0.Columns["WarrantName"].CellActivation = Activation.AllowEdit;
+                band0.Columns["exeRatio"].CellActivation = Activation.AllowEdit;
 
                 buttonEdit.Visible = false;
                 buttonConfirm.Visible = true;
@@ -314,32 +284,30 @@ namespace WarrantAssistant
                 toolStripButton1.Visible = false;
                 toolStripSeparator2.Visible = false;
 
-                ultraGrid1.DisplayLayout.Bands[0].Columns["確認"].Hidden = true;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["標的代號"].Hidden = true;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["約當張數"].Hidden = true;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["今日額度(%)"].Hidden = true;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵額度"].Hidden = true;
+                band0.Columns["ConfirmChecked"].Hidden = true;
+                band0.Columns["UnderlyingID"].Hidden = true;
+                band0.Columns["EquivalentNum"].Hidden = true;
+                band0.Columns["IssuedPercent"].Hidden = true;
+                band0.Columns["RewardIssueCredit"].Hidden = true;
 
-            }
-            else
-            {
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
+            } else {
+                band0.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
+                band0.Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
+                band0.Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
 
-                ultraGrid1.DisplayLayout.Bands[0].Columns["確認"].CellActivation = Activation.AllowEdit;
+                band0.Columns["ConfirmChecked"].CellActivation = Activation.AllowEdit;
 
-                ultraGrid1.DisplayLayout.Bands[0].Columns["權證代號"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["增額張數"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["明日上市"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["權證價格"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["標的代號"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["權證名稱"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["行使比例"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["約當張數"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["今日額度(%)"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵額度"].CellActivation = Activation.NoEdit;
+                band0.Columns["WarrantID"].CellActivation = Activation.NoEdit;
+                band0.Columns["ReIssueNum"].CellActivation = Activation.NoEdit;
+                band0.Columns["MarketTmr"].CellActivation = Activation.NoEdit;
+                band0.Columns["isReward"].CellActivation = Activation.NoEdit;
+                band0.Columns["MPrice"].CellActivation = Activation.NoEdit;
+                band0.Columns["UnderlyingID"].CellActivation = Activation.NoEdit;
+                band0.Columns["WarrantName"].CellActivation = Activation.NoEdit;
+                band0.Columns["exeRatio"].CellActivation = Activation.NoEdit;
+                band0.Columns["EquivalentNum"].CellActivation = Activation.NoEdit;
+                band0.Columns["IssuedPercent"].CellActivation = Activation.NoEdit;
+                band0.Columns["RewardIssueCredit"].CellActivation = Activation.NoEdit;
 
                 buttonEdit.Visible = true;
                 buttonConfirm.Visible = false;
@@ -348,36 +316,32 @@ namespace WarrantAssistant
                 toolStripButton1.Visible = true;
                 toolStripSeparator2.Visible = true;
 
-                ultraGrid1.DisplayLayout.Bands[0].Columns["確認"].Hidden = false;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["標的代號"].Hidden = false;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["約當張數"].Hidden = false;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["今日額度(%)"].Hidden = false;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵額度"].Hidden = false;
+                band0.Columns["ConfirmChecked"].Hidden = false;
+                band0.Columns["UnderlyingID"].Hidden = false;
+                band0.Columns["EquivalentNum"].Hidden = false;
+                band0.Columns["IssuedPercent"].Hidden = false;
+                band0.Columns["RewardIssueCredit"].Hidden = false;
             }
         }
 
-        private void ultraGrid1_InitializeLayout(object sender, InitializeLayoutEventArgs e)
-        {
+        private void ultraGrid1_InitializeLayout(object sender, InitializeLayoutEventArgs e) {
             ultraGrid1.DisplayLayout.Override.RowSelectorHeaderStyle = RowSelectorHeaderStyle.ColumnChooserButton;
 
             ValueList v;
-            if (!e.Layout.ValueLists.Exists("MyValueList"))
-            {
+            if (!e.Layout.ValueLists.Exists("MyValueList")) {
                 v = e.Layout.ValueLists.Add("MyValueList");
                 v.ValueListItems.Add("Y", "Y");
                 v.ValueListItems.Add("N", "N");
             }
-            e.Layout.Bands[0].Columns["明日上市"].ValueList = e.Layout.ValueLists["MyValueList"];
+            e.Layout.Bands[0].Columns["MarketTmr"].ValueList = e.Layout.ValueLists["MyValueList"];
         }
 
-        private void buttonEdit_Click(object sender, EventArgs e)
-        {
+        private void buttonEdit_Click(object sender, EventArgs e) {
             isEdit = true;
             SetButton();
         }
 
-        private void buttonConfirm_Click(object sender, EventArgs e)
-        {
+        private void buttonConfirm_Click(object sender, EventArgs e) {
             ultraGrid1.PerformAction(Infragistics.Win.UltraWinGrid.UltraGridAction.ExitEditMode);
             isEdit = false;
             UpdateData();
@@ -385,86 +349,59 @@ namespace WarrantAssistant
             LoadData();
         }
 
-        private void buttonDelete_Click(object sender, EventArgs e)
-        {
+        private void buttonDelete_Click(object sender, EventArgs e) {
             isEdit = true;
 
             DialogResult result = MessageBox.Show("將全部刪除，確定?", "刪除資料", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (result == DialogResult.Yes)
-            {
-                SqlCommand cmd = new SqlCommand("DELETE FROM [ReIssueTempList] WHERE UserID='" + userID + "'", conn);
+            if (result == DialogResult.Yes) {
+                MSSQL.ExecSqlCmd("DELETE FROM [ReIssueTempList] WHERE UserID='" + userID + "'", conn);
+                /*SqlCommand cmd = new SqlCommand("DELETE FROM [ReIssueTempList] WHERE UserID='" + userID + "'", conn);
                 conn.Open();
                 cmd.ExecuteNonQuery();
                 cmd.Dispose();
-                conn.Close();
+                conn.Close();*/
             }
             LoadData();
             SetButton();
         }
 
-        private void buttonCancel_Click(object sender, EventArgs e)
-        {
+        private void buttonCancel_Click(object sender, EventArgs e) {
             isEdit = false;
             LoadData();
             SetButton();
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
-        {
-            if (GlobalVar.globalParameter.userGroup == "FE")
-            {
+        private void toolStripButton1_Click(object sender, EventArgs e) {
+            if (GlobalVar.globalParameter.userGroup == "FE") {
                 OfficiallyApply();
                 LoadData();
-            }
-            else
-            {
+            } else {
                 if (DateTime.Now.TimeOfDay.TotalMinutes > 630)
                     MessageBox.Show("超過交易所申報時間，欲改條件請洽行政組");
-                else if (DateTime.Now.TimeOfDay.TotalMinutes > 570)
-                {
+                else if (DateTime.Now.TimeOfDay.TotalMinutes > 570) {
                     DialogResult result = MessageBox.Show("超過約定的9:30了，已經告知組長及行政?", "逾時申請", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (result == DialogResult.Yes)
-                    {
+                    if (result == DialogResult.Yes) {
                         OfficiallyApply();
                         LoadData();
                         GlobalUtility.LogInfo("Announce", GlobalVar.globalParameter.userID + " 逾時申請" + applyCount + "檔權證增額");
-                        /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                        List<SqlParameter> psInfo = new List<SqlParameter>();
-                        psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                        psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                        psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                        psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
 
-                        SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                        hInfo.SetParameterValue("@MDate", DateTime.Now);
-                        hInfo.SetParameterValue("@InformationType", "Announce");
-                        hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID + " 逾時申請" + applyCount + "檔權證增額");
-                        hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                        hInfo.ExecuteCommand();
-                        hInfo.Dispose();*/
-                    }
-                    else
+                    } else
                         LoadData();
-                }
-                else
-                {
+                } else {
                     OfficiallyApply();
                     LoadData();
                 }
             }
         }
 
-        private void ultraGrid1_CellChange(object sender, CellEventArgs e)
-        {
-            if (e.Cell.Column.Key == "確認")
+        private void ultraGrid1_CellChange(object sender, CellEventArgs e) {
+            if (e.Cell.Column.Key == "ConfirmChecked")
                 ultraGrid1.PerformAction(Infragistics.Win.UltraWinGrid.UltraGridAction.ExitEditMode);
         }
 
-        private void ultraGrid1_AfterCellUpdate(object sender, CellEventArgs e)
-        {
-            if (e.Cell.Column.Key == "權證代號")
-            {
-                string warrantID = e.Cell.Row.Cells["權證代號"].Value.ToString();
+        private void ultraGrid1_AfterCellUpdate(object sender, CellEventArgs e) {
+            if (e.Cell.Column.Key == "WarrantID") {
+                string warrantID = e.Cell.Row.Cells["WarrantID"].Value.ToString();
                 string useReward = "";
                 double warrantPrice = 0.0;
                 string warrantName = "";
@@ -479,54 +416,48 @@ namespace WarrantAssistant
                                   FROM [EDIS].[dbo].[WarrantBasic] a
                                   LEFT JOIN [EDIS].[dbo].[WarrantPrices] b ON a.WarrantID=b.CommodityID";
                 sqlTemp += " WHERE a.WarrantID='" + warrantID + "'";
-                DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+                //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+                DataTable dtTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
 
-                foreach (DataRowView drTemp in dvTemp)
-                {
+                foreach (DataRow drTemp in dtTemp.Rows) {
                     useReward = drTemp["isReward"].ToString();
                     warrantPrice = Convert.ToDouble(drTemp["MPrice"]);
                     warrantName = drTemp["WarrantName"].ToString();
                     traderID = drTemp["TraderID"].ToString();
                     cr = Convert.ToDouble(drTemp["exeRatio"]);
                 }
-                e.Cell.Row.Cells["獎勵"].Value = useReward;
-                e.Cell.Row.Cells["權證價格"].Value = warrantPrice;
-                e.Cell.Row.Cells["權證名稱"].Value = warrantName;
-                e.Cell.Row.Cells["行使比例"].Value = cr;
-                e.Cell.Row.Cells["交易員"].Value = traderID;
+                e.Cell.Row.Cells["isReward"].Value = useReward;
+                e.Cell.Row.Cells["MPrice"].Value = warrantPrice;
+                e.Cell.Row.Cells["WarrantName"].Value = warrantName;
+                e.Cell.Row.Cells["exeRatio"].Value = cr;
+                e.Cell.Row.Cells["TraderID"].Value = traderID;
             }
         }
 
-        private void ultraGrid1_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
+        private void ultraGrid1_MouseDown(object sender, MouseEventArgs e) {
+            if (e.Button == MouseButtons.Right) {
                 contextMenuStrip1.Show();
             }
         }
 
-        private void ultraGrid1_BeforeRowsDeleted(object sender, BeforeRowsDeletedEventArgs e)
-        {
+        private void ultraGrid1_BeforeRowsDeleted(object sender, BeforeRowsDeletedEventArgs e) {
             e.DisplayPromptMsg = false;
         }
 
-        private void 刪除ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
+        private void 刪除ToolStripMenuItem_Click(object sender, EventArgs e) {
             DialogResult result = MessageBox.Show("刪除此檔，確定?", "刪除資料", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (result == DialogResult.Yes)
-            {
+            if (result == DialogResult.Yes) {
                 ultraGrid1.ActiveRow.Delete();
                 UpdateData();
             }
             LoadData();
         }
 
-        private void ultraGrid1_InitializeRow(object sender, InitializeRowEventArgs e)
-        {
+        private void ultraGrid1_InitializeRow(object sender, InitializeRowEventArgs e) {
             string warrantID = "";
             string underlyingID = "";
-            warrantID = e.Row.Cells["權證代號"].Value.ToString();
-            underlyingID = e.Row.Cells["標的代號"].Value.ToString();
+            warrantID = e.Row.Cells["WarrantID"].Value.ToString();
+            underlyingID = e.Row.Cells["UnderlyingID"].Value.ToString();
 
             string traderID = "NA";
             string issuable = "NA";
@@ -539,95 +470,59 @@ namespace WarrantAssistant
 
             string sqlTemp = "SELECT TraderID, IsNull(Issuable,'NA') Issuable FROM [EDIS].[dbo].[WarrantUnderlyingSummary] WHERE UnderlyingID = '" + underlyingID + "'";
             DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
-            if (dvTemp.Count > 0)
-            {
-                foreach (DataRowView drTemp in dvTemp)
-                {
+            if (dvTemp.Count > 0) {
+                foreach (DataRowView drTemp in dvTemp) {
                     traderID = "000" + drTemp["TraderID"].ToString();
                     issuable = drTemp["Issuable"].ToString();
                 }
             }
             string sqlTemp2 = "SELECT IsNull([ReIssuable],'NA') ReIssuable FROM [EDIS].[dbo].[WarrantReIssuable] WHERE WarrantID = '" + warrantID + "'";
             DataView dvTemp2 = DeriLib.Util.ExecSqlQry(sqlTemp2, GlobalVar.loginSet.edisSqlConnString);
-            if (dvTemp2.Count > 0)
-            {
-                foreach (DataRowView drTemp2 in dvTemp2)
-                {
+            if (dvTemp2.Count > 0) {
+                foreach (DataRowView drTemp2 in dvTemp2) {
                     reissuable = drTemp2["ReIssuable"].ToString();
                 }
             }
-            if (!isEdit)
-            {
-                
-                if (issuable == "NA")
-                {
+            if (!isEdit) {
+
+                if (issuable == "NA") {
                     e.Row.ToolTipText = toolTip2;
                     e.Row.Appearance.ForeColor = Color.Red;
-                }
-                else if (issuable == "N")
-                {
-                    e.Row.Cells["標的代號"].ToolTipText = toolTip3;
-                    e.Row.Cells["標的代號"].Appearance.ForeColor = Color.Red;
+                } else if (issuable == "N") {
+                    e.Row.Cells["UnderlyingID"].ToolTipText = toolTip3;
+                    e.Row.Cells["UnderlyingID"].Appearance.ForeColor = Color.Red;
                 }
 
-                if (reissuable == "NA")
-                {
-                    e.Row.Cells["權證代號"].ToolTipText = toolTip1;
-                    e.Row.Cells["權證代號"].Appearance.ForeColor = Color.Red;
+                if (reissuable == "NA") {
+                    e.Row.Cells["WarrantID"].ToolTipText = toolTip1;
+                    e.Row.Cells["WarrantID"].Appearance.ForeColor = Color.Red;
                 }
 
-                if (issuable != "NA" && traderID != userID)
-                {
+                if (issuable != "NA" && traderID != userID) {
                     e.Row.Appearance.BackColor = Color.LightYellow;
-                    e.Row.Cells["權證代號"].ToolTipText = toolTip4;
+                    e.Row.Cells["WarrantID"].ToolTipText = toolTip4;
                 }
             }
-            
+
         }
 
-        private void ultraGrid1_DoubleClickCell(object sender, DoubleClickCellEventArgs e)
-        {
-            if (e.Cell.Column.Key == "權證代號")
-            {
-                FrmReIssuable frmReIssuable = null;
-
-                foreach (Form iForm in Application.OpenForms)
-                {
-                    if (iForm.GetType() == typeof(FrmReIssuable))
-                    {
-                        frmReIssuable = (FrmReIssuable)iForm;
-                        break;
-                    }
-                }
-
-                if (frmReIssuable != null)
-                    frmReIssuable.BringToFront();
-                else
-                {
-                    frmReIssuable = new FrmReIssuable();
-                    frmReIssuable.StartPosition = FormStartPosition.CenterScreen;
-                    frmReIssuable.Show();
-                }
-            }
+        private void ultraGrid1_DoubleClickCell(object sender, DoubleClickCellEventArgs e) {
+            if (e.Cell.Column.Key == "WarrantID")
+                GlobalUtility.MenuItemClick<FrmReIssuable>();
         }
 
-        private void ultraGrid1_DoubleClickHeader(object sender, DoubleClickHeaderEventArgs e)
-        {
-            if (e.Header.Column.Key == "確認")
-            {
-                foreach (Infragistics.Win.UltraWinGrid.UltraGridRow r in ultraGrid1.Rows)
-                {
-                    r.Cells["確認"].Value = true;
+        private void ultraGrid1_DoubleClickHeader(object sender, DoubleClickHeaderEventArgs e) {
+            if (e.Header.Column.Key == "ConfirmChecked") {
+                foreach (Infragistics.Win.UltraWinGrid.UltraGridRow r in ultraGrid1.Rows) {
+                    r.Cells["ConfirmChecked"].Value = true;
                     UpdateData();
                     LoadData();
                 }
             }
         }
 
-        private void FrmReIssue_FormClosed(object sender, FormClosedEventArgs e)
-        {
+        private void FrmReIssue_FormClosed(object sender, FormClosedEventArgs e) {
             UpdateData();
         }
-
     }
 }

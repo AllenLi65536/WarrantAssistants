@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using System.Diagnostics;
-using Infragistics.Shared;
 using Infragistics.Win;
 using Infragistics.Win.UltraWinGrid;
 using System.Data.SqlClient;
@@ -22,14 +17,11 @@ namespace WarrantAssistant
         public SqlConnection conn = new SqlConnection(GlobalVar.loginSet.edisSqlConnString);
         private DataTable dt = new DataTable();
         private bool isEdit = false;
-        public string userID;
-        public string userName;
+        public string userID = GlobalVar.globalParameter.userID;
+        public string userName = GlobalVar.globalParameter.userName;
         private int applyCount = 0;
 
         public FrmApply() {
-            userID = GlobalVar.globalParameter.userID;
-            userName = GlobalVar.globalParameter.userName;
-            //MessageBox.Show(userID +" " + userName);          
             InitializeComponent();
         }
 
@@ -123,7 +115,7 @@ namespace WarrantAssistant
             band0.Columns["約當張數"].Width = 60;
             band0.Columns["今日額度"].Width = 60;
             band0.Columns["獎勵額度"].Width = 60;
-           
+
 
             band0.Columns["發行價格"].CellAppearance.BackColor = Color.LightGray;
             band0.Columns["標的名稱"].CellAppearance.BackColor = Color.LightGray;
@@ -139,7 +131,7 @@ namespace WarrantAssistant
             band0.Columns["獎勵額度"].CellAppearance.BackColor = Color.LightGray;
 
             //band0.Columns["標的代號"].SortIndicator = SortIndicator.None;
-                        
+
             // To sort multi-column using SortedColumns property
             // This enables multi-column sorting
             this.ultraGrid1.DisplayLayout.Override.HeaderClickAction = Infragistics.Win.UltraWinGrid.HeaderClickAction.SortMulti;
@@ -336,12 +328,12 @@ namespace WarrantAssistant
             sql2 += " WHERE [UserID]='" + userID + "' AND [ConfirmChecked]='Y' and ((Reason=0  and A.CP='C') or (ReasonP = 0 and A.CP = 'P'))";//
 
             DataTable noReason = MSSQL.ExecSqlQry(sql2, conn);// new DataTable("noReason");            
-            
+
             foreach (DataRow Row in noReason.Rows) {
                 MessageBox.Show(Row["UnderlyingID"] + " 未輸入發行原因");
                 undoneReason = false;
             }
-           
+
             return undoneReason;
         }
         private void CheckRelation() {
@@ -545,20 +537,6 @@ namespace WarrantAssistant
 
                 h.Dispose();
                 GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + " 編輯/更新" + (i - 1) + "檔發行");
-                /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                List<SqlParameter> psInfo = new List<SqlParameter>();
-                psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
-
-                SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                hInfo.SetParameterValue("@MDate", DateTime.Now);
-                hInfo.SetParameterValue("@InformationType", "Log");
-                hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID + " 編輯/更新" + (i-1) + "檔發行");
-                hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                hInfo.ExecuteCommand();
-                hInfo.Dispose();*/
 
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
@@ -621,13 +599,13 @@ namespace WarrantAssistant
                     DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                     int count = 0;
                     if (dvTemp.Count > 0) {
-                        string lastWarrantName = dvTemp[0][0].ToString();                        
+                        string lastWarrantName = dvTemp[0][0].ToString();
                         if (!int.TryParse(lastWarrantName.Substring(lastWarrantName.Length - 2, 2), out count))
-                            MessageBox.Show("parse failed "+ lastWarrantName);
+                            MessageBox.Show("parse failed " + lastWarrantName);
                     }
 
                     //if (dvTemp.Count > 0)
-                     //   count += dvTemp.Count;
+                    //   count += dvTemp.Count;
 
                     /*sqlTemp = "SELECT [WarrantName] FROM [EDIS].[dbo].[ApplyTotalList] WHERE [ApplyKind]='1' AND [SerialNum]<" + serialNum + " AND SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 1) + "'";
                     dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
@@ -644,20 +622,6 @@ namespace WarrantAssistant
 
                 toolStripLabel2.Text = DateTime.Now + "申請" + applyCount + "檔權證發行成功";
                 GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 申請" + applyCount + "檔權證發行");
-                /* string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                 List<SqlParameter> psInfo = new List<SqlParameter>();
-                 psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                 psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                 psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                 psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
-
-                 SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                 hInfo.SetParameterValue("@MDate", DateTime.Now);
-                 hInfo.SetParameterValue("@InformationType", "Info");
-                 hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID + " 申請"+applyCount+"檔權證發行");
-                 hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                 hInfo.ExecuteCommand();
-                 hInfo.Dispose();*/
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
@@ -976,7 +940,7 @@ namespace WarrantAssistant
         }
 
         private void 刪除ToolStripMenuItem_Click(object sender, EventArgs e) {
-            DialogResult result = MessageBox.Show("刪除此檔，標的:"+ultraGrid1.ActiveRow.Cells["標的代號"].Value+" 履約價:"+ ultraGrid1.ActiveRow.Cells["履約價"].Value + "，確定?", "刪除資料", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            DialogResult result = MessageBox.Show("刪除此檔，標的:" + ultraGrid1.ActiveRow.Cells["標的代號"].Value + " 履約價:" + ultraGrid1.ActiveRow.Cells["履約價"].Value + "，確定?", "刪除資料", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (result == DialogResult.Yes) {
                 ultraGrid1.ActiveRow.Delete();
                 UpdateData();
@@ -1153,20 +1117,7 @@ namespace WarrantAssistant
                         OfficiallyApply();
                         LoadData();
                         GlobalUtility.LogInfo("Announce", GlobalVar.globalParameter.userID + " 逾時申請" + applyCount + "檔權證發行");
-                        /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                        List<SqlParameter> psInfo = new List<SqlParameter>();
-                        psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                        psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                        psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                        psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
 
-                        SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                        hInfo.SetParameterValue("@MDate", DateTime.Now);
-                        hInfo.SetParameterValue("@InformationType", "Announce");
-                        hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID + " 逾時申請" + applyCount + "檔權證發行");
-                        hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                        hInfo.ExecuteCommand();
-                        hInfo.Dispose();*/
                     } else
                         LoadData();
                 } else {
@@ -1207,7 +1158,5 @@ namespace WarrantAssistant
             UpdateData();
             LoadData();
         }
-
-
     }
 }
