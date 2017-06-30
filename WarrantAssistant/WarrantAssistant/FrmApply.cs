@@ -28,7 +28,8 @@ namespace WarrantAssistant
 
         public FrmApply() {
             userID = GlobalVar.globalParameter.userID;
-            userName = GlobalVar.globalParameter.userName;            
+            userName = GlobalVar.globalParameter.userName;
+            MessageBox.Show(userID +" " + userName);          
             InitializeComponent();
         }
 

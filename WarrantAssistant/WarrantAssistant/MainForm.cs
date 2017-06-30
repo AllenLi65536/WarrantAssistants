@@ -217,7 +217,7 @@ namespace WarrantAssistant
         }
 
         private void 發行條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
-            GlobalUtility.MenuItemClick<FrmApply>().userID = GlobalVar.globalParameter.userID;
+            GlobalUtility.MenuItemClick<FrmApply>();
         }
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
