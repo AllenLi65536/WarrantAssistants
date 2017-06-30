@@ -25,6 +25,8 @@ namespace WarrantAssistant
 
         public FrmReIssue()
         {
+            userID = GlobalVar.globalParameter.userID;
+            userName = GlobalVar.globalParameter.userName;
             InitializeComponent();
         }
 

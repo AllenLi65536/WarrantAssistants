@@ -22,11 +22,13 @@ namespace WarrantAssistant
         public SqlConnection conn = new SqlConnection(GlobalVar.loginSet.edisSqlConnString);
         private DataTable dt = new DataTable();
         private bool isEdit = false;
-        public string userID = GlobalVar.globalParameter.userID;
+        public string userID;
         public string userName;
         private int applyCount = 0;
 
         public FrmApply() {
+            userID = GlobalVar.globalParameter.userID;
+            userName = GlobalVar.globalParameter.userName;            
             InitializeComponent();
         }
 
