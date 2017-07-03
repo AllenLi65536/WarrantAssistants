@@ -258,7 +258,7 @@ namespace WarrantAssistant
                     iForm.BringToFront();
                     return;
                 }
-            }
+            }           
             FrmApply frmApplyDeputy = new FrmApply();
             frmApplyDeputy.userID = GlobalVar.globalParameter.userDeputy;
             frmApplyDeputy.StartPosition = FormStartPosition.CenterScreen;

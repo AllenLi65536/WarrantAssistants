@@ -265,6 +265,7 @@ namespace WarrantAssistant
 
                         double jumpSize = 0.0;
                         double multiplier = 0.0;
+                        multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice);
                         if (underlyingID.Substring(0, 2) == "00") {
                             if (underlyingPrice <= 50)
                                 multiplier = 0.01;

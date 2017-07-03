@@ -80,8 +80,7 @@ namespace WarrantAssistant
                               ,a.[Result]
                               ,IsNull(b.[IssueCredit],0) Credit
                               ,IsNull(b.[RewardIssueCredit],0) RewardCredit
-                              ,a.[UseReward]
-                              ,CASE WHEN a.CP='C' THEN c.Reason ELSE c.ReasonP END Reason
+                              ,a.[UseReward]                              
                           FROM [EDIS].[dbo].[ApplyTotalList] a 
                           LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingSummary] b ON a.UnderlyingID=b.UnderlyingID
                           left join Underlying_TraderIssue c on a.UnderlyingID=c.UID 
@@ -103,13 +102,13 @@ namespace WarrantAssistant
                     dr["行使比例"] = Convert.ToDouble(drv["CR"]);
                     dr["張數"] = Convert.ToDouble(drv["IssueNum"]);
                     dr["約當張數"] = Convert.ToDouble(drv["EquivalentNum"]);
-                    double result = drv["Result"] == DBNull.Value ? 0.0 : Convert.ToDouble(drv["Result"]);
-                    result = Math.Floor(result);
+                    //double result = drv["Result"] == DBNull.Value ? 0.0 : Convert.ToDouble(drv["Result"]);
+                    //result = Math.Floor(drv["Result"] == DBNull.Value ? 0.0 : Convert.ToDouble(drv["Result"]));
                     double credit = (double) drv["Credit"];
                     credit = Math.Floor(credit);
                     double rewardCredit = (double) drv["RewardCredit"];
                     rewardCredit = Math.Floor(rewardCredit);
-                    dr["額度結果"] = result;
+                    dr["額度結果"] = Math.Floor(drv["Result"] == DBNull.Value ? 0.0 : Convert.ToDouble(drv["Result"]));
                     dr["今日額度"] = credit;
                     dr["獎勵額度"] = rewardCredit;
                     dr["使用獎勵"] = drv["UseReward"].ToString();

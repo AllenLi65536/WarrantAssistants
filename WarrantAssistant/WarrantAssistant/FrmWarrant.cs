@@ -22,6 +22,7 @@ namespace WarrantAssistant
             toolStripComboBox1.Items.Add("0008570");
             //toolStripComboBox1.Items.Add("0008629");
             toolStripComboBox1.Items.Add("0008730");
+            toolStripComboBox1.Items.Add("0010120");
 
         }
 
@@ -66,7 +67,7 @@ namespace WarrantAssistant
             dataGridView1.AllowUserToDeleteRows = false;
             dataGridView1.AllowUserToResizeRows = false;
             dataGridView1.RowHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.RowHeaderSelect;
         }
 
         private void LoadData() {

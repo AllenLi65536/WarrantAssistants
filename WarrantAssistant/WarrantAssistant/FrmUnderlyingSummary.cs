@@ -42,7 +42,9 @@ namespace WarrantAssistant
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = false;
             dataGridView1.AllowUserToResizeRows = false;
-            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.RowHeaderSelect;
+            //dataGridView1.DefaultCellStyle.SelectionBackColor = Color.White;
+            //dataGridView1.DefaultCellStyle.SelectionForeColor = Color.Red;
         }
 
         private void LoadData() {

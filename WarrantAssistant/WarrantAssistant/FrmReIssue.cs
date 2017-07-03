@@ -67,14 +67,16 @@ namespace WarrantAssistant
             band0.Columns["WarrantName"].Width = 150;
             band0.Columns["exeRatio"].Width = 73;
 
-            band0.Columns["isReward"].CellAppearance.BackColor = Color.LightGray;
+            for (int i = 4; i < 12; i++)
+                band0.Columns[i].CellAppearance.BackColor = Color.LightGray;
+            /*band0.Columns["isReward"].CellAppearance.BackColor = Color.LightGray;
             band0.Columns["MPrice"].CellAppearance.BackColor = Color.LightGray;
             band0.Columns["UnderlyingID"].CellAppearance.BackColor = Color.LightGray;
             band0.Columns["WarrantName"].CellAppearance.BackColor = Color.LightGray;
             band0.Columns["exeRatio"].CellAppearance.BackColor = Color.LightGray;
             band0.Columns["EquivalentNum"].CellAppearance.BackColor = Color.LightGray;
             band0.Columns["IssuedPercent"].CellAppearance.BackColor = Color.LightGray;
-            band0.Columns["RewardIssueCredit"].CellAppearance.BackColor = Color.LightGray;
+            band0.Columns["RewardIssueCredit"].CellAppearance.BackColor = Color.LightGray;*/
 
             band0.Columns["MarketTmr"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Center;
             band0.Override.HeaderAppearance.TextHAlign = Infragistics.Win.HAlign.Left;
@@ -401,12 +403,7 @@ namespace WarrantAssistant
 
         private void ultraGrid1_AfterCellUpdate(object sender, CellEventArgs e) {
             if (e.Cell.Column.Key == "WarrantID") {
-                string warrantID = e.Cell.Row.Cells["WarrantID"].Value.ToString();
-                string useReward = "";
-                double warrantPrice = 0.0;
-                string warrantName = "";
-                string traderID = "";
-                double cr = 0.0;
+                string warrantID = e.Cell.Row.Cells["WarrantID"].Value.ToString();                
 
                 string sqlTemp = @"SELECT CASE WHEN a.isReward='1' THEN 'Y' ELSE 'N' END isReward
 		                                ,IsNull(b.MPrice,ISNull(b.BPrice,IsNull(b.APrice,0))) MPrice
@@ -419,6 +416,22 @@ namespace WarrantAssistant
                 //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                 DataTable dtTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
 
+                if (dtTemp.Rows.Count == 0) {
+                    MessageBox.Show("Wrong WarrantID!");                    
+                } else {
+                    e.Cell.Row.Cells["isReward"].Value = dtTemp.Rows[0]["isReward"];
+                    e.Cell.Row.Cells["MPrice"].Value = dtTemp.Rows[0]["MPrice"];
+                    e.Cell.Row.Cells["WarrantName"].Value = dtTemp.Rows[0]["WarrantName"];
+                    e.Cell.Row.Cells["exeRatio"].Value = dtTemp.Rows[0]["exeRatio"];
+                    e.Cell.Row.Cells["TraderID"].Value = dtTemp.Rows[0]["TraderID"];
+                }
+
+
+                /*string useReward = "";
+                double warrantPrice = 0.0;
+                string warrantName = "";
+                string traderID = "";
+                double cr = 0.0;
                 foreach (DataRow drTemp in dtTemp.Rows) {
                     useReward = drTemp["isReward"].ToString();
                     warrantPrice = Convert.ToDouble(drTemp["MPrice"]);
@@ -430,7 +443,7 @@ namespace WarrantAssistant
                 e.Cell.Row.Cells["MPrice"].Value = warrantPrice;
                 e.Cell.Row.Cells["WarrantName"].Value = warrantName;
                 e.Cell.Row.Cells["exeRatio"].Value = cr;
-                e.Cell.Row.Cells["TraderID"].Value = traderID;
+                e.Cell.Row.Cells["TraderID"].Value = traderID;*/
             }
         }
 
@@ -503,7 +516,6 @@ namespace WarrantAssistant
                     e.Row.Cells["WarrantID"].ToolTipText = toolTip4;
                 }
             }
-
         }
 
         private void ultraGrid1_DoubleClickCell(object sender, DoubleClickCellEventArgs e) {
