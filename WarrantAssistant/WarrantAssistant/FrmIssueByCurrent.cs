@@ -28,10 +28,11 @@ namespace WarrantAssistant
 
         private void FrmIssueByCurrent_Load(object sender, EventArgs e)
         {
-            toolStripComboBox1.Items.Add("0005986");
-            toolStripComboBox1.Items.Add("0007643");
-            toolStripComboBox1.Items.Add("0008570");
-            toolStripComboBox1.Items.Add("0008730");
+            toolStripComboBox1.Items.Add("5986");
+            toolStripComboBox1.Items.Add("7643");
+            toolStripComboBox1.Items.Add("8570");
+            toolStripComboBox1.Items.Add("8730");
+            toolStripComboBox1.Items.Add("10120");
             toolStripComboBox1.Text = userID;
             InitialGrid();
             LoadTraderSql();
@@ -118,11 +119,11 @@ namespace WarrantAssistant
                                   ,a.[IssuePrice]
                                   ,a.[IssueDate]
                                   ,a.[ExpiryDate]
-                                  ,'000'+c.[TraderID] TraderID
+                                  ,c.[TraderID] TraderID
                               FROM [EDIS].[dbo].[WarrantBasic] a
                               LEFT JOIN [EDIS].[dbo].[WarrantPrices] b ON a.UnderlyingID=b.CommodityID
                               LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingSummary] c ON a.UnderlyingID=c.UnderlyingID";
-            sql += " WHERE ('000'+c.[TraderID])='" + trader + "' ORDER BY a.UnderlyingID, a.[WarrantType] desc, a.IssueDate desc";
+            sql += " WHERE (c.[TraderID])='" + trader + "' ORDER BY a.UnderlyingID, a.[WarrantType] desc, a.IssueDate desc";
         }
 
         private void LoadUnderSql()
@@ -143,7 +144,7 @@ namespace WarrantAssistant
                                   ,a.[IssuePrice]
                                   ,a.[IssueDate]
                                   ,a.[ExpiryDate]
-                                  ,'000'+c.[TraderID] TraderID
+                                  ,c.[TraderID] TraderID
                               FROM [EDIS].[dbo].[WarrantBasic] a
                               LEFT JOIN [EDIS].[dbo].[WarrantPrices] b ON a.UnderlyingID=b.CommodityID
                               LEFT JOIN [EDIS].[dbo].[WarrantUnderlying] c ON a.UnderlyingID=c.UnderlyingID";
@@ -260,7 +261,7 @@ namespace WarrantAssistant
                     dr["到期日"] = expiry;
                     dr["今日理論價"] = Math.Round(price, 2);
                     dr["Delta"] = Math.Round(delta, 4);
-                    dr["交易員"] = drv["TraderID"].ToString();
+                    dr["交易員"] = drv["TraderID"].ToString().PadLeft(7,'0');
 
                     dt.Rows.Add(dr);
                 }
@@ -335,7 +336,7 @@ namespace WarrantAssistant
             string confirm = "N";
             string is1500W = "N";
             string tempName = "";
-            string traderID = ultraGrid1.ActiveRow.Cells["交易員"].Value.ToString();
+            string traderID = ultraGrid1.ActiveRow.Cells["交易員"].Value.ToString().PadLeft(7, '0');
 
             DateTime expiryDate;
             expiryDate = GlobalVar.globalParameter.nextTradeDate3.AddMonths(t);

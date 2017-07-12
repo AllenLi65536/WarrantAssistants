@@ -338,7 +338,7 @@ namespace WarrantAssistant
             return undoneReason;
         }
         private void CheckRelation() {
-
+            //TODO 
         }
 
         private void UpdateData() {
@@ -770,6 +770,7 @@ namespace WarrantAssistant
                 v3.ValueListItems.Add("0007643", "0007643");
                 v3.ValueListItems.Add("0008570", "0008570");
                 v3.ValueListItems.Add("0008730", "0008730");
+                v3.ValueListItems.Add("0010120", "0010120");
             }
             e.Layout.Bands[0].Columns["交易員"].ValueList = e.Layout.ValueLists["MyValueList3"];
 
