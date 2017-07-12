@@ -968,7 +968,7 @@ namespace WarrantAssistant
                 double underlyingPrice = 0.0;
                 string sqlTemp = @"SELECT a.[UnderlyingName]
 	                                      ,IsNull(IsNull(b.MPrice, IsNull(b.BPrice,b.APrice)),0) MPrice
-                                          ,'000'+a.TraderID TraderID
+                                          ,a.TraderID TraderID
                                       FROM [EDIS].[dbo].[WarrantUnderlying] a
                                       LEFT JOIN [EDIS].[dbo].[WarrantPrices] b ON a.UnderlyingID=b.CommodityID ";
                 sqlTemp += "WHERE  CAST(UnderlyingID as varbinary(100)) = CAST('" + underlyingID + "' as varbinary(100))";
@@ -976,7 +976,7 @@ namespace WarrantAssistant
                 DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                 foreach (DataRowView drTemp in dvTemp) {
                     underlyingName = drTemp["UnderlyingName"].ToString();
-                    traderID = drTemp["TraderID"].ToString();
+                    traderID = drTemp["TraderID"].ToString().PadLeft(7, '0');
                     underlyingPrice = Convert.ToDouble(drTemp["MPrice"]);
                 }
 

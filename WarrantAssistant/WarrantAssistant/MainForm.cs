@@ -9,6 +9,7 @@ using System.Data.SqlClient;
 using Microsoft.Office.Interop.Excel;
 using System.IO;
 using System.Text;
+using EDLib.SQL;
 
 namespace WarrantAssistant
 {
@@ -136,21 +137,22 @@ namespace WarrantAssistant
             dt.Columns.Add("人員", typeof(string));
             grid.DataSource = dt;
 
-            grid.DisplayLayout.Bands[0].Columns["時間"].Width = 60;
-            grid.DisplayLayout.Bands[0].Columns["人員"].Width = 30;
+            UltraGridBand band0 = grid.DisplayLayout.Bands[0];
+            band0.Columns["時間"].Width = 60;
+            band0.Columns["人員"].Width = 30;
             //ultraGrid1.DisplayLayout.Bands[0].Override.HeaderAppearance.TextHAlign = Infragistics.Win.HAlign.Left;
-            grid.DisplayLayout.Bands[0].ColHeadersVisible = false;
+            band0.ColHeadersVisible = false;
             grid.DisplayLayout.AutoFitStyle = AutoFitStyle.ResizeAllColumns;
             grid.DisplayLayout.Override.CellAppearance.BorderAlpha = Alpha.Transparent;
             grid.DisplayLayout.Override.RowAppearance.BorderAlpha = Alpha.Transparent;
-            grid.DisplayLayout.Bands[0].Columns[2].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Right;
-            grid.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
-            grid.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
-            grid.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.False;
+            band0.Columns[2].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Right;
+            band0.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
+            band0.Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
+            band0.Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.False;
 
-            grid.DisplayLayout.Bands[0].Columns["時間"].CellActivation = Activation.NoEdit;
-            grid.DisplayLayout.Bands[0].Columns["內容"].CellActivation = Activation.NoEdit;
-            grid.DisplayLayout.Bands[0].Columns["人員"].CellActivation = Activation.NoEdit;
+            band0.Columns["時間"].CellActivation = Activation.NoEdit;
+            band0.Columns["內容"].CellActivation = Activation.NoEdit;
+            band0.Columns["人員"].CellActivation = Activation.NoEdit;
 
         }
 
@@ -162,13 +164,14 @@ namespace WarrantAssistant
                               FROM [EDIS].[dbo].[InformationLog]
                               WHERE InformationType='" + infoOrAnnounce + "'";
                 sql += "AND CONVERT(VARCHAR,Date,112) >='" + GlobalVar.globalParameter.lastTradeDate.ToString("yyyy-MM-dd") + "' ORDER BY MDate DESC";
-                DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                System.Data.DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
-                if (dt.Rows.Count == dv.Count)
+                if (dt.Rows.Count == dv.Rows.Count)
                     return;
 
                 dt.Rows.Clear();
-                foreach (DataRowView drv in dv) {
+                foreach (DataRow drv in dv.Rows) {
                     DataRow dr = dt.NewRow();
 
                     DateTime md = Convert.ToDateTime(drv["MDate"]);
@@ -186,7 +189,7 @@ namespace WarrantAssistant
         }
         public void LoadUltraGrid2() {
             LoadUltraGrid(dtAnnounce, "Announce");
-        }               
+        }
 
         private void 標的SummaryToolStripMenuItem_Click(object sender, EventArgs e) {
             GlobalUtility.MenuItemClick<FrmUnderlyingSummary>();
@@ -258,7 +261,7 @@ namespace WarrantAssistant
                     iForm.BringToFront();
                     return;
                 }
-            }           
+            }
             FrmApply frmApplyDeputy = new FrmApply();
             frmApplyDeputy.userID = GlobalVar.globalParameter.userDeputy;
             frmApplyDeputy.StartPosition = FormStartPosition.CenterScreen;
@@ -294,9 +297,7 @@ namespace WarrantAssistant
             string fileOTC = "D:\\權證發行_相關Excel\\上傳檔\\OTC申請上傳檔.txt";
 
             //TXTFileWriter tseWriter = new TXTFileWriter(fileTSE);
-            //TXTFileWriter otcWriter = new TXTFileWriter(fileOTC);
-            StreamWriter tseWriter = new StreamWriter(fileTSE, false, Encoding.GetEncoding("Big5"));
-            StreamWriter otcWriter = new StreamWriter(fileOTC, false, Encoding.GetEncoding("Big5"));
+            //TXTFileWriter otcWriter = new TXTFileWriter(fileOTC);           
 
             int tseCount = 0;
             int otcCount = 0;
@@ -308,7 +309,10 @@ namespace WarrantAssistant
             int otcReward = 0;
 
             try {
-                string sql = @"SELECT a.ApplyKind
+                using (StreamWriter tseWriter = new StreamWriter(fileTSE, false, Encoding.GetEncoding("Big5")))
+                using (StreamWriter otcWriter = new StreamWriter(fileOTC, false, Encoding.GetEncoding("Big5"))) {
+
+                    string sql = @"SELECT a.ApplyKind
                                       ,a.Market
 	                                  ,a.WarrantName
                                       ,a.UnderlyingID
@@ -323,76 +327,70 @@ namespace WarrantAssistant
                                   LEFT JOIN [EDIS].[dbo].[ApplyOfficial] b ON a.SerialNum=b.SerialNumber
                                   LEFT JOIN [EDIS].[dbo].[WarrantBasic] c ON a.WarrantName=c.WarrantName
                                   ORDER BY a.Market desc, a.Type, a.CP, a.UnderlyingID, a.SerialNum";//a.SerialNum
-                DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
-                if (dv.Count > 0) {
-                    foreach (DataRowView dr in dv) {
-                        string applyKind = dr["ApplyKind"].ToString();
-                        string market = dr["Market"].ToString();
-                        string warrantName = dr["WarrantName"].ToString();
-                        string underlyingID = dr["UnderlyingID"].ToString();
-                        double issueNum = Convert.ToDouble(dr["IssueNum"]);
-                        double cr = Convert.ToDouble(dr["CR"]);
-                        int t = Convert.ToInt32(dr["T"]);
-                        string type = dr["Type"].ToString();
-                        string cp = dr["CP"].ToString();
-                        string useReward = dr["UseReward"].ToString();
-                        string marketTmr = dr["MarketTmr"].ToString();
+                    //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                    System.Data.DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                    if (dv.Rows.Count > 0) {
+                        foreach (DataRow dr in dv.Rows) {
+                            string applyKind = dr["ApplyKind"].ToString();
+                            string market = dr["Market"].ToString();
+                            string warrantName = dr["WarrantName"].ToString();
+                            string underlyingID = dr["UnderlyingID"].ToString();
+                            double issueNum = Convert.ToDouble(dr["IssueNum"]);
+                            double cr = Convert.ToDouble(dr["CR"]);
+                            int t = Convert.ToInt32(dr["T"]);
+                            string type = dr["Type"].ToString();
+                            string cp = dr["CP"].ToString();
+                            string useReward = dr["UseReward"].ToString();
+                            string marketTmr = dr["MarketTmr"].ToString();
 
-                        string markup = "                                     ";
-                        int byteLen = System.Text.Encoding.Default.GetBytes(warrantName).Length;
-                        warrantName = warrantName + markup.Substring(0, 16 - byteLen);
-                        underlyingID = underlyingID.PadRight(12, ' ');
-                        string issueNumS = issueNum.ToString();
-                        issueNumS = issueNumS.PadLeft(7, '0');
-                        string crS = (cr * 10000).ToString();
-                        crS = crS.Substring(0, Math.Min(5, crS.Length));
-                        crS = crS.PadLeft(5, '0');
-                        string tS = t.ToString();
-                        tS = tS.PadLeft(2, '0');
+                            string markup = "                                     ";
+                            int byteLen = System.Text.Encoding.Default.GetBytes(warrantName).Length;
+                            warrantName = warrantName + markup.Substring(0, 16 - byteLen);
+                            underlyingID = underlyingID.PadRight(12, ' ');
+                            string issueNumS = issueNum.ToString().PadLeft(7, '0');
+                            //issueNumS = issueNumS.PadLeft(7, '0');
+                            string crS = (cr * 10000).ToString();
+                            crS = crS.Substring(0, Math.Min(5, crS.Length));
+                            crS = crS.PadLeft(5, '0');
+                            string tS = t.ToString().PadLeft(2, '0');
+                            //tS = tS.PadLeft(2, '0');
 
-                        string tempType = "1";
-                        if (type == "牛熊證") {
-                            if (cp == "P")
-                                tempType = "4";
-                            else
-                                tempType = "3";
-                        } else {
-                            if (cp == "P")
-                                tempType = "2";
-                            else
-                                tempType = "1";
+                            string tempType = "1";
+                            if (type == "牛熊證") {
+                                if (cp == "P")
+                                    tempType = "4";
+                                else
+                                    tempType = "3";
+                            } else {
+                                if (cp == "P")
+                                    tempType = "2";
+                                else
+                                    tempType = "1";
+                            }
+
+                            string writestr = "";
+                            writestr = warrantName + underlyingID + issueNumS + crS + tS + tempType + useReward + marketTmr;
+
+                            if (market == "TSE") {
+                                //tseWriter.WriteFile(writestr);
+                                tseWriter.WriteLine(writestr);
+                                tseCount++;
+                                if (useReward == "1")
+                                    tseReward++;
+                                if (applyKind == "2")
+                                    tseReissue++;
+                            } else if (market == "OTC") {
+                                //otcWriter.WriteFile(writestr);
+                                otcWriter.WriteLine(writestr);
+                                otcCount++;
+                                if (useReward == "1")
+                                    otcReward++;
+                                if (applyKind == "2")
+                                    otcReissue++;
+                            }
                         }
-
-                        string writestr = "";
-                        writestr = warrantName + underlyingID + issueNumS + crS + tS + tempType + useReward + marketTmr;
-
-                        if (market == "TSE") {
-                            //tseWriter.WriteFile(writestr);
-                            tseWriter.WriteLine(writestr);
-                            tseCount++;
-                            if (useReward == "1")
-                                tseReward++;
-                            if (applyKind == "2")
-                                tseReissue++;
-                        } else if (market == "OTC") {
-                            //otcWriter.WriteFile(writestr);
-                            otcWriter.WriteLine(writestr);
-                            otcCount++;
-                            if (useReward == "1")
-                                otcReward++;
-                            if (applyKind == "2")
-                                otcReissue++;
-                        }
-
                     }
                 }
-
-                if (tseWriter != null)
-                    tseWriter.Close();
-                //tseWriter.Dispose(); 
-                if (otcWriter != null)
-                    otcWriter.Close();
-                //otcWriter.Dispose(); 
 
                 string infoStr = "TSE 共" + tseCount + "檔，增額" + tseReissue + "檔，獎勵" + tseReward + "檔。\nOTC共" + otcCount + "檔，增額" + otcReissue + "檔，獎勵" + otcReward + "檔。";
 
@@ -404,13 +402,11 @@ namespace WarrantAssistant
                 MessageBox.Show(ex.Message);
             }
 
-
         }
 
         private void 權證系統上傳檔ToolStripMenuItem_Click(object sender, EventArgs e) {
             string fileName = "D:\\權證發行_相關Excel\\上傳檔\\權證發行匯入檔.xls";
             Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
-            app.Visible = true;
             Workbook workBook = null;
 
             try {
@@ -437,21 +433,23 @@ namespace WarrantAssistant
                                   LEFT JOIN [EDIS].[dbo].[ApplyOfficial] c ON a.SerialNum=c.SerialNumber
                                   WHERE a.ApplyKind='1' AND a.Result+0.00001 >= a.EquivalentNum
                                   ORDER BY a.Market desc, a.Type, a.CP, a.UnderlyingID, a.SerialNum"; //a.SerialNum
-                DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
-                int i = 3;
-                if (dv.Count > 0) {
+                //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                System.Data.DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+
+                if (dv.Rows.Count > 0) {
+                    int i = 3;
+                    app.Visible = true;
                     workBook = app.Workbooks.Open(fileName);
                     //workBook.EnvelopeVisible = false;
                     Worksheet workSheet = (Worksheet) workBook.Sheets[1];
                     workSheet.get_Range("A3:BZ1000").ClearContents();
                     //workSheet.UsedRange.
 
-                    foreach (DataRowView dr in dv) {
+                    foreach (DataRow dr in dv.Rows) {
                         string date = DateTime.Today.ToString("yyyyMMdd");
                         string underlyingID = dr["UnderlyingID"].ToString();
-                        string traderID = dr["TraderID"].ToString();
-                        traderID = traderID.Substring(3, 4);
-                        if (traderID == "8730")
+                        string traderID = dr["TraderID"].ToString().TrimStart('0');
+                        if (traderID == "8730" || traderID == "10120")
                             traderID = "7643";
                         string warrantName = dr["WarrantName"].ToString();
                         string type = dr["Type"].ToString();
@@ -573,41 +571,27 @@ namespace WarrantAssistant
                         }
                     }
 
-                    if (workBook != null) {
-                        workBook.Save();
-                        workBook.Close();
-                    }
-                    if (app != null)
-                        app.Quit();
-
                     GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + "產發行上傳檔");
-
+                    app.Visible = false;
                     MessageBox.Show("發行上傳檔完成!");
-                } else {
-                    if (workBook != null) {
-                        workBook.Save();
-                        workBook.Close();
-                    }
-                    if (app != null)
-                        app.Quit();
-
+                } else
                     MessageBox.Show("無可發行權證");
-                }
+
             } catch (Exception ex) {
+                MessageBox.Show(ex.Message);
+            } finally {
                 if (workBook != null) {
                     workBook.Save();
                     workBook.Close();
                 }
                 if (app != null)
                     app.Quit();
-                MessageBox.Show(ex.Message);
             }
         }
 
         private void 增額上傳檔ToolStripMenuItem_Click(object sender, EventArgs e) {
             string fileName = "D:\\權證發行_相關Excel\\上傳檔\\增額作業匯入資料.xls";
             Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
-            app.Visible = true;
             Workbook workBook = null;
             bool noPrice = false;
 
@@ -621,71 +605,54 @@ namespace WarrantAssistant
                                   LEFT JOIN [EDIS].[dbo].[WarrantPrices] c ON b.WarrantID=c.CommodityID
                                   WHERE a.ApplyKind='2' AND a.Result + 0.00001 >=a.EquivalentNum
                                   ORDER BY a.Market desc, a.SerialNum";
-                DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
-                int i = 3;
-                if (dv.Count > 0) {
+                //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                System.Data.DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+
+                if (dv.Rows.Count > 0) {
+                    int i = 3;
+                    app.Visible = true;
                     workBook = app.Workbooks.Open(fileName);
                     //workBook.EnvelopeVisible = false;
                     Worksheet workSheet = (Worksheet) workBook.Sheets[1];
                     workSheet.get_Range("A3:Z1000").ClearContents();
 
-                    foreach (DataRowView dr in dv) {
-                        string date = DateTime.Today.ToString("yyyyMMdd");
-                        string warrantName = dr["WarrantName"].ToString();
+                    foreach (DataRow dr in dv.Rows) {
                         double warrantPrice = Convert.ToDouble(dr["MPrice"]);
                         if (warrantPrice == 0.0)
                             noPrice = true;
-                        double issueNum = Convert.ToDouble(dr["IssueNum"]);
-                        issueNum = issueNum * 1000;
 
-                        workSheet.get_Range("A" + i.ToString(), "A" + i.ToString()).Value = warrantName;
+                        workSheet.get_Range("A" + i.ToString(), "A" + i.ToString()).Value = dr["WarrantName"].ToString();
                         workSheet.get_Range("B" + i.ToString(), "B" + i.ToString()).Value = "權證增額";
-                        workSheet.get_Range("C" + i.ToString(), "C" + i.ToString()).Value = date;
+                        workSheet.get_Range("C" + i.ToString(), "C" + i.ToString()).Value = DateTime.Today.ToString("yyyyMMdd");
                         workSheet.get_Range("D" + i.ToString(), "D" + i.ToString()).Value = "增額發行";
-                        workSheet.get_Range("E" + i.ToString(), "E" + i.ToString()).Value = issueNum;
+                        workSheet.get_Range("E" + i.ToString(), "E" + i.ToString()).Value = Convert.ToDouble(dr["IssueNum"]) * 1000;
                         workSheet.get_Range("F" + i.ToString(), "F" + i.ToString()).Value = warrantPrice;
                         i++;
                     }
-
-                    if (!noPrice) {
-                        if (workBook != null) {
-                            workBook.Save();
-                            workBook.Close();
-                        }
-                        if (app != null)
-                            app.Quit();
-                    }
+                    if (noPrice)
+                        MessageBox.Show("注意!有權證價格為零!");
 
                     GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + "產增額上傳檔");
-
+                    app.Visible = false;
                     MessageBox.Show("增額上傳檔完成!");
-                } else {
-                    if (!noPrice) {
-                        if (workBook != null) {
-                            workBook.Save();
-                            workBook.Close();
-                        }
-                        if (app != null)
-                            app.Quit();
-                    }
-
+                } else                   
                     MessageBox.Show("無可增額權證");
-                }
-            } catch (Exception ex) {
+                
+            } catch (Exception ex) {               
+                MessageBox.Show(ex.Message);
+            } finally {
                 if (workBook != null) {
                     workBook.Save();
                     workBook.Close();
                 }
                 if (app != null)
                     app.Quit();
-                MessageBox.Show(ex.Message);
             }
         }
 
         private void 關係人列表ToolStripMenuItem_Click(object sender, EventArgs e) {
             string fileName = "D:\\權證發行_相關Excel\\上傳檔\\利害關係人整批查詢上傳格式範例.xls";
             Microsoft.Office.Interop.Excel.Application app = new Microsoft.Office.Interop.Excel.Application();
-            app.Visible = true;
             Workbook workBook = null;
 
             try {
@@ -698,51 +665,34 @@ namespace WarrantAssistant
                 DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
                 int i = 2;
                 if (dv.Count > 0) {
+                    app.Visible = true;
                     workBook = app.Workbooks.Open(fileName);
                     //workBook.EnvelopeVisible = false;
                     Worksheet workSheet = (Worksheet) workBook.Sheets[1];
                     workSheet.get_Range("A3:Z1000").ClearContents();
 
                     foreach (DataRowView dr in dv) {
-                        int index = i - 1;
-                        string unifiedID = dr["UnifiedID"].ToString();
-                        string fullName = dr["FullName"].ToString();
-
-                        workSheet.get_Range("A" + i.ToString(), "A" + i.ToString()).Value = index;
-                        workSheet.get_Range("B" + i.ToString(), "B" + i.ToString()).Value = unifiedID;
-                        workSheet.get_Range("C" + i.ToString(), "C" + i.ToString()).Value = fullName;
-
+                        workSheet.get_Range("A" + i.ToString(), "A" + i.ToString()).Value = i - 1;
+                        workSheet.get_Range("B" + i.ToString(), "B" + i.ToString()).Value = dr["UnifiedID"].ToString();
+                        workSheet.get_Range("C" + i.ToString(), "C" + i.ToString()).Value = dr["FullName"].ToString();
                         i++;
                     }
 
-                    if (workBook != null) {
-                        workBook.Save();
-                        workBook.Close();
-                    }
-                    if (app != null)
-                        app.Quit();
-
                     GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + "產關係人上傳檔");
-
+                    app.Visible = false;
                     MessageBox.Show("關係人上傳檔完成!");
-                } else {
-                    if (workBook != null) {
-                        workBook.Save();
-                        workBook.Close();
-                    }
-                    if (app != null)
-                        app.Quit();
-
+                } else
                     MessageBox.Show("無關係人需查詢");
-                }
+
             } catch (Exception ex) {
+                MessageBox.Show(ex.Message);
+            } finally {
                 if (workBook != null) {
                     workBook.Save();
                     workBook.Close();
                 }
                 if (app != null)
                     app.Quit();
-                MessageBox.Show(ex.Message);
             }
         }
     }

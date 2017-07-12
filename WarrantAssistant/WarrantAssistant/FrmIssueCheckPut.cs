@@ -9,7 +9,6 @@ namespace WarrantAssistant
     {
         private DataTable dataTable;
         private string enteredKey = "";
-
         public FrmIssueCheckPut() {
             InitializeComponent();
         }
@@ -81,12 +80,7 @@ namespace WarrantAssistant
         }
 
         public void SelectUnderlying(string underlyingID) {
-            GlobalUtility.SelectUnderlying(underlyingID, dataGridView1);
-            /*for (int i = 0; i < dataGridView1.Rows.Count; i++) {
-                string uID = (string) dataGridView1.Rows[i].Cells[0].Value;
-                if (uID == underlyingID)
-                    dataGridView1.CurrentCell = dataGridView1.Rows[i].Cells[0];
-            }*/
+            GlobalUtility.SelectUnderlying(underlyingID, dataGridView1);           
         }
 
         private void dataGridView1_KeyDown(object sender, KeyEventArgs e) {

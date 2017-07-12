@@ -69,14 +69,6 @@ namespace WarrantAssistant
 
             for (int i = 4; i < 12; i++)
                 band0.Columns[i].CellAppearance.BackColor = Color.LightGray;
-            /*band0.Columns["isReward"].CellAppearance.BackColor = Color.LightGray;
-            band0.Columns["MPrice"].CellAppearance.BackColor = Color.LightGray;
-            band0.Columns["UnderlyingID"].CellAppearance.BackColor = Color.LightGray;
-            band0.Columns["WarrantName"].CellAppearance.BackColor = Color.LightGray;
-            band0.Columns["exeRatio"].CellAppearance.BackColor = Color.LightGray;
-            band0.Columns["EquivalentNum"].CellAppearance.BackColor = Color.LightGray;
-            band0.Columns["IssuedPercent"].CellAppearance.BackColor = Color.LightGray;
-            band0.Columns["RewardIssueCredit"].CellAppearance.BackColor = Color.LightGray;*/
 
             band0.Columns["MarketTmr"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Center;
             band0.Override.HeaderAppearance.TextHAlign = Infragistics.Win.HAlign.Left;
@@ -85,7 +77,7 @@ namespace WarrantAssistant
         }
 
         private void LoadData() {
-            try {                
+            try {
                 string sql = @"SELECT a.WarrantID
                                   ,a.ReIssueNum
                                   ,a.MarketTmr
@@ -122,7 +114,10 @@ namespace WarrantAssistant
                 dt.Columns[10].Caption = "今日額度(%)";
                 dt.Columns[11].Caption = "獎勵額度";
                 dt.Columns[12].Caption = "交易員";
-
+                foreach (DataRow row in dt.Rows) {
+                    row["IssuedPercent"] = Math.Round((double) row["IssuedPercent"], 2);
+                    row["RewardIssueCredit"] = Math.Floor((double) row["RewardIssueCredit"]);
+                }
                 /*DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
                 foreach (DataRowView drv in dv) {
@@ -160,11 +155,6 @@ namespace WarrantAssistant
         private void UpdateData() {
             try {
                 MSSQL.ExecSqlCmd("DELETE FROM [ReIssueTempList] WHERE UserID='" + userID + "'", conn);
-                /*SqlCommand cmd = new SqlCommand("DELETE FROM [ReIssueTempList] WHERE UserID='" + userID + "'", conn);
-                conn.Open();
-                cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                conn.Close();*/
 
                 string sql = @"INSERT INTO [ReIssueTempList] (SerialNum, WarrantID, ReIssueNum, MarketTmr, ConfirmChecked, TraderID, MDate, UserID) ";
                 sql += "VALUES(@SerialNum, @WarrantID, @ReIssueNum, @MarketTmr, @ConfirmChecked, @TraderID, @MDate, @UserID)";
@@ -182,7 +172,7 @@ namespace WarrantAssistant
 
                 int i = 1;
                 applyCount = 0;
-                foreach (Infragistics.Win.UltraWinGrid.UltraGridRow r in ultraGrid1.Rows) {
+                foreach (UltraGridRow r in ultraGrid1.Rows) {
                     string serialNumber = DateTime.Today.ToString("yyyyMMdd") + userID + "02" + i.ToString("0#");
                     string warrantID = r.Cells["WarrantID"].Value.ToString();
                     double reIssueNum = Convert.ToDouble(r.Cells["ReIssueNum"].Value);
@@ -235,25 +225,11 @@ namespace WarrantAssistant
                                 LEFT JOIN [EDIS].[dbo].[WarrantBasic] c ON a.WarrantID=c.WarrantID";
                 sql4 += " WHERE a.[UserID]='" + userID + "'";
 
-                /*SqlCommand cmd1 = new SqlCommand(sql1, conn);
-                SqlCommand cmd2 = new SqlCommand(sql2, conn);
-                SqlCommand cmd3 = new SqlCommand(sql3, conn);
-                SqlCommand cmd4 = new SqlCommand(sql4, conn);*/
-
                 conn.Open();
                 MSSQL.ExecSqlCmd(sql1, conn);
                 MSSQL.ExecSqlCmd(sql2, conn);
                 MSSQL.ExecSqlCmd(sql3, conn);
                 MSSQL.ExecSqlCmd(sql4, conn);
-
-                /*cmd1.ExecuteNonQuery();
-                cmd1.Dispose();
-                cmd2.ExecuteNonQuery();
-                cmd2.Dispose();
-                cmd3.ExecuteNonQuery();
-                cmd3.Dispose();
-                cmd4.ExecuteNonQuery();
-                cmd4.Dispose();*/
                 conn.Close();
 
                 toolStripLabel2.Text = DateTime.Now + "申請成功";
@@ -355,14 +331,9 @@ namespace WarrantAssistant
             isEdit = true;
 
             DialogResult result = MessageBox.Show("將全部刪除，確定?", "刪除資料", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (result == DialogResult.Yes) {
+            if (result == DialogResult.Yes)
                 MSSQL.ExecSqlCmd("DELETE FROM [ReIssueTempList] WHERE UserID='" + userID + "'", conn);
-                /*SqlCommand cmd = new SqlCommand("DELETE FROM [ReIssueTempList] WHERE UserID='" + userID + "'", conn);
-                conn.Open();
-                cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                conn.Close();*/
-            }
+
             LoadData();
             SetButton();
         }
@@ -398,12 +369,12 @@ namespace WarrantAssistant
 
         private void ultraGrid1_CellChange(object sender, CellEventArgs e) {
             if (e.Cell.Column.Key == "ConfirmChecked")
-                ultraGrid1.PerformAction(Infragistics.Win.UltraWinGrid.UltraGridAction.ExitEditMode);
+                ultraGrid1.PerformAction(UltraGridAction.ExitEditMode);
         }
 
         private void ultraGrid1_AfterCellUpdate(object sender, CellEventArgs e) {
             if (e.Cell.Column.Key == "WarrantID") {
-                string warrantID = e.Cell.Row.Cells["WarrantID"].Value.ToString();                
+                string warrantID = e.Cell.Row.Cells["WarrantID"].Value.ToString();
 
                 string sqlTemp = @"SELECT CASE WHEN a.isReward='1' THEN 'Y' ELSE 'N' END isReward
 		                                ,IsNull(b.MPrice,ISNull(b.BPrice,IsNull(b.APrice,0))) MPrice
@@ -417,7 +388,7 @@ namespace WarrantAssistant
                 DataTable dtTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
 
                 if (dtTemp.Rows.Count == 0) {
-                    MessageBox.Show("Wrong WarrantID!");                    
+                    MessageBox.Show("Wrong WarrantID!");
                 } else {
                     e.Cell.Row.Cells["isReward"].Value = dtTemp.Rows[0]["isReward"];
                     e.Cell.Row.Cells["MPrice"].Value = dtTemp.Rows[0]["MPrice"];
@@ -425,25 +396,6 @@ namespace WarrantAssistant
                     e.Cell.Row.Cells["exeRatio"].Value = dtTemp.Rows[0]["exeRatio"];
                     e.Cell.Row.Cells["TraderID"].Value = dtTemp.Rows[0]["TraderID"];
                 }
-
-
-                /*string useReward = "";
-                double warrantPrice = 0.0;
-                string warrantName = "";
-                string traderID = "";
-                double cr = 0.0;
-                foreach (DataRow drTemp in dtTemp.Rows) {
-                    useReward = drTemp["isReward"].ToString();
-                    warrantPrice = Convert.ToDouble(drTemp["MPrice"]);
-                    warrantName = drTemp["WarrantName"].ToString();
-                    traderID = drTemp["TraderID"].ToString();
-                    cr = Convert.ToDouble(drTemp["exeRatio"]);
-                }
-                e.Cell.Row.Cells["isReward"].Value = useReward;
-                e.Cell.Row.Cells["MPrice"].Value = warrantPrice;
-                e.Cell.Row.Cells["WarrantName"].Value = warrantName;
-                e.Cell.Row.Cells["exeRatio"].Value = cr;
-                e.Cell.Row.Cells["TraderID"].Value = traderID;*/
             }
         }
 
