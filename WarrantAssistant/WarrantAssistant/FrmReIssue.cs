@@ -437,7 +437,7 @@ namespace WarrantAssistant
             DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
             if (dvTemp.Count > 0) {
                 foreach (DataRowView drTemp in dvTemp) {
-                    traderID = "000" + drTemp["TraderID"].ToString();
+                    traderID = drTemp["TraderID"].ToString().PadLeft(7, '0');
                     issuable = drTemp["Issuable"].ToString();
                 }
             }
