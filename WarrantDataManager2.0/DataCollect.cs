@@ -196,9 +196,10 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
                                     WRTCAN_STKID,
                                     CASE WHEN WRTCAN_STOCKTYPE = 'DE' THEN 100 ELSE 22 END AS 尚可發行額度,
                                     CASE WHEN WRTCAN_STOCKTYPE = 'DE' THEN 100 ELSE 30 END AS 增額發行額度
-                                FROM [10.7.0.52].[WAFT].[dbo].[V_CANDIDATE]) AS CANDI
+                                FROM [10.7.0.52].[WAFT].[dbo].[CANDIDATE]
+WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CANDIDATE])) AS CANDI
                                 WHERE QUOTA.ISUQTA_DATE= ( SELECT MAX(ISUQTA_DATE) FROM [10.7.0.52].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] )
-                                AND QUOTA.ISUQTA_STKID = CANDI.WRTCAN_STKID", conn);
+                                AND QUOTA.ISUQTA_STKID = CANDI.WRTCAN_STKID", conn);//V_CANDIDATE
             MSSQL.ExecSqlCmd(sql, conn);
             conn.Close();
         }

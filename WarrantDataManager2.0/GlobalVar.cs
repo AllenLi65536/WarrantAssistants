@@ -28,7 +28,7 @@ namespace WarrantDataManager2._0
             GlobalVar.loginSet = new LoginSet();
             GlobalVar.loginSet.edisSqlConnString = "SERVER=10.10.1.30;DATABASE=EDIS;UID=WarrantWeb;PWD=WarrantWeb";
             GlobalVar.loginSet.tsquoteSqlConnString = "SERVER=10.60.0.37;DATABASE=TsQuote;UID=WarrantWeb;PWD=WarrantWeb";
-            GlobalVar.loginSet.warrantSysSqlConnString = "SERVER=10.7.0.52;DATABASE=WAFT;UID=eduser;PWD=eduser";
+            GlobalVar.loginSet.warrantSysSqlConnString = "SERVER=10.7.0.52;DATABASE=WAFT;UID=warpap;PWD=warpap";
         }
 
         public static void loadGlobalParameters() {

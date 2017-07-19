@@ -41,7 +41,7 @@ namespace WarrantDataManager2._0
                 string sql = "SELECT [股票代號], [股票名稱], isNull([上市上櫃],'1') 市場, IsNull([公司名稱], '') 公司名稱, IsNull([統一編號], '00000000') 統一編號 FROM [上市櫃公司基本資料] WHERE ";
                 List<string> datas = new List<string>();
                 //DataView dv = DeriLib.Util.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
-                DataTable dv = MSSQL.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
+                DataTable dv = MSSQL.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [CANDIDATE] WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [WAFT].[dbo].[CANDIDATE]) ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);//V_CANDIDATE
                 string cStr = "";
                 foreach (DataRow dr in dv.Rows)
                     cStr += "'" + dr["WRTCAN_CMONEY_ID"].ToString() + "',";
@@ -105,7 +105,7 @@ namespace WarrantDataManager2._0
                 string sql = "SELECT [股票代號], [股票名稱], isNull([上市上櫃],'1') 市場, IsNull([公司名稱], '') 公司名稱, IsNull([統一編號], '00000000') 統一編號 FROM [上市櫃公司基本資料] WHERE ";
 
                 //DataView dv = DeriLib.Util.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
-                DataTable dv = MSSQL.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [V_CANDIDATE] ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString);
+                DataTable dv = MSSQL.ExecSqlQry("SELECT WRTCAN_CMONEY_ID FROM [CANDIDATE] WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [WAFT].[dbo].[CANDIDATE]) ORDER BY WRTCAN_CMONEY_ID", GlobalVar.loginSet.warrantSysSqlConnString); // V_CANDIDATE
                 string cStr = "";
                 foreach (DataRow dr in dv.Rows)
                     cStr += "'" + dr["WRTCAN_CMONEY_ID"].ToString() + "',";

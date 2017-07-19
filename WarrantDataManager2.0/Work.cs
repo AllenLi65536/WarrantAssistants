@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 //using Microsoft.Office.Interop.Excel;
 //using Microsoft.Office.Interop;
 //using Oracle.DataAccess.Client;
@@ -115,6 +116,7 @@ namespace WarrantDataManager2._0
             }
             catch (Exception ex)
             {
+                MessageBox.Show(ex.Message);
                 //GlobalVar.errProcess.Add(1, "[IssuableUnderlyingDataWork_DoWork][" + ex.Message + "][" + ex.StackTrace + "]");
                 return WorkState.Exception;
             }

@@ -56,6 +56,7 @@ namespace WarrantAssistant
             band0.Columns["RewardIssueCredit"].Format = "###,###";
 
             band0.Columns["MarketTmr"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.DropDownList;
+            band0.Columns["ConfirmChecked"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
 
             band0.Columns["WarrantID"].Width = 100;
             band0.Columns["ReIssueNum"].Width = 100;
