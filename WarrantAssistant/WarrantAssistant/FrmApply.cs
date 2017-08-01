@@ -581,7 +581,8 @@ namespace WarrantAssistant
                 conn.Close();
 
                 string sql5 = "SELECT [SerialNum], [WarrantName] FROM [EDIS].[dbo].[ApplyTotalList] WHERE [ApplyKind]='1' AND UserID='" + userID + "'";
-                DataView dv = DeriLib.Util.ExecSqlQry(sql5, GlobalVar.loginSet.edisSqlConnString);
+                //DataView dv = DeriLib.Util.ExecSqlQry(sql5, GlobalVar.loginSet.edisSqlConnString);
+                DataTable dv = MSSQL.ExecSqlQry(sql5, GlobalVar.loginSet.edisSqlConnString);
 
                 string cmdText = "UPDATE [ApplyTotalList] SET WarrantName=@WarrantName WHERE SerialNum=@SerialNum";
                 List<System.Data.SqlClient.SqlParameter> pars = new List<System.Data.SqlClient.SqlParameter>();
@@ -589,18 +590,18 @@ namespace WarrantAssistant
                 pars.Add(new SqlParameter("@SerialNum", SqlDbType.VarChar));
                 SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, cmdText, pars);
 
-                foreach (DataRowView dr in dv) {
-                    //double count = 0.0;
+                foreach (DataRow dr in dv.Rows) {
                     string serialNum = dr["SerialNum"].ToString();
                     string warrantName = dr["WarrantName"].ToString();
 
                     string sqlTemp = "select top (1) WarrantName from (SELECT [WarrantName] FROM [EDIS].[dbo].[WarrantBasic] WHERE SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 1) + "' union ";
                     sqlTemp += " SELECT [WarrantName] FROM [EDIS].[dbo].[ApplyTotalList] WHERE [ApplyKind]='1' AND [SerialNum]<" + serialNum + " AND SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 1) + "') as tb1 ";
                     sqlTemp += " order by SUBSTRING(WarrantName,len(WarrantName)-1,len(WarrantName)) desc";
-                    DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+                    //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+                    DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                     int count = 0;
-                    if (dvTemp.Count > 0) {
-                        string lastWarrantName = dvTemp[0][0].ToString();
+                    if (dvTemp.Rows.Count > 0) {
+                        string lastWarrantName = dvTemp.Rows[0][0].ToString();
                         if (!int.TryParse(lastWarrantName.Substring(lastWarrantName.Length - 2, 2), out count))
                             MessageBox.Show("parse failed " + lastWarrantName);
                     }

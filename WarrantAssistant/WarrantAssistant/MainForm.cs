@@ -635,10 +635,10 @@ namespace WarrantAssistant
                     GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + "產增額上傳檔");
                     app.Visible = false;
                     MessageBox.Show("增額上傳檔完成!");
-                } else                   
+                } else
                     MessageBox.Show("無可增額權證");
-                
-            } catch (Exception ex) {               
+
+            } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             } finally {
                 if (workBook != null) {
@@ -694,6 +694,41 @@ namespace WarrantAssistant
                 if (app != null)
                     app.Quit();
             }
+        }
+
+        private void 修正權證名稱ToolStripMenuItem_Click(object sender, EventArgs e) {
+            string sql5 = "SELECT [SerialNum], [WarrantName] FROM [EDIS].[dbo].[ApplyTotalList] WHERE [ApplyKind]='1'";
+            System.Data.DataTable dv = MSSQL.ExecSqlQry(sql5, GlobalVar.loginSet.edisSqlConnString);
+
+            string cmdText = "UPDATE [ApplyTotalList] SET WarrantName=@WarrantName WHERE SerialNum=@SerialNum";
+            List<System.Data.SqlClient.SqlParameter> pars = new List<System.Data.SqlClient.SqlParameter>();
+            pars.Add(new SqlParameter("@WarrantName", SqlDbType.VarChar));
+            pars.Add(new SqlParameter("@SerialNum", SqlDbType.VarChar));
+            SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, cmdText, pars);
+
+            foreach (DataRow dr in dv.Rows) {
+                string serialNum = dr["SerialNum"].ToString();
+                string warrantName = dr["WarrantName"].ToString();
+
+                string sqlTemp = "select top (1) WarrantName from (SELECT [WarrantName] FROM [EDIS].[dbo].[WarrantBasic] WHERE SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 3) + "' union ";
+                sqlTemp += " SELECT [WarrantName] FROM [EDIS].[dbo].[ApplyTotalList] WHERE [ApplyKind]='1' AND [SerialNum]<" + serialNum + " AND SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 3) + "') as tb1 ";
+                sqlTemp += " order by SUBSTRING(WarrantName,len(WarrantName)-3,len(WarrantName)-2) desc";
+
+                System.Data.DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+                int count = 0;
+                if (dvTemp.Rows.Count > 0) {
+                    string lastWarrantName = dvTemp.Rows[0][0].ToString();
+                    if (!int.TryParse(lastWarrantName.Substring(lastWarrantName.Length - 2, 2), out count))
+                        MessageBox.Show("parse failed " + lastWarrantName);
+                }
+
+                warrantName = warrantName.Substring(0, warrantName.Length - 2) + (count + 1).ToString("0#");
+
+                h.SetParameterValue("@WarrantName", warrantName);
+                h.SetParameterValue("@SerialNum", serialNum);
+                h.ExecuteCommand();
+            }
+            h.Dispose();
         }
     }
 }

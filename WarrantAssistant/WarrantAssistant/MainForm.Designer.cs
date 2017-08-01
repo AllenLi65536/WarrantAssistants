@@ -67,6 +67,7 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.ultraGrid1 = new Infragistics.Win.UltraWinGrid.UltraGrid();
             this.monthCalendar1 = new System.Windows.Forms.MonthCalendar();
+            this.修正權證名稱ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -211,6 +212,7 @@
             this.可增額列表ToolStripMenuItem1,
             this.試算表ToolStripMenuItem,
             this.toolStripSeparator1,
+            this.修正權證名稱ToolStripMenuItem,
             this.轉申請發行TXTToolStripMenuItem,
             this.權證系統上傳檔ToolStripMenuItem,
             this.增額上傳檔ToolStripMenuItem,
@@ -277,7 +279,7 @@
             // 詳細LOGToolStripMenuItem
             // 
             this.詳細LOGToolStripMenuItem.Name = "詳細LOGToolStripMenuItem";
-            this.詳細LOGToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.詳細LOGToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
             this.詳細LOGToolStripMenuItem.Text = "詳細LOG";
             this.詳細LOGToolStripMenuItem.Click += new System.EventHandler(this.詳細LOGToolStripMenuItem_Click);
             // 
@@ -408,6 +410,13 @@
             this.monthCalendar1.Name = "monthCalendar1";
             this.monthCalendar1.TabIndex = 0;
             // 
+            // 修正權證名稱ToolStripMenuItem
+            // 
+            this.修正權證名稱ToolStripMenuItem.Name = "修正權證名稱ToolStripMenuItem";
+            this.修正權證名稱ToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.修正權證名稱ToolStripMenuItem.Text = "修正權證名稱";
+            this.修正權證名稱ToolStripMenuItem.Click += new System.EventHandler(this.修正權證名稱ToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
@@ -484,6 +493,7 @@
         private System.Windows.Forms.ToolStripMenuItem 代理人增額條件輸入ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 增額上傳檔ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 已發權證條件發行ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 修正權證名稱ToolStripMenuItem;
     }
 }
 
