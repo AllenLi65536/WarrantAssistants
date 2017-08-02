@@ -343,11 +343,8 @@ namespace WarrantAssistant
 
         private void UpdateData() {
             try {
-                SqlCommand cmd = new SqlCommand("DELETE FROM [ApplyTempList] WHERE UserID='" + userID + "'", conn);
-                conn.Open();
-                cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                conn.Close();
+
+                MSSQL.ExecSqlCmd("DELETE FROM [ApplyTempList] WHERE UserID='" + userID + "'", conn);
 
                 string sql = @"INSERT INTO [ApplyTempList] (SerialNum, UnderlyingID, K, T, R, HV, IV, IssueNum, ResetR, BarrierR, FinancialR, Type, CP, UseReward, ConfirmChecked, Apply1500W, UserID, MDate, TempName, TempType, TraderID, IVNew) ";
                 sql += "VALUES(@SerialNum, @UnderlyingID, @K, @T, @R, @HV, @IV, @IssueNum, @ResetR, @BarrierR, @FinancialR, @Type, @CP, @UseReward, @ConfirmChecked, @Apply1500W, @UserID, @MDate, @TempName ,@TempType, @TraderID, @IVNew)";
@@ -376,8 +373,6 @@ namespace WarrantAssistant
                 ps.Add(new SqlParameter("@IVNew", SqlDbType.Float));
 
                 SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sql, ps);
-
-
 
                 int i = 1;
                 applyCount = 0;
@@ -412,54 +407,45 @@ namespace WarrantAssistant
                             else
                                 cp = "C";
                         }
-                        bool isReward = false;
-                        isReward = r.Cells["獎勵"].Value == DBNull.Value ? false : Convert.ToBoolean(r.Cells["獎勵"].Value);
+                        bool isReward = r.Cells["獎勵"].Value == DBNull.Value ? false : Convert.ToBoolean(r.Cells["獎勵"].Value);
                         string useReward = "N";
-
                         if (isReward)
                             useReward = "Y";
-                        else
-                            useReward = "N";
 
-                        bool confirmed = false;
-                        confirmed = r.Cells["確認"].Value == DBNull.Value ? false : Convert.ToBoolean(r.Cells["確認"].Value);
+                        bool confirmed = r.Cells["確認"].Value == DBNull.Value ? false : Convert.ToBoolean(r.Cells["確認"].Value);
                         string confirmChecked = "N";
                         if (confirmed) {
                             confirmChecked = "Y";
                             applyCount++;
-                        } else
-                            confirmChecked = "N";
+                        }
 
                         List<SqlParameter> reasonL = new List<SqlParameter>();
                         SQLCommandHelper underlyReason;
                         reasonL.Add(new SqlParameter("@UnderlyingID", SqlDbType.VarChar));
                         reasonL.Add(new SqlParameter("@Reason", SqlDbType.Int));
-                        if (cp == "C") {
+                        if (cp == "C")
                             underlyReason = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, "Update [Underlying_TraderIssue] set Reason = @Reason where UID = @UnderlyingID", reasonL);
-                        } else {
+                        else
                             underlyReason = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, "Update [Underlying_TraderIssue] set ReasonP = @Reason where UID = @UnderlyingID", reasonL);
-                        }
+
                         int reason = r.Cells["發行原因"].Value == DBNull.Value ? 0 : Convert.ToInt32(r.Cells["發行原因"].Value);
 
-                        bool apply1500Wbool = false;
-                        apply1500Wbool = r.Cells["1500W"].Value == DBNull.Value ? false : Convert.ToBoolean(r.Cells["1500W"].Value);
+                        bool apply1500Wbool = r.Cells["1500W"].Value == DBNull.Value ? false : Convert.ToBoolean(r.Cells["1500W"].Value);
                         string apply1500W = "N";
                         if (apply1500Wbool)
                             apply1500W = "Y";
-                        else
-                            apply1500W = "N";
 
-
-                        DateTime expiryDate;
-                        expiryDate = GlobalVar.globalParameter.nextTradeDate3.AddMonths(t);
+                        DateTime expiryDate = GlobalVar.globalParameter.nextTradeDate3.AddMonths(t);
                         expiryDate = expiryDate.AddDays(-1);
                         string sqlTemp = "SELECT TOP 1 TradeDate from TradeDate WHERE IsTrade='Y' AND TradeDate >= '" + expiryDate.ToString("yyyy-MM-dd") + "'";
-                        DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.tsquoteSqlConnString);
-                        foreach (DataRowView drTemp in dvTemp) {
+                        //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.tsquoteSqlConnString);
+                        DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.tsquoteSqlConnString);
+                        foreach (DataRow drTemp in dvTemp.Rows) {
                             expiryDate = Convert.ToDateTime(drTemp["TradeDate"]);
                         }
-                        string expiryMonth = "";
+
                         int month = expiryDate.Month;
+                        string expiryMonth = month.ToString();
                         if (month >= 10) {
                             if (month == 10)
                                 expiryMonth = "A";
@@ -467,11 +453,9 @@ namespace WarrantAssistant
                                 expiryMonth = "B";
                             if (month == 12)
                                 expiryMonth = "C";
-                        } else
-                            expiryMonth = month.ToString();
+                        }
 
-                        string expiryYear = "";
-                        expiryYear = expiryDate.AddYears(-1).ToString("yyyy");
+                        string expiryYear = expiryDate.AddYears(-1).ToString("yyyy");
                         expiryYear = expiryYear.Substring(expiryYear.Length - 1, 1);
 
                         string warrantType = "";
@@ -495,11 +479,9 @@ namespace WarrantAssistant
                             }
                         }
 
-                        string tempName = "";
-                        tempName = underlyingName + "凱基" + expiryYear + expiryMonth + warrantType;
+                        string tempName = underlyingName + "凱基" + expiryYear + expiryMonth + warrantType;
 
-                        string traderID = "";
-                        traderID = r.Cells["交易員"].Value == DBNull.Value ? userID : r.Cells["交易員"].Value.ToString();
+                        string traderID = r.Cells["交易員"].Value == DBNull.Value ? userID : r.Cells["交易員"].Value.ToString();
 
                         double ivNew = r.Cells["IV*"].Value == DBNull.Value ? 0.0 : (double) r.Cells["IV*"].Value;
 
@@ -564,20 +546,11 @@ namespace WarrantAssistant
                                 LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingSummary] b ON a.UnderlyingID=b.UnderlyingID";
                 sql4 += " WHERE a.[UserID]='" + userID + "'";
 
-                SqlCommand cmd1 = new SqlCommand(sql1, conn);
-                SqlCommand cmd2 = new SqlCommand(sql2, conn);
-                SqlCommand cmd3 = new SqlCommand(sql3, conn);
-                SqlCommand cmd4 = new SqlCommand(sql4, conn);
-
                 conn.Open();
-                cmd1.ExecuteNonQuery();
-                cmd1.Dispose();
-                cmd2.ExecuteNonQuery();
-                cmd2.Dispose();
-                cmd3.ExecuteNonQuery();
-                cmd3.Dispose();
-                cmd4.ExecuteNonQuery();
-                cmd4.Dispose();
+                MSSQL.ExecSqlCmd(sql1, conn);
+                MSSQL.ExecSqlCmd(sql2, conn);
+                MSSQL.ExecSqlCmd(sql3, conn);
+                MSSQL.ExecSqlCmd(sql4, conn);
                 conn.Close();
 
                 string sql5 = "SELECT [SerialNum], [WarrantName] FROM [EDIS].[dbo].[ApplyTotalList] WHERE [ApplyKind]='1' AND UserID='" + userID + "'";
@@ -963,8 +936,7 @@ namespace WarrantAssistant
 
         private void ultraGrid1_AfterCellUpdate(object sender, CellEventArgs e) {
             if (e.Cell.Column.Key == "標的代號") {
-                string underlyingID = "";
-                underlyingID = e.Cell.Row.Cells["標的代號"].Value.ToString();
+                string underlyingID = e.Cell.Row.Cells["標的代號"].Value.ToString();
                 string underlyingName = "";
                 string traderID = "";
                 double underlyingPrice = 0.0;
@@ -996,28 +968,17 @@ namespace WarrantAssistant
                 double multiplier = 0.0;
 
                 string underlyingID = e.Cell.Row.Cells["標的代號"].Value == DBNull.Value ? "" : e.Cell.Row.Cells["標的代號"].Value.ToString();
-                double underlyingPrice = 0.0;
-                underlyingPrice = e.Cell.Row.Cells["股價"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["股價"].Value);
-                double k = 0.0;
-                k = e.Cell.Row.Cells["履約價"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["履約價"].Value);
-                int t = 0;
-                t = e.Cell.Row.Cells["期間(月)"].Value == DBNull.Value ? 0 : Convert.ToInt32(e.Cell.Row.Cells["期間(月)"].Value);
-                double cr = 0.0;
-                cr = e.Cell.Row.Cells["行使比例"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["行使比例"].Value);
-                double vol = 0.0;
-                vol = e.Cell.Row.Cells["IV"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["IV"].Value) / 100;
-                double resetR = 0.0;
-                resetR = e.Cell.Row.Cells["重設比"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["重設比"].Value) / 100;
-                double financialR = 0.0;
-                financialR = e.Cell.Row.Cells["財務費用"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["財務費用"].Value) / 100;
-                string warrantType = "一般型";
-                warrantType = e.Cell.Row.Cells["類型"].Value == DBNull.Value ? "一般型" : e.Cell.Row.Cells["類型"].Value.ToString();
-                string cpType = "C";
-                cpType = e.Cell.Row.Cells["CP"].Value == DBNull.Value ? "C" : e.Cell.Row.Cells["CP"].Value.ToString();
-                double shares = 0.0;
-                shares = e.Cell.Row.Cells["張數"].Value == DBNull.Value ? 10000 : Convert.ToDouble(e.Cell.Row.Cells["張數"].Value);
-                bool is1500W = false;
-                is1500W = e.Cell.Row.Cells["1500W"].Value == DBNull.Value ? false : (bool) e.Cell.Row.Cells["1500W"].Value;
+                double underlyingPrice = e.Cell.Row.Cells["股價"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["股價"].Value);
+                double k = e.Cell.Row.Cells["履約價"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["履約價"].Value);
+                int t = e.Cell.Row.Cells["期間(月)"].Value == DBNull.Value ? 0 : Convert.ToInt32(e.Cell.Row.Cells["期間(月)"].Value);
+                double cr = e.Cell.Row.Cells["行使比例"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["行使比例"].Value);
+                double vol = e.Cell.Row.Cells["IV"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["IV"].Value) / 100;
+                double resetR = e.Cell.Row.Cells["重設比"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["重設比"].Value) / 100;
+                double financialR = e.Cell.Row.Cells["財務費用"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["財務費用"].Value) / 100;
+                string warrantType = e.Cell.Row.Cells["類型"].Value == DBNull.Value ? "一般型" : e.Cell.Row.Cells["類型"].Value.ToString();
+                string cpType = e.Cell.Row.Cells["CP"].Value == DBNull.Value ? "C" : e.Cell.Row.Cells["CP"].Value.ToString();
+                double shares = e.Cell.Row.Cells["張數"].Value == DBNull.Value ? 10000 : Convert.ToDouble(e.Cell.Row.Cells["張數"].Value);
+                bool is1500W = e.Cell.Row.Cells["1500W"].Value == DBNull.Value ? false : (bool) e.Cell.Row.Cells["1500W"].Value;
 
                 if (warrantType != "一般型" && warrantType != "牛熊證" && warrantType != "重設型") {
                     if (warrantType == "2")
@@ -1084,8 +1045,7 @@ namespace WarrantAssistant
                 double vol_ = vol;
                 double price_ = price;
                 double lowerLimit = 0.0;
-                double totalValue = 0.0;
-                totalValue = price_ * shares * 1000;
+                double totalValue = price_ * shares * 1000;
                 double volLimit = 2 * vol_;
                 while (totalValue < 15000000 && vol_ != 0.0 && price != 0.0 && vol_ < volLimit) {
                     vol_ += 0.01;

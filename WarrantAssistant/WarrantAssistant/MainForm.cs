@@ -712,7 +712,7 @@ namespace WarrantAssistant
 
                 string sqlTemp = "select top (1) WarrantName from (SELECT [WarrantName] FROM [EDIS].[dbo].[WarrantBasic] WHERE SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 3) + "' union ";
                 sqlTemp += " SELECT [WarrantName] FROM [EDIS].[dbo].[ApplyTotalList] WHERE [ApplyKind]='1' AND [SerialNum]<" + serialNum + " AND SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 3) + "') as tb1 ";
-                sqlTemp += " order by SUBSTRING(WarrantName,len(WarrantName)-3,len(WarrantName)-2) desc";
+                sqlTemp += " order by SUBSTRING(WarrantName,len(WarrantName)-2,len(WarrantName)) desc";
 
                 System.Data.DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                 int count = 0;
@@ -729,6 +729,7 @@ namespace WarrantAssistant
                 h.ExecuteCommand();
             }
             h.Dispose();
+            MessageBox.Show("Magic!");
         }
     }
 }
