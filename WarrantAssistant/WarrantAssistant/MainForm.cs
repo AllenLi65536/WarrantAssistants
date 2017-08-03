@@ -706,6 +706,7 @@ namespace WarrantAssistant
             pars.Add(new SqlParameter("@SerialNum", SqlDbType.VarChar));
             SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, cmdText, pars);
 
+            bool updated = false;
             foreach (DataRow dr in dv.Rows) {
                 string serialNum = dr["SerialNum"].ToString();
                 string warrantName = dr["WarrantName"].ToString();
@@ -722,14 +723,19 @@ namespace WarrantAssistant
                         MessageBox.Show("parse failed " + lastWarrantName);
                 }
 
-                warrantName = warrantName.Substring(0, warrantName.Length - 2) + (count + 1).ToString("0#");
-
-                h.SetParameterValue("@WarrantName", warrantName);
-                h.SetParameterValue("@SerialNum", serialNum);
-                h.ExecuteCommand();
+                if (warrantName.Substring(warrantName.Length - 2, 2) != (count + 1).ToString("0#")) {
+                    updated = true;
+                    warrantName = warrantName.Substring(0, warrantName.Length - 2) + (count + 1).ToString("0#");
+                    h.SetParameterValue("@WarrantName", warrantName);
+                    h.SetParameterValue("@SerialNum", serialNum);
+                    h.ExecuteCommand();
+                }            
             }
             h.Dispose();
-            MessageBox.Show("Magic!");
+            if (updated)
+                MessageBox.Show("Magic!");
+            else
+                MessageBox.Show("No magic.");
         }
     }
 }
