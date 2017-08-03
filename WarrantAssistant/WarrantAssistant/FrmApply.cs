@@ -603,27 +603,28 @@ namespace WarrantAssistant
         }
 
         private void SetButton() {
+            UltraGridBand bands0 = ultraGrid1.DisplayLayout.Bands[0];
             if (isEdit) {
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.TemplateOnBottom;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.True;
+                bands0.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.TemplateOnBottom;
+                bands0.Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
+                bands0.Override.AllowDelete = Infragistics.Win.DefaultableBoolean.True;
 
-                ultraGrid1.DisplayLayout.Bands[0].Columns["標的代號"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["履約價"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["期間(月)"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["行使比例"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["HV"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["IV"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["張數"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["重設比"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["界限比"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["財務費用"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["類型"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["CP"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["發行原因"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["交易員"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["1500W"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["發行價格"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["標的代號"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["履約價"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["期間(月)"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["行使比例"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["HV"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["IV"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["張數"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["重設比"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["界限比"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["財務費用"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["類型"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["CP"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["發行原因"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["交易員"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["1500W"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["發行價格"].CellActivation = Activation.AllowEdit;
                 //ultraGrid1.DisplayLayout.Bands[0].Columns["標的名稱"].CellActivation = Activation.AllowEdit;
                 //ultraGrid1.DisplayLayout.Bands[0].Columns["股價"].CellActivation = Activation.AllowEdit;
                 //ultraGrid1.DisplayLayout.Bands[0].Columns["市場"].CellActivation = Activation.AllowEdit;
@@ -662,38 +663,38 @@ namespace WarrantAssistant
                 //ultraGrid1.Rows[0].Selected = true;
                  * */
             } else {
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["確認"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["1500W"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["標的代號"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["履約價"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["期間(月)"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["行使比例"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["HV"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["IV"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["張數"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["重設比"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["界限比"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["財務費用"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["類型"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["CP"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["交易員"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵"].CellActivation = Activation.AllowEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["發行價格"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["發行原因"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["標的名稱"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["股價"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["Delta"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["跳動價差"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["市場"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["約當張數"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["今日額度"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵額度"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["IV*"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["發行價格*"].CellActivation = Activation.NoEdit;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["跌停價*"].CellActivation = Activation.NoEdit;
+                bands0.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
+                bands0.Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
+                bands0.Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
+                bands0.Columns["確認"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["1500W"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["標的代號"].CellActivation = Activation.NoEdit;
+                bands0.Columns["履約價"].CellActivation = Activation.NoEdit;
+                bands0.Columns["期間(月)"].CellActivation = Activation.NoEdit;
+                bands0.Columns["行使比例"].CellActivation = Activation.NoEdit;
+                bands0.Columns["HV"].CellActivation = Activation.NoEdit;
+                bands0.Columns["IV"].CellActivation = Activation.NoEdit;
+                bands0.Columns["張數"].CellActivation = Activation.NoEdit;
+                bands0.Columns["重設比"].CellActivation = Activation.NoEdit;
+                bands0.Columns["界限比"].CellActivation = Activation.NoEdit;
+                bands0.Columns["財務費用"].CellActivation = Activation.NoEdit;
+                bands0.Columns["類型"].CellActivation = Activation.NoEdit;
+                bands0.Columns["CP"].CellActivation = Activation.NoEdit;
+                bands0.Columns["交易員"].CellActivation = Activation.NoEdit;
+                bands0.Columns["獎勵"].CellActivation = Activation.AllowEdit;
+                bands0.Columns["發行價格"].CellActivation = Activation.NoEdit;
+                bands0.Columns["發行原因"].CellActivation = Activation.NoEdit;
+                bands0.Columns["標的名稱"].CellActivation = Activation.NoEdit;
+                bands0.Columns["股價"].CellActivation = Activation.NoEdit;
+                bands0.Columns["Delta"].CellActivation = Activation.NoEdit;
+                bands0.Columns["跳動價差"].CellActivation = Activation.NoEdit;
+                bands0.Columns["市場"].CellActivation = Activation.NoEdit;
+                bands0.Columns["約當張數"].CellActivation = Activation.NoEdit;
+                bands0.Columns["今日額度"].CellActivation = Activation.NoEdit;
+                bands0.Columns["獎勵額度"].CellActivation = Activation.NoEdit;
+                bands0.Columns["IV*"].CellActivation = Activation.NoEdit;
+                bands0.Columns["發行價格*"].CellActivation = Activation.NoEdit;
+                bands0.Columns["跌停價*"].CellActivation = Activation.NoEdit;
 
 
                 buttonEdit.Visible = true;
@@ -706,14 +707,14 @@ namespace WarrantAssistant
                 toolStripSeparator3.Visible = true;
                 toolStripButton3.Visible = true;
 
-                ultraGrid1.DisplayLayout.Bands[0].Columns["確認"].Hidden = false;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵"].Hidden = false;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["1500W"].Hidden = false;
+                bands0.Columns["確認"].Hidden = false;
+                bands0.Columns["獎勵"].Hidden = false;
+                bands0.Columns["1500W"].Hidden = false;
 
-                ultraGrid1.DisplayLayout.Bands[0].Columns["市場"].Hidden = false;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["約當張數"].Hidden = false;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["今日額度"].Hidden = false;
-                ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵額度"].Hidden = false;
+                bands0.Columns["市場"].Hidden = false;
+                bands0.Columns["約當張數"].Hidden = false;
+                bands0.Columns["今日額度"].Hidden = false;
+                bands0.Columns["獎勵額度"].Hidden = false;
             }
         }
 
@@ -872,45 +873,15 @@ namespace WarrantAssistant
         }
 
         private void ultraGrid1_DoubleClickCell(object sender, DoubleClickCellEventArgs e) {
-            if (e.Cell.Column.Key == "標的代號" && ultraGrid1.ActiveRow.Cells["標的代號"].Value != DBNull.Value) {
-                string target = (string) e.Cell.Value;
-                FrmIssueCheck frmIssueCheck = null;
-
-                foreach (Form iForm in Application.OpenForms) {
-                    if (iForm.GetType() == typeof(FrmIssueCheck)) {
-                        frmIssueCheck = (FrmIssueCheck) iForm;
-                        break;
-                    }
-                }
-
-                if (frmIssueCheck != null)
-                    frmIssueCheck.BringToFront();
-                else {
-                    frmIssueCheck = new FrmIssueCheck();
-                    frmIssueCheck.StartPosition = FormStartPosition.CenterScreen;
-                    frmIssueCheck.Show();
-                }
+            if (e.Cell.Row.Cells[0].Value == DBNull.Value)
+                return;
+            string target = (string) e.Cell.Row.Cells[0].Value;
+            if (e.Cell.Row.Cells["CP"].Value.ToString() == "C") {               
+                FrmIssueCheck frmIssueCheck = GlobalUtility.MenuItemClick<FrmIssueCheck>();               
                 frmIssueCheck.SelectUnderlying(target);
             }
-
-            if (e.Cell.Column.Key == "CP") {
-                string target = (string) e.Cell.Row.Cells[0].Value;
-                FrmIssueCheckPut frmIssueCheckPut = null;
-
-                foreach (Form iForm in Application.OpenForms) {
-                    if (iForm.GetType() == typeof(FrmIssueCheckPut)) {
-                        frmIssueCheckPut = (FrmIssueCheckPut) iForm;
-                        break;
-                    }
-                }
-
-                if (frmIssueCheckPut != null)
-                    frmIssueCheckPut.BringToFront();
-                else {
-                    frmIssueCheckPut = new FrmIssueCheckPut();
-                    frmIssueCheckPut.StartPosition = FormStartPosition.CenterScreen;
-                    frmIssueCheckPut.Show();
-                }
+            if (e.Cell.Row.Cells["CP"].Value.ToString() == "P") {                
+                FrmIssueCheckPut frmIssueCheckPut = GlobalUtility.MenuItemClick<FrmIssueCheckPut>();
                 frmIssueCheckPut.SelectUnderlying(target);
             }
         }

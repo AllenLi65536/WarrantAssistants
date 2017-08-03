@@ -1,14 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Data;
-using System.Configuration;
-using System.Diagnostics;
-using System.Windows.Forms;
-using System.IO;
-using System.Data.OleDb;
 
 
 namespace WarrantAssistant
