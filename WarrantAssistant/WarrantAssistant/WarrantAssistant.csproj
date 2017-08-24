@@ -42,8 +42,7 @@
       <HintPath>.\DeriLib.dll</HintPath>
     </Reference>
     <Reference Include="EDLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EDLib.1.0.7-beta\lib\net40\EDLib.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\EDLib.1.1.2\lib\net40\EDLib.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\Net40\HtmlAgilityPack.dll</HintPath>

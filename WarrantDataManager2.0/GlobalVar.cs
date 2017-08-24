@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using EDLib.SQL;
+using System.Windows.Forms;
 
 namespace WarrantDataManager2._0
 {
@@ -47,16 +48,16 @@ namespace WarrantDataManager2._0
             getFirstTradeDateOfQuarter();
         }
 
-        private static void checkIsLevelA() {
-            DataTable isA = MSSQL.ExecSqlQry("select FLGDAT_FLGDSC from EDAISYS.dbo.FLAGDATAS "
-                                         + " where FLGDAT_FLGVAR + 1911 = DATEPART(yyyy, GETDATE())"
-                                         + " AND FLGDAT_FLGDTA = DATEPART(q, GETDATE())"
-                                         + " AND FLGDAT_FLGNAM = 'WRT_MARKET_RATING'",
+        private static void checkIsLevelA() { 
+            DataTable isA = MSSQL.ExecSqlQry(@"select FLGDAT_FLGVAR from EDAISYS.dbo.FLAGDATAS 
+                                         where FLGDAT_FLGNAM = 'WRT_MARKET_RATING'
+                                         and convert(varchar(10), GETDATE(), 112) between FLGDAT_FLGNBR and FLGDAT_ORDERS",
                                          "SERVER=10.7.0.52;DATABASE=EDAISYS;UID=eduser;PWD=eduser");
             if (isA.Rows.Count > 0 && isA.Rows[0][0].ToString() == "A")
                 GlobalVar.globalParameter.isLevelA = true;
             else
-                GlobalVar.globalParameter.isLevelA = false;            
+                GlobalVar.globalParameter.isLevelA = false;
+            //MessageBox.Show(GlobalVar.globalParameter.isLevelA.ToString());
         }
         private static void checkIsTodayTradeDate() {
             //DataView dv = DeriLib.Util.ExecSqlQry("SELECT IsTrade FROM [TradeDate] WHERE CONVERT(VARCHAR, TradeDate, 112) = CONVERT(VARCHAR, GETDATE(), 112)", GlobalVar.loginSet.tsquoteSqlConnString);
@@ -64,7 +65,7 @@ namespace WarrantDataManager2._0
             if (dv.Rows[0]["IsTrade"].ToString() == "Y")
                 GlobalVar.globalParameter.isTodayTradeDate = true;
             else
-                GlobalVar.globalParameter.isTodayTradeDate = false;            
+                GlobalVar.globalParameter.isTodayTradeDate = false;
         }
 
         private static void getLastTradeDate() {

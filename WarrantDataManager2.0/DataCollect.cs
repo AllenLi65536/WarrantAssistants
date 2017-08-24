@@ -64,14 +64,14 @@ select C.WRTCAN_STKID, C.WRTCAN_CMONEY_ID, C.WRTCAN_SHORT_NAME, C.TraderAssount,
 (SELECT A.WRTCAN_STKID, A.WRTCAN_CMONEY_ID, A.WRTCAN_SHORT_NAME, ISNULL(B.TraderAccount,'7643') as TraderAssount, ISNULL(B.TraderName,'Aaron') as TraderName, A.WRTCAN_STOCKTYPE, A.WRTCAN_FULL_NAME,    
     CASE WHEN (WRTCAN_STOCKTYPE = 'DI' OR WRTCAN_STOCKTYPE = 'DE') AND (AUT.FLGDAT_FLGVAR is null OR AUT.FLGDAT_FLGVAR = 0 OR AUT.FLGDAT_FLGVAR < CONVERT(VARCHAR, GETDATE(), 112)) THEN '未授權'                       
     WHEN WRTCAN_STOCKTYPE = 'DS' AND A.WRTCAN_STKID IN('2883', '6005') THEN '未授權'
-    WHEN (WRTCAN_STOCKTYPE = 'DS' OR WRTCAN_STOCKTYPE = 'DR') AND A.WRTCAN_SOURCE = 'STOCK_A' AND (RATING.FLGDAT_FLGDSC <> 'A' OR RATING.FLGDAT_FLGDSC is null) THEN '非A級券商'               
+    WHEN (WRTCAN_STOCKTYPE = 'DS' OR WRTCAN_STOCKTYPE = 'DR') AND A.WRTCAN_SOURCE = 'STOCK_A' AND (C.FLGDAT_FLGVAR <> 'A' OR C.FLGDAT_FLGVAR is null) THEN '非A級券商'               
     ELSE '1'
     END as CHECK_CAN_ISSUE
 FROM [10.7.0.52].[WAFT].[dbo].[CANDIDATE] as A WITH(NOLOCK)
 LEFT JOIN  [10.7.0.52].EDAISYS.dbo.FLAGDATAS as AUT WITH(NOLOCK)
     ON WRTCAN_INSNBR = AUT.FLGDAT_FLGNBR AND AUT.FLGDAT_FLGNAM = 'WRT_AUTHORIZATION_MAINTAIN' AND AUT.FLGDAT_FLGNBR = A.WRTCAN_INSNBR 
-LEFT JOIN  [10.7.0.52].EDAISYS.dbo.FLAGDATAS as RATING WITH (NOLOCK)
-     ON RATING.FLGDAT_FLGVAR + 1911 = DATEPART(yyyy,GETDATE()) AND RATING.FLGDAT_FLGDTA = DATEPART(q,GETDATE()) AND RATING.FLGDAT_FLGNAM = 'WRT_MARKET_RATING'
+LEFT JOIN  [10.7.0.52].EDAISYS.dbo.FLAGDATAS as C WITH (NOLOCK)
+     ON C.FLGDAT_FLGNAM = 'WRT_MARKET_RATING' and  convert(varchar(10), GETDATE(), 112) between C.FLGDAT_FLGNBR and C.FLGDAT_ORDERS
 LEFT JOIN [10.19.1.20].[EDIS].[dbo].[Underlying_Trader] as B ON A.[WRTCAN_STKID]=B.UID COLLATE Chinese_Taiwan_Stroke_CI_AS
 WHERE A.WRTCAN_DATE = ( SELECT MAX(WRTCAN_DATE) FROM  [10.7.0.52].WAFT.dbo.CANDIDATE WHERE WRTCAN_VER = 1) AND A.WRTCAN_VER = 1)as C
 WHERE C.CHECK_CAN_ISSUE = '1'", conn);
@@ -187,7 +187,7 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
 
             conn.Open();
             MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantUnderlyingCredit (UnderlyingID, MDate, DataDate, Market, AvailableShares, IssuedPercent, CanIssue, CanFurthurIssue)
-                               SELECT
+                               SELECT distinct
                                 QUOTA.ISUQTA_STKID, QUOTA.ISUQTA_CREATME, QUOTA.ISUQTA_DATE, SUBSTRING(QUOTA.ISUQTA_MKTTYPE,4,3), (QUOTA.ISUQTA_FOR_WARRANT_SHARES/1000), QUOTA.ISUQTA_ISSUED_PERCENT,
                                 (CANDI.尚可發行額度- QUOTA.ISUQTA_ISSUED_PERCENT) / 100.0 * QUOTA.ISUQTA_FOR_WARRANT_SHARES / 1000.0,
                                 (CANDI.增額發行額度- QUOTA.ISUQTA_ISSUED_PERCENT) / 100.0 * QUOTA.ISUQTA_FOR_WARRANT_SHARES / 1000.0
@@ -210,7 +210,7 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
 
         private void insertWarrantPrices() {
             MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantPrices 
-                               SELECT CASE WHEN (A.[CommodityId]='1000') THEN 'IX0001' ELSE A.[CommodityId] END
+                               SELECT DISTINCT CASE WHEN (A.[CommodityId]='1000') THEN 'IX0001' ELSE A.[CommodityId] END
                                              ,isnull(A.[LastPrice],0)
                                              ,A.[tradedate]
                                              ,isnull(B.[BuyPriceBest1],0)

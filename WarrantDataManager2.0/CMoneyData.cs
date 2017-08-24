@@ -562,6 +562,7 @@ namespace WarrantDataManager2._0
                 insertIssueCheckPut.Dispose();
             } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_updateIssueCheck][" + ex.Message + "][" + ex.StackTrace + "]");
+                MessageBox.Show(ex.ToString());
             }
 
         }

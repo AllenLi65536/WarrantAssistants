@@ -208,6 +208,7 @@ namespace WarrantDataManager2._0
             catch (Exception ex)
             {
                 //GlobalVar.errProcess.Add(1, "[IssuableUnderlyingDataWork_DoWork][" + ex.Message + "][" + ex.StackTrace + "]");
+                //MessageBox.Show(ex.ToString());
                 return WorkState.Exception;
             }
         }
