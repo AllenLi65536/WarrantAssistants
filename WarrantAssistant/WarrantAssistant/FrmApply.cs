@@ -192,9 +192,10 @@ namespace WarrantAssistant
                    WHERE a.UserID='" + userID + "' ";//or (a.UnderlyingID = 'IX0001' and d.UID ='TWA00')
                 sql += "ORDER BY a.MDate";
 
-                DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
-                if (dv.Count > 0) {
-                    foreach (DataRowView drv in dv) {
+                //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+                if (dv.Rows.Count > 0) {
+                    foreach (DataRow drv in dv.Rows) {
                         DataRow dr = dt.NewRow();
 
                         //dr["編號"] = drv["SerialNum"].ToString();
@@ -226,10 +227,7 @@ namespace WarrantAssistant
                         dr["交易員"] = drv["TraderID"].ToString();
                         dr["獎勵"] = drv["UseReward"];
                         dr["確認"] = drv["ConfirmChecked"];
-                        //if (drv["Reason"] == DBNull.Value)
                         dr["發行原因"] = drv["Reason"] == DBNull.Value ? 0 : Convert.ToInt32(drv["Reason"]);
-                        //else
-                        //  dr["發行原因"] = Convert.ToInt32(drv["Reason"]);
                         dr["1500W"] = drv["Apply1500W"];
                         dr["標的名稱"] = drv["UnderlyingName"].ToString();
                         double underlyingPrice = 0.0;
@@ -324,9 +322,9 @@ namespace WarrantAssistant
 
         private bool CheckReason() {
             bool undoneReason = true;
-            string sql2 = @"SELECT [UnderlyingID]";
-            sql2 += " FROM [EDIS].[dbo].[ApplyTempList] as A left join Underlying_TraderIssue as B on A.UnderlyingID = B.UID "; //or(A.UnderlyingID = 'IX0001' and B.UID ='TWA00')
-            sql2 += " WHERE [UserID]='" + userID + "' AND [ConfirmChecked]='Y' and ((Reason=0  and A.CP='C') or (ReasonP = 0 and A.CP = 'P'))";//
+            string sql2 = "SELECT [UnderlyingID]"
+             + " FROM [EDIS].[dbo].[ApplyTempList] as A left join Underlying_TraderIssue as B on A.UnderlyingID = B.UID " //or(A.UnderlyingID = 'IX0001' and B.UID ='TWA00')
+             + " WHERE [UserID]='" + userID + "' AND [ConfirmChecked]='Y' and ((Reason=0  and A.CP='C') or (ReasonP = 0 and A.CP = 'P'))";//
 
             DataTable noReason = MSSQL.ExecSqlQry(sql2, conn);// new DataTable("noReason");            
 
@@ -337,8 +335,15 @@ namespace WarrantAssistant
 
             return undoneReason;
         }
-        private void CheckRelation() {
-            //TODO 
+        private void CheckData() {
+            string sql2 = "SELECT [UnderlyingID]"
+             + " FROM [EDIS].[dbo].[ApplyTempList] as A left join Underlying_TraderIssue as B on A.UnderlyingID = B.UID " //or(A.UnderlyingID = 'IX0001' and B.UID ='TWA00')
+             + " WHERE [UserID]='" + userID + "' AND [ConfirmChecked]='Y' and (HV = 0 or IV = 0 or IssueNum = 0 or T = 0 or K = 0)";//
+                                                                                                                                    //TODO 
+            DataTable noReason = MSSQL.ExecSqlQry(sql2, conn);// new DataTable("noReason");            
+
+            foreach (DataRow Row in noReason.Rows)
+                MessageBox.Show(Row["UnderlyingID"] + " 未輸入發行原因");
         }
 
         private void UpdateData() {
@@ -346,8 +351,8 @@ namespace WarrantAssistant
 
                 MSSQL.ExecSqlCmd("DELETE FROM [ApplyTempList] WHERE UserID='" + userID + "'", conn);
 
-                string sql = @"INSERT INTO [ApplyTempList] (SerialNum, UnderlyingID, K, T, R, HV, IV, IssueNum, ResetR, BarrierR, FinancialR, Type, CP, UseReward, ConfirmChecked, Apply1500W, UserID, MDate, TempName, TempType, TraderID, IVNew) ";
-                sql += "VALUES(@SerialNum, @UnderlyingID, @K, @T, @R, @HV, @IV, @IssueNum, @ResetR, @BarrierR, @FinancialR, @Type, @CP, @UseReward, @ConfirmChecked, @Apply1500W, @UserID, @MDate, @TempName ,@TempType, @TraderID, @IVNew)";
+                string sql = @"INSERT INTO [ApplyTempList] (SerialNum, UnderlyingID, K, T, R, HV, IV, IssueNum, ResetR, BarrierR, FinancialR, Type, CP, UseReward, ConfirmChecked, Apply1500W, UserID, MDate, TempName, TempType, TraderID, IVNew) "
+                + "VALUES(@SerialNum, @UnderlyingID, @K, @T, @R, @HV, @IV, @IssueNum, @ResetR, @BarrierR, @FinancialR, @Type, @CP, @UseReward, @ConfirmChecked, @Apply1500W, @UserID, @MDate, @TempName ,@TempType, @TraderID, @IVNew)";
                 List<SqlParameter> ps = new List<SqlParameter>();
                 ps.Add(new SqlParameter("@SerialNum", SqlDbType.VarChar));
                 ps.Add(new SqlParameter("@UnderlyingID", SqlDbType.VarChar));
@@ -436,7 +441,8 @@ namespace WarrantAssistant
                             apply1500W = "Y";
 
                         DateTime expiryDate = GlobalVar.globalParameter.nextTradeDate3.AddMonths(t);
-                        expiryDate = expiryDate.AddDays(-1);
+                        if(expiryDate.Day == GlobalVar.globalParameter.nextTradeDate3.Day)
+                            expiryDate = expiryDate.AddDays(-1);
                         string sqlTemp = "SELECT TOP 1 TradeDate from TradeDate WHERE IsTrade='Y' AND TradeDate >= '" + expiryDate.ToString("yyyy-MM-dd") + "'";
                         //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.tsquoteSqlConnString);
                         DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.tsquoteSqlConnString);
@@ -529,22 +535,22 @@ namespace WarrantAssistant
         private void OfficiallyApply() {
             try {
                 //CheckReason();
-                //CheckRelation();
+                CheckData();
 
                 UpdateData();
                 string sql1 = "DELETE FROM [EDIS].[dbo].[ApplyOfficial] WHERE [UserID]='" + userID + "'";
                 string sql2 = @"INSERT INTO [EDIS].[dbo].[ApplyOfficial] ([SerialNumber],[UnderlyingID],[K],[T],[R],[HV],[IV],[IssueNum],[ResetR],[BarrierR],[FinancialR],[Type],[CP],[UseReward],[Apply1500W],[TempName],[TraderID],[MDate],UserID, IVNew)
-                                SELECT [SerialNum],[UnderlyingID],[K],[T],[R],[HV],[IV],[IssueNum],[ResetR],[BarrierR],[FinancialR],[Type],[CP],[UseReward],[Apply1500W],[TempName],[TraderID],[MDate],UserID, IVNew";
+                                SELECT [SerialNum],[UnderlyingID],[K],[T],[R],[HV],[IV],[IssueNum],[ResetR],[BarrierR],[FinancialR],[Type],[CP],[UseReward],[Apply1500W],[TempName],[TraderID],[MDate],UserID, IVNew"
                 //sql2 += "'"+userID + "', [MDate]" ;
-                sql2 += " FROM [EDIS].[dbo].[ApplyTempList]";
-                sql2 += " WHERE [UserID]='" + userID + "' AND [ConfirmChecked]='Y'";
+                 + " FROM [EDIS].[dbo].[ApplyTempList]"
+                 + " WHERE [UserID]='" + userID + "' AND [ConfirmChecked]='Y'";
 
                 string sql3 = "DELETE FROM [EDIS].[dbo].[ApplyTotalList] WHERE [UserID]='" + userID + "' AND [ApplyKind]='1'";
                 string sql4 = @"INSERT INTO [EDIS].[dbo].[ApplyTotalList] ([ApplyKind],[SerialNum],[Market],[UnderlyingID],[WarrantName],[CR] ,[IssueNum],[EquivalentNum],[Credit],[RewardCredit],[Type],[CP],[UseReward],[MarketTmr],[TraderID],[MDate],UserID)
                                 SELECT '1',a.SerialNumber, b.Market, a.UnderlyingID, a.TempName, a.R, a.IssueNum, ROUND(a.R*a.IssueNum, 2), b.IssueCredit, b.RewardIssueCredit, a.Type, a.CP, a.UseReward,'N', a.TraderID, GETDATE(), a.UserID
                                 FROM [EDIS].[dbo].[ApplyOfficial] a
-                                LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingSummary] b ON a.UnderlyingID=b.UnderlyingID";
-                sql4 += " WHERE a.[UserID]='" + userID + "'";
+                                LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingSummary] b ON a.UnderlyingID=b.UnderlyingID"
+                  + " WHERE a.[UserID]='" + userID + "'";
 
                 conn.Open();
                 MSSQL.ExecSqlCmd(sql1, conn);
@@ -567,9 +573,9 @@ namespace WarrantAssistant
                     string serialNum = dr["SerialNum"].ToString();
                     string warrantName = dr["WarrantName"].ToString();
 
-                    string sqlTemp = "select top (1) WarrantName from (SELECT [WarrantName] FROM [EDIS].[dbo].[WarrantBasic] WHERE SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 1) + "' union ";
-                    sqlTemp += " SELECT [WarrantName] FROM [EDIS].[dbo].[ApplyTotalList] WHERE [ApplyKind]='1' AND [SerialNum]<" + serialNum + " AND SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 1) + "') as tb1 ";
-                    sqlTemp += " order by SUBSTRING(WarrantName,len(WarrantName)-1,len(WarrantName)) desc";
+                    string sqlTemp = "select top (1) WarrantName from (SELECT [WarrantName] FROM [EDIS].[dbo].[WarrantBasic] WHERE SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 1) + "' union "
+                     + " SELECT [WarrantName] FROM [EDIS].[dbo].[ApplyTotalList] WHERE [ApplyKind]='1' AND [SerialNum]<" + serialNum + " AND SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 1) + "') as tb1 "
+                     + " order by SUBSTRING(WarrantName,len(WarrantName)-1,len(WarrantName)) desc";
                     //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                     DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                     int count = 0;
@@ -876,11 +882,11 @@ namespace WarrantAssistant
             if (e.Cell.Row.Cells[0].Value == DBNull.Value)
                 return;
             string target = (string) e.Cell.Row.Cells[0].Value;
-            if (e.Cell.Row.Cells["CP"].Value.ToString() == "C") {               
-                FrmIssueCheck frmIssueCheck = GlobalUtility.MenuItemClick<FrmIssueCheck>();               
+            if (e.Cell.Row.Cells["CP"].Value.ToString() == "C") {
+                FrmIssueCheck frmIssueCheck = GlobalUtility.MenuItemClick<FrmIssueCheck>();
                 frmIssueCheck.SelectUnderlying(target);
             }
-            if (e.Cell.Row.Cells["CP"].Value.ToString() == "P") {                
+            if (e.Cell.Row.Cells["CP"].Value.ToString() == "P") {
                 FrmIssueCheckPut frmIssueCheckPut = GlobalUtility.MenuItemClick<FrmIssueCheckPut>();
                 frmIssueCheckPut.SelectUnderlying(target);
             }

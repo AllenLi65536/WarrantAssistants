@@ -228,13 +228,13 @@ namespace WarrantAssistant
         private void toolStripButtonGetData_Click(object sender, EventArgs e) {
 
             //Get key and id
-            DataView dv = DeriLib.Util.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='10'"
+            DataTable dv = EDLib.SQL.MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='10'"
                 , GlobalVar.loginSet.warrantSysKeySqlConnString);
-            string key = dv[0]["FLGDAT_FLGDTA"].ToString();
+            string key = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
 
-            dv = DeriLib.Util.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='20'"
+            dv = EDLib.SQL.MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='20'"
                 , GlobalVar.loginSet.warrantSysKeySqlConnString);
-            string id = dv[0]["FLGDAT_FLGDTA"].ToString();
+            string id = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
 
             DateTime lastTrade = TradeDate.LastNTradeDateDT(1);
             string aday = (lastTrade.Year - 1911) + lastTrade.ToString("MMdd");
