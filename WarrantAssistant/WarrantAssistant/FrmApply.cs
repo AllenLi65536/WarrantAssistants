@@ -344,7 +344,7 @@ namespace WarrantAssistant
             DataTable noReason = MSSQL.ExecSqlQry(sql2, conn);// new DataTable("noReason");            
 
             foreach (DataRow Row in noReason.Rows) {
-                MessageBox.Show(Row["UnderlyingID"] + " 發行條件輸入有誤");
+                MessageBox.Show(Row["UnderlyingID"] + " 發行條件輸入有誤，會被後臺某些人罵，避免他們該該叫，請修改條件。");
                 dataOK = false;
             }
             return dataOK;
