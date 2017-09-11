@@ -73,6 +73,7 @@ namespace WarrantDataManager2._0
                 }
 
             } catch (Exception ex) {
+                MessageBox.Show("GetCommodityBasics" + ex.Message);
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getCommodityBasics][" + ex.Message + "][" + ex.StackTrace + "]");
             }
 
@@ -96,6 +97,7 @@ namespace WarrantDataManager2._0
 
                 }
             } catch (Exception ex) {
+                MessageBox.Show("LoadCommodityData" + ex.Message);
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_loadCommodityData][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
@@ -142,6 +144,7 @@ namespace WarrantDataManager2._0
                 }
                 h.Dispose();
             } catch (Exception ex) {
+                MessageBox.Show("RefreshCommodityBasics" + ex.Message);
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_refreshIssuableUnderlyingData][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
@@ -186,6 +189,7 @@ namespace WarrantDataManager2._0
                     tw50Stocks.Add(cid);
                 }*/
             } catch (Exception ex) {
+                MessageBox.Show("Gettw50Stocks" + ex.Message);
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getBigStocks][" + ex.Message + "][" + ex.StackTrace + "]");
             }
 
@@ -253,6 +257,7 @@ namespace WarrantDataManager2._0
                 }
 
             } catch (Exception ex) {
+                MessageBox.Show("getPriceAndPERatio" + ex.Message);
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getPricesAndPERatio][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
@@ -279,6 +284,7 @@ namespace WarrantDataManager2._0
                 }
 
             } catch (Exception ex) {
+                MessageBox.Show("getEarning" + ex.Message);
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getEarning][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
@@ -311,7 +317,7 @@ namespace WarrantDataManager2._0
                     data[stockID].stockDividend = sd;
                 }
             } catch (Exception ex) {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("GetDividendDates" + ex.Message);
             }
         }
 
@@ -361,6 +367,7 @@ namespace WarrantDataManager2._0
                         data[stockID].disposeEndDate = DateTime.ParseExact(es, "yyyyMMdd", null);
                 }
             } catch (Exception ex) {
+                MessageBox.Show("getDisposeEndDate" + ex.Message);
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getDisposeEndDates][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
@@ -398,6 +405,7 @@ namespace WarrantDataManager2._0
                         d.watchCount++;
                 }
             } catch (Exception ex) {
+                MessageBox.Show("getWatchStock" + ex.Message);
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getWatchStock][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
@@ -422,6 +430,7 @@ namespace WarrantDataManager2._0
                     data[stockID].warningScore = w;
                 }
             } catch (Exception ex) {
+                MessageBox.Show("getWarningScore" + ex.Message);
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getWarningScore][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
@@ -459,6 +468,7 @@ namespace WarrantDataManager2._0
                     data[stockID].accNetIncome = Convert.ToDouble(rs.Fields["稅後純益"].Value);
                 }
             } catch (Exception ex) {
+                MessageBox.Show("getAccNetIncome" + ex.Message);
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_getAccNetIncome][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
@@ -562,7 +572,7 @@ namespace WarrantDataManager2._0
                 insertIssueCheckPut.Dispose();
             } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[CMoneyWork_updateIssueCheck][" + ex.Message + "][" + ex.StackTrace + "]");
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show("UpdateIssueCheck" + ex.ToString());
             }
 
         }

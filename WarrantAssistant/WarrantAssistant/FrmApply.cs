@@ -335,15 +335,19 @@ namespace WarrantAssistant
 
             return undoneReason;
         }
-        private void CheckData() {
+        private bool CheckData() {
+            bool dataOK = true;
             string sql2 = "SELECT [UnderlyingID]"
-             + " FROM [EDIS].[dbo].[ApplyTempList] as A left join Underlying_TraderIssue as B on A.UnderlyingID = B.UID " //or(A.UnderlyingID = 'IX0001' and B.UID ='TWA00')
-             + " WHERE [UserID]='" + userID + "' AND [ConfirmChecked]='Y' and (HV = 0 or IV = 0 or IssueNum = 0 or T = 0 or K = 0)";//
-                                                                                                                                    //TODO 
+             + " FROM [EDIS].[dbo].[ApplyTempList]"
+             + " WHERE [UserID]='" + userID + "' AND [ConfirmChecked]='Y' and (HV = 0 or IV = 0 or IssueNum = 0 or T = 0 or K = 0)";
+                                                                                                                                              
             DataTable noReason = MSSQL.ExecSqlQry(sql2, conn);// new DataTable("noReason");            
 
-            foreach (DataRow Row in noReason.Rows)
-                MessageBox.Show(Row["UnderlyingID"] + " 未輸入發行原因");
+            foreach (DataRow Row in noReason.Rows) {
+                MessageBox.Show(Row["UnderlyingID"] + " 發行條件輸入有誤");
+                dataOK = false;
+            }
+            return dataOK;
         }
 
         private void UpdateData() {
@@ -441,7 +445,7 @@ namespace WarrantAssistant
                             apply1500W = "Y";
 
                         DateTime expiryDate = GlobalVar.globalParameter.nextTradeDate3.AddMonths(t);
-                        if(expiryDate.Day == GlobalVar.globalParameter.nextTradeDate3.Day)
+                        if (expiryDate.Day == GlobalVar.globalParameter.nextTradeDate3.Day)
                             expiryDate = expiryDate.AddDays(-1);
                         string sqlTemp = "SELECT TOP 1 TradeDate from TradeDate WHERE IsTrade='Y' AND TradeDate >= '" + expiryDate.ToString("yyyy-MM-dd") + "'";
                         //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.tsquoteSqlConnString);
@@ -449,7 +453,6 @@ namespace WarrantAssistant
                         foreach (DataRow drTemp in dvTemp.Rows) {
                             expiryDate = Convert.ToDateTime(drTemp["TradeDate"]);
                         }
-
                         int month = expiryDate.Month;
                         string expiryMonth = month.ToString();
                         if (month >= 10) {
@@ -534,10 +537,12 @@ namespace WarrantAssistant
 
         private void OfficiallyApply() {
             try {
-                //CheckReason();
-                CheckData();
-
+                               
                 UpdateData();
+
+                if (!CheckData())
+                    return;
+
                 string sql1 = "DELETE FROM [EDIS].[dbo].[ApplyOfficial] WHERE [UserID]='" + userID + "'";
                 string sql2 = @"INSERT INTO [EDIS].[dbo].[ApplyOfficial] ([SerialNumber],[UnderlyingID],[K],[T],[R],[HV],[IV],[IssueNum],[ResetR],[BarrierR],[FinancialR],[Type],[CP],[UseReward],[Apply1500W],[TempName],[TraderID],[MDate],UserID, IVNew)
                                 SELECT [SerialNum],[UnderlyingID],[K],[T],[R],[HV],[IV],[IssueNum],[ResetR],[BarrierR],[FinancialR],[Type],[CP],[UseReward],[Apply1500W],[TempName],[TraderID],[MDate],UserID, IVNew"
