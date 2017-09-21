@@ -944,50 +944,9 @@ namespace WarrantAssistant
             }
 
             if (e.Cell.Column.Key == "重設比") {
-
-                string cpType = e.Cell.Row.Cells["CP"].Value == DBNull.Value ? "C" : e.Cell.Row.Cells["CP"].Value.ToString();
-                if (cpType != "C" && cpType != "P") {
-                    if (cpType == "2")
-                        cpType = "P";
-                    else
-                        cpType = "C";
-                }
-
-                CallPutType cp = CallPutType.Call;
-                if (cpType == "P")
-                    cp = CallPutType.Put;
-                else
-                    cp = CallPutType.Call;
-
-                double price = 0.0;
-                int t = e.Cell.Row.Cells["期間(月)"].Value == DBNull.Value ? 0 : Convert.ToInt32(e.Cell.Row.Cells["期間(月)"].Value);
-                double cr = e.Cell.Row.Cells["行使比例"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["行使比例"].Value);
-                double vol = e.Cell.Row.Cells["IV"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["IV"].Value) / 100;
-                double resetR = e.Cell.Row.Cells["重設比"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["重設比"].Value) / 100;
-                string underlyingID = e.Cell.Row.Cells["標的代號"].Value == DBNull.Value ? "" : e.Cell.Row.Cells["標的代號"].Value.ToString();
                 double underlyingPrice = e.Cell.Row.Cells["股價"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["股價"].Value);
-                double k = Math.Round(underlyingPrice * resetR, 2);
-                double financialR = e.Cell.Row.Cells["財務費用"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["財務費用"].Value) / 100;
-                string warrantType = e.Cell.Row.Cells["類型"].Value == DBNull.Value ? "一般型" : e.Cell.Row.Cells["類型"].Value.ToString();
-                if (warrantType != "一般型" && warrantType != "牛熊證" && warrantType != "重設型") {
-                    if (warrantType == "2")
-                        warrantType = "牛熊證";
-                    else if (warrantType == "3")
-                        warrantType = "重設型";
-                    else
-                        warrantType = "一般型";
-                }
-
-                if (underlyingPrice != 0.0 && underlyingID != "") {
-
-                    if (warrantType == "牛熊證")
-                        price = Pricing.BullBearWarrantPrice(cp, underlyingPrice, resetR, GlobalVar.globalParameter.interestRate, vol, t, financialR, cr);
-                    else if (warrantType == "重設型")
-                        price = Pricing.ResetWarrantPrice(cp, underlyingPrice, resetR, GlobalVar.globalParameter.interestRate, vol, t, cr);
-                    else
-                        price = Pricing.NormalWarrantPrice(cp, underlyingPrice, k, GlobalVar.globalParameter.interestRate, vol, t, cr);
-                }
-                e.Cell.Row.Cells["發行價格"].Value = Math.Round(price, 2);
+                double resetR = e.Cell.Row.Cells["重設比"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["重設比"].Value) / 100;
+                double k = Math.Round(underlyingPrice * resetR, 2);                
                 e.Cell.Row.Cells["履約價"].Value = k;
             }
 
