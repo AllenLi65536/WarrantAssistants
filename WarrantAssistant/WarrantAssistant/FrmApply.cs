@@ -54,7 +54,8 @@ namespace WarrantAssistant
             dt.Columns["1500W"].ReadOnly = false;
             dt.Columns.Add("確認", typeof(bool));
             dt.Columns["確認"].ReadOnly = false;
-            dt.Columns.Add("發行原因", typeof(string));
+            dt.Columns.Add("Adj", typeof(double));
+            dt.Columns.Add("發行原因", typeof(string));            
             dt.Columns.Add("發行價格", typeof(double));
             dt.Columns.Add("標的名稱", typeof(string));
             dt.Columns.Add("股價", typeof(double));
@@ -103,6 +104,7 @@ namespace WarrantAssistant
             band0.Columns["確認"].Width = 40;
             band0.Columns["1500W"].Width = 50;
             band0.Columns["發行價格"].Width = 60;
+            band0.Columns["Adj"].Width = 60;
             band0.Columns["發行原因"].Width = 150;
             band0.Columns["標的名稱"].Width = 70;
             band0.Columns["股價"].Width = 60;
@@ -185,6 +187,7 @@ namespace WarrantAssistant
 	                              ,IsNull(b.[IssueCredit],0) IssueCredit
 	                              ,IsNull(b.[RewardIssueCredit],0) RewardIssueCredit
                                   ,CASE WHEN a.CP='C' THEN d.Reason ELSE d.ReasonP END Reason
+                                  ,IsNull(a.[Adj],0) Adj
                               FROM [EDIS].[dbo].[ApplyTempList] a ";
                 sql += @"LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingSummary] b on a.UnderlyingID=b.UnderlyingID
                    LEFT JOIN [EDIS].[dbo].[WarrantPrices] c on a.UnderlyingID=c.CommodityID 
@@ -238,27 +241,29 @@ namespace WarrantAssistant
                         double rewardCredit = Math.Floor((double) drv["RewardIssueCredit"]);                        
                         dr["今日額度"] = credit;
                         dr["獎勵額度"] = rewardCredit;
-                        
+                        double adj = (double) drv["Adj"];
+                        dr["Adj"] = adj;
+
                         double price = 0.0;
                         double delta = 0.0;
                         if (underlyingPrice != 0) {
                             if (warrantType == "牛熊證")
-                                price = Pricing.BullBearWarrantPrice(cp, underlyingPrice, resetR, GlobalVar.globalParameter.interestRate, vol, t, financialR, cr);
+                                price = Pricing.BullBearWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol, t, financialR, cr);
                             else if (warrantType == "重設型")
-                                price = Pricing.ResetWarrantPrice(cp, underlyingPrice, resetR, GlobalVar.globalParameter.interestRate, vol, t, cr);
+                                price = Pricing.ResetWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol, t, cr);
                             else
-                                price = Pricing.NormalWarrantPrice(cp, underlyingPrice, k, GlobalVar.globalParameter.interestRate, vol, t, cr);
+                                price = Pricing.NormalWarrantPrice(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, t, cr);
 
                             if (warrantType == "牛熊證")
                                 delta = 1.0;
                             else
-                                delta = Pricing.Delta(cp, underlyingPrice, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
+                                delta = Pricing.Delta(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
 
                         }
                         dr["發行價格"] = Math.Round(price, 2);
 
                         double jumpSize = 0.0;
-                        double multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice);                       
+                        double multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);                       
                         /*if (underlyingID.Substring(0, 2) == "00") {
                             if (underlyingPrice <= 50)
                                 multiplier = 0.01;
@@ -288,14 +293,14 @@ namespace WarrantAssistant
                         while (totalValue < 15000000 && vol_ < volLimit) {
                             vol_ += 0.01;
                             if (warrantType == "牛熊證")
-                                price_ = Pricing.BullBearWarrantPrice(cp, underlyingPrice, resetR, GlobalVar.globalParameter.interestRate, vol_, t, financialR, cr);
+                                price_ = Pricing.BullBearWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol_, t, financialR, cr);
                             else if (warrantType == "重設型")
-                                price_ = Pricing.ResetWarrantPrice(cp, underlyingPrice, resetR, GlobalVar.globalParameter.interestRate, vol_, t, cr);
+                                price_ = Pricing.ResetWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol_, t, cr);
                             else
-                                price_ = Pricing.NormalWarrantPrice(cp, underlyingPrice, k, GlobalVar.globalParameter.interestRate, vol_, t, cr);
+                                price_ = Pricing.NormalWarrantPrice(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol_, t, cr);
                             totalValue = price_ * shares * 1000;
                         }                        
-                        lowerLimit = Math.Max(0.01, price_ - underlyingPrice * 0.1 * cr);
+                        lowerLimit = Math.Max(0.01, price_ - (underlyingPrice + adj) * 0.1 * cr);
 
                         dr["IV*"] = vol_ * 100;
                         dr["發行價格*"] = Math.Round(price_, 2);
@@ -347,8 +352,8 @@ namespace WarrantAssistant
 
                 MSSQL.ExecSqlCmd("DELETE FROM [ApplyTempList] WHERE UserID='" + userID + "'", conn);
 
-                string sql = @"INSERT INTO [ApplyTempList] (SerialNum, UnderlyingID, K, T, R, HV, IV, IssueNum, ResetR, BarrierR, FinancialR, Type, CP, UseReward, ConfirmChecked, Apply1500W, UserID, MDate, TempName, TempType, TraderID, IVNew) "
-                + "VALUES(@SerialNum, @UnderlyingID, @K, @T, @R, @HV, @IV, @IssueNum, @ResetR, @BarrierR, @FinancialR, @Type, @CP, @UseReward, @ConfirmChecked, @Apply1500W, @UserID, @MDate, @TempName ,@TempType, @TraderID, @IVNew)";
+                string sql = @"INSERT INTO [ApplyTempList] (SerialNum, UnderlyingID, K, T, R, HV, IV, IssueNum, ResetR, BarrierR, FinancialR, Type, CP, UseReward, ConfirmChecked, Apply1500W, UserID, MDate, TempName, TempType, TraderID, IVNew, Adj) "
+                + "VALUES(@SerialNum, @UnderlyingID, @K, @T, @R, @HV, @IV, @IssueNum, @ResetR, @BarrierR, @FinancialR, @Type, @CP, @UseReward, @ConfirmChecked, @Apply1500W, @UserID, @MDate, @TempName ,@TempType, @TraderID, @IVNew, @Adj)";
                 List<SqlParameter> ps = new List<SqlParameter> {
                     new SqlParameter("@SerialNum", SqlDbType.VarChar),
                     new SqlParameter("@UnderlyingID", SqlDbType.VarChar),
@@ -371,7 +376,8 @@ namespace WarrantAssistant
                     new SqlParameter("@TempName", SqlDbType.VarChar),
                     new SqlParameter("@TempType", SqlDbType.VarChar),
                     new SqlParameter("@TraderID", SqlDbType.VarChar),
-                    new SqlParameter("@IVNew", SqlDbType.Float)
+                    new SqlParameter("@IVNew", SqlDbType.Float),
+                    new SqlParameter("@Adj", SqlDbType.Float)
                 };
 
                 SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sql, ps);
@@ -392,6 +398,7 @@ namespace WarrantAssistant
                         double resetR = r.Cells["重設比"].Value == DBNull.Value ? 0 : Convert.ToDouble(r.Cells["重設比"].Value);
                         double barrierR = r.Cells["界限比"].Value == DBNull.Value ? 0 : Convert.ToDouble(r.Cells["界限比"].Value);
                         double financialR = r.Cells["財務費用"].Value == DBNull.Value ? 0 : Convert.ToDouble(r.Cells["財務費用"].Value);
+                        double adj = r.Cells["Adj"].Value == DBNull.Value ? 0 : Convert.ToDouble(r.Cells["Adj"].Value);
                         string type = r.Cells["類型"].Value.ToString();
                         if (type != "一般型" && type != "牛熊證" && type != "重設型") {
                             if (type == "2")
@@ -509,6 +516,7 @@ namespace WarrantAssistant
                         h.SetParameterValue("@TempType", tempType);
                         h.SetParameterValue("@TraderID", traderID);
                         h.SetParameterValue("@IVNew", ivNew);
+                        h.SetParameterValue("@Adj", adj);
 
                         h.ExecuteCommand();
                         underlyReason.SetParameterValue("@Reason", reason);
@@ -937,7 +945,8 @@ namespace WarrantAssistant
                 e.Cell.Row.Cells["履約價"].Value = k;
             }
 
-            if (e.Cell.Column.Key == "履約價" || e.Cell.Column.Key == "期間(月)" || e.Cell.Column.Key == "行使比例" || e.Cell.Column.Key == "IV" || e.Cell.Column.Key == "財務費用" || e.Cell.Column.Key == "類型" || e.Cell.Column.Key == "CP" || e.Cell.Column.Key == "張數") {
+            if (e.Cell.Column.Key == "履約價" || e.Cell.Column.Key == "期間(月)" || e.Cell.Column.Key == "行使比例" || e.Cell.Column.Key == "IV" 
+                || e.Cell.Column.Key == "財務費用" || e.Cell.Column.Key == "類型" || e.Cell.Column.Key == "CP" || e.Cell.Column.Key == "張數" || e.Cell.Column.Key == "Adj") {
                 double price = 0.0;
                 double delta = 0.0;
                 double jumpSize = 0.0;
@@ -955,7 +964,7 @@ namespace WarrantAssistant
                 string cpType = e.Cell.Row.Cells["CP"].Value == DBNull.Value ? "C" : e.Cell.Row.Cells["CP"].Value.ToString();
                 double shares = e.Cell.Row.Cells["張數"].Value == DBNull.Value ? 10000 : Convert.ToDouble(e.Cell.Row.Cells["張數"].Value);
                 bool is1500W = e.Cell.Row.Cells["1500W"].Value == DBNull.Value ? false : (bool) e.Cell.Row.Cells["1500W"].Value;
-
+                double adj = e.Cell.Row.Cells["Adj"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["Adj"].Value);
                 if (warrantType != "一般型" && warrantType != "牛熊證" && warrantType != "重設型") {
                     if (warrantType == "2")
                         warrantType = "牛熊證";
@@ -982,19 +991,19 @@ namespace WarrantAssistant
                     if (warrantType == "牛熊證") {
                         resetR = Math.Round(k / underlyingPrice, 2);
                         e.Cell.Row.Cells["重設比"].Value = resetR * 100;
-                        price = Pricing.BullBearWarrantPrice(cp, underlyingPrice, resetR, GlobalVar.globalParameter.interestRate, vol, t, financialR, cr);
+                        price = Pricing.BullBearWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol, t, financialR, cr);
                     } else if (warrantType == "重設型") {
                         resetR = Math.Round(k / underlyingPrice, 2);
                         e.Cell.Row.Cells["重設比"].Value = resetR * 100;
-                        price = Pricing.ResetWarrantPrice(cp, underlyingPrice, resetR, GlobalVar.globalParameter.interestRate, vol, t, cr);
+                        price = Pricing.ResetWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol, t, cr);
                     } else
-                        price = Pricing.NormalWarrantPrice(cp, underlyingPrice, k, GlobalVar.globalParameter.interestRate, vol, t, cr);
+                        price = Pricing.NormalWarrantPrice(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, t, cr);
 
                     if (warrantType == "牛熊證")
                         delta = 1.0;
                     else
-                        delta = Pricing.Delta(cp, underlyingPrice, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
-                    multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice);
+                        delta = Pricing.Delta(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
+                    multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);
                     /*if (underlyingID.Substring(0, 2) == "00") {
                         if (underlyingPrice <= 50)
                             multiplier = 0.01;
@@ -1030,14 +1039,14 @@ namespace WarrantAssistant
                 while (totalValue < 15000000 && vol_ != 0.0 && price != 0.0 && vol_ < volLimit) {
                     vol_ += 0.01;
                     if (warrantType == "牛熊證")
-                        price_ = Pricing.BullBearWarrantPrice(cp, underlyingPrice, resetR, GlobalVar.globalParameter.interestRate, vol_, t, financialR, cr);
+                        price_ = Pricing.BullBearWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol_, t, financialR, cr);
                     else if (warrantType == "重設型")
-                        price_ = Pricing.ResetWarrantPrice(cp, underlyingPrice, resetR, GlobalVar.globalParameter.interestRate, vol_, t, cr);
+                        price_ = Pricing.ResetWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol_, t, cr);
                     else
-                        price_ = Pricing.NormalWarrantPrice(cp, underlyingPrice, k, GlobalVar.globalParameter.interestRate, vol_, t, cr);
+                        price_ = Pricing.NormalWarrantPrice(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol_, t, cr);
                     totalValue = price_ * shares * 1000;
                 }
-                lowerLimit = price_ - underlyingPrice * 0.1 * cr;
+                lowerLimit = price_ - (underlyingPrice + adj) * 0.1 * cr;
                 lowerLimit = Math.Max(0.01, lowerLimit);
 
                 e.Cell.Row.Cells["IV*"].Value = vol_ * 100;
