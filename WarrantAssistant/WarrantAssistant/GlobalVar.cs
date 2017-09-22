@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Net;
 using System.IO;
 using System.Windows.Forms;
+using EDLib.SQL;
 
 namespace WarrantAssistant
 {
@@ -21,8 +22,8 @@ namespace WarrantAssistant
     public class GlobalUtility
     {
         public static void Start() {
-            loadLoginSet();
-            loadGlobalParameters();
+            LoadLoginSet();
+            LoadGlobalParameters();
             //GlobalVar.errProcess = new ErrProcess();
             //GlobalVar.autoWork = new AutoWork();
             //GlobalVar.warrantPriceUpdator = new WarrantPriceUpdator();
@@ -35,8 +36,9 @@ namespace WarrantAssistant
                     return (T) iForm;
                 }
             }
-            T form = new T();
-            form.StartPosition = FormStartPosition.CenterScreen;
+            T form = new T {
+                StartPosition = FormStartPosition.CenterScreen
+            };
             form.Show();
             return form;
         }
@@ -107,11 +109,12 @@ namespace WarrantAssistant
 
         public static void LogInfo(string type, string content) {
             string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-            List<SqlParameter> psInfo = new List<SqlParameter>();
-            psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-            psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-            psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-            psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
+            List<SqlParameter> psInfo = new List<SqlParameter> {
+                new SqlParameter("@MDate", SqlDbType.DateTime),
+                new SqlParameter("@InformationType", SqlDbType.VarChar),
+                new SqlParameter("@InformationContent", SqlDbType.VarChar),
+                new SqlParameter("@MUser", SqlDbType.VarChar)
+            };
 
             SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
             hInfo.SetParameterValue("@MDate", DateTime.Now);
@@ -123,68 +126,76 @@ namespace WarrantAssistant
 
         }
 
-        public static void loadLoginSet() {
-            GlobalVar.loginSet = new LoginSet();
-            GlobalVar.loginSet.edisSqlConnString = "SERVER=10.10.1.30;DATABASE=EDIS;UID=WarrantWeb;PWD=WarrantWeb";
-            GlobalVar.loginSet.tsquoteSqlConnString = "SERVER=10.60.0.37;DATABASE=TsQuote;UID=WarrantWeb;PWD=WarrantWeb";
-            GlobalVar.loginSet.warrantSysSqlConnString = "SERVER=10.7.0.52;DATABASE=WAFT;UID=eduser;PWD=eduser";
-            GlobalVar.loginSet.warrantSysKeySqlConnString = "SERVER=10.7.0.52;DATABASE=EDAISYS;UID=eduser;PWD=eduser";
+        public static void LoadLoginSet() {
+            GlobalVar.loginSet = new LoginSet {
+                edisSqlConnString = "SERVER=10.10.1.30;DATABASE=EDIS;UID=WarrantWeb;PWD=WarrantWeb",
+                tsquoteSqlConnString = "SERVER=10.60.0.37;DATABASE=TsQuote;UID=WarrantWeb;PWD=WarrantWeb",
+                warrantSysSqlConnString = "SERVER=10.7.0.52;DATABASE=WAFT;UID=eduser;PWD=eduser",
+                warrantSysKeySqlConnString = "SERVER=10.7.0.52;DATABASE=EDAISYS;UID=eduser;PWD=eduser"
+            };
         }
 
-        public static void loadGlobalParameters() {
+        public static void LoadGlobalParameters() {
             if (GlobalVar.globalParameter == null)
                 GlobalVar.globalParameter = new GlobalParameter();
 
-            checkGlobal();
+            CheckGlobal();
 
-            checkIsTodayTradeDate();
-            getNextTradeDate();
-            getLastTradeDate();
+            CheckIsTodayTradeDate();
+            GetNextTradeDate();
+            GetLastTradeDate();
         }
-        private static void checkGlobal() {
-            DataView dv = DeriLib.Util.ExecSqlQry("SELECT [InterestRate],[GivenRewardPercent],[IsLevelA],[DayPerYear],[ResultTime] FROM [EDIS].[dbo].[Global]", GlobalVar.loginSet.edisSqlConnString);
-            GlobalVar.globalParameter.interestRate = Convert.ToDouble(dv[0]["InterestRate"]);
+        private static void CheckGlobal() {
+            //DataView dv = DeriLib.Util.ExecSqlQry("SELECT [InterestRate],[GivenRewardPercent],[IsLevelA],[DayPerYear],[ResultTime] FROM [EDIS].[dbo].[Global]", GlobalVar.loginSet.edisSqlConnString);
+            DataTable dt = MSSQL.ExecSqlQry("SELECT [InterestRate],[GivenRewardPercent],[IsLevelA],[DayPerYear],[ResultTime] FROM [EDIS].[dbo].[Global]", GlobalVar.loginSet.edisSqlConnString);
+            GlobalVar.globalParameter.interestRate = Convert.ToDouble(dt.Rows[0]["InterestRate"]);
             //A集券商獎勵額度目前為1%
-            GlobalVar.globalParameter.givenRewardPercent = Convert.ToDouble(dv[0]["GivenRewardPercent"]);
+            GlobalVar.globalParameter.givenRewardPercent = Convert.ToDouble(dt.Rows[0]["GivenRewardPercent"]);
             //本季是否為A級券商
-            GlobalVar.globalParameter.isLevelA = Convert.ToBoolean(dv[0]["IsLevelA"]);
-            GlobalVar.globalParameter.dayPerYear = Convert.ToInt32(dv[0]["DayPerYear"]);
-            GlobalVar.globalParameter.resultTime = Convert.ToInt32(dv[0]["ResultTime"]);
+            GlobalVar.globalParameter.isLevelA = Convert.ToBoolean(dt.Rows[0]["IsLevelA"]);
+            GlobalVar.globalParameter.dayPerYear = Convert.ToInt32(dt.Rows[0]["DayPerYear"]);
+            GlobalVar.globalParameter.resultTime = Convert.ToInt32(dt.Rows[0]["ResultTime"]);
 
+            GlobalVar.globalParameter.traders = new List<string>();
+            dt = MSSQL.ExecSqlQry("Select UserID from Trader", "SERVER=10.101.10.5;DATABASE=WMM3;UID=hedgeuser;PWD=hedgeuser");
+            foreach (DataRow row in dt.Rows) 
+                GlobalVar.globalParameter.traders.Add(row[0].ToString());
+            
         }
-        private static void checkIsTodayTradeDate() {
-            DataView dv = DeriLib.Util.ExecSqlQry("SELECT IsTrade FROM [TradeDate] WHERE CONVERT(VARCHAR, TradeDate, 112) = CONVERT(VARCHAR, GETDATE(), 112)", GlobalVar.loginSet.tsquoteSqlConnString);
-            if (dv[0]["IsTrade"].ToString() == "Y")
+        private static void CheckIsTodayTradeDate() {
+            //DataView dv = DeriLib.Util.ExecSqlQry("SELECT IsTrade FROM [TradeDate] WHERE CONVERT(VARCHAR, TradeDate, 112) = CONVERT(VARCHAR, GETDATE(), 112)", GlobalVar.loginSet.tsquoteSqlConnString);
+            DataTable dv = MSSQL.ExecSqlQry("SELECT IsTrade FROM [TradeDate] WHERE CONVERT(VARCHAR, TradeDate, 112) = CONVERT(VARCHAR, GETDATE(), 112)", GlobalVar.loginSet.tsquoteSqlConnString);
+            if (dv.Rows[0]["IsTrade"].ToString() == "Y")
                 GlobalVar.globalParameter.isTodayTradeDate = true;
             else
                 GlobalVar.globalParameter.isTodayTradeDate = false;
         }
 
-        private static void getLastTradeDate() {
+        private static void GetLastTradeDate() {
             try {
                 string sql = "SELECT TOP 1 TradeDate FROM TradeDate WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate desc";
-                DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
-
-                GlobalVar.globalParameter.lastTradeDate = Convert.ToDateTime(dv[0]["TradeDate"]);
+                //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
+                DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
+                GlobalVar.globalParameter.lastTradeDate = Convert.ToDateTime(dv.Rows[0]["TradeDate"]);
             } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[GlobalUtil_GetLastTradeDate][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
 
-        private static void getNextTradeDate() {
+        private static void GetNextTradeDate() {
             try {
                 string sql = "SELECT TOP 3 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)>CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate";
-                DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
-
-                GlobalVar.globalParameter.nextTradeDate1 = Convert.ToDateTime(dv[0]["TradeDate"]);
-                GlobalVar.globalParameter.nextTradeDate2 = Convert.ToDateTime(dv[1]["TradeDate"]);
-                GlobalVar.globalParameter.nextTradeDate3 = Convert.ToDateTime(dv[2]["TradeDate"]);
+                //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
+                DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
+                GlobalVar.globalParameter.nextTradeDate1 = Convert.ToDateTime(dv.Rows[0]["TradeDate"]);
+                GlobalVar.globalParameter.nextTradeDate2 = Convert.ToDateTime(dv.Rows[1]["TradeDate"]);
+                GlobalVar.globalParameter.nextTradeDate3 = Convert.ToDateTime(dv.Rows[2]["TradeDate"]);
             } catch (Exception ex) {
                 //GlobalVar.errProcess.Add(1, "[FrmIssueTable_GetNextTradeDate][" + ex.Message + "][" + ex.StackTrace + "]");
             }
         }
 
-        public static void close() {
+        public static void Close() {
             if (GlobalVar.autoWork != null) { GlobalVar.autoWork.Dispose(); }
         }
     }
@@ -204,6 +215,7 @@ namespace WarrantAssistant
         public string userGroup = "";
         public string userLevel = "";
         public string userName = "";
+        public List<string> traders;
 
         public double interestRate = 0.025;
         public int dayPerYear = 365;

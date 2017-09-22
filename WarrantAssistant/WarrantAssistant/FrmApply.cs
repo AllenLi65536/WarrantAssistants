@@ -110,7 +110,7 @@ namespace WarrantAssistant
             band0.Columns["跳動價差"].Width = 70;
             band0.Columns["市場"].Width = 40;
             band0.Columns["IV*"].Width = 60;
-            band0.Columns["發行價格*"].Width = 60;
+            band0.Columns["發行價格*"].Width = 70;
             band0.Columns["跌停價*"].Width = 60;
             band0.Columns["約當張數"].Width = 60;
             band0.Columns["今日額度"].Width = 60;
@@ -213,7 +213,7 @@ namespace WarrantAssistant
                         double vol = Convert.ToDouble(drv["IV"]) / 100;
                         dr["IV"] = Convert.ToDouble(drv["IV"]);
                         double shares = Convert.ToDouble(drv["IssueNum"]);
-                        dr["張數"] = Convert.ToDouble(drv["IssueNum"]);
+                        dr["張數"] = shares;
                         double resetR = Convert.ToDouble(drv["ResetR"]) / 100;
                         dr["重設比"] = Convert.ToDouble(drv["ResetR"]);
                         double barrierR = Convert.ToDouble(drv["BarrierR"]);
@@ -230,19 +230,15 @@ namespace WarrantAssistant
                         dr["發行原因"] = drv["Reason"] == DBNull.Value ? 0 : Convert.ToInt32(drv["Reason"]);
                         dr["1500W"] = drv["Apply1500W"];
                         dr["標的名稱"] = drv["UnderlyingName"].ToString();
-                        double underlyingPrice = 0.0;
-                        underlyingPrice = Convert.ToDouble(drv["MPrice"]);
+                        double underlyingPrice = Convert.ToDouble(drv["MPrice"]);                        
                         dr["股價"] = underlyingPrice;
                         dr["市場"] = drv["Market"].ToString();
                         dr["約當張數"] = Convert.ToDouble(drv["EquivalentNum"]);
-                        double credit = (double) drv["IssueCredit"];
-                        credit = Math.Floor(credit);
-                        double rewardCredit = (double) drv["RewardIssueCredit"];
-                        rewardCredit = Math.Floor(rewardCredit);
+                        double credit = Math.Floor((double) drv["IssueCredit"]);                        
+                        double rewardCredit = Math.Floor((double) drv["RewardIssueCredit"]);                        
                         dr["今日額度"] = credit;
                         dr["獎勵額度"] = rewardCredit;
-
-
+                        
                         double price = 0.0;
                         double delta = 0.0;
                         if (underlyingPrice != 0) {
@@ -262,9 +258,8 @@ namespace WarrantAssistant
                         dr["發行價格"] = Math.Round(price, 2);
 
                         double jumpSize = 0.0;
-                        double multiplier = 0.0;
-                        multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice);
-                        if (underlyingID.Substring(0, 2) == "00") {
+                        double multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice);                       
+                        /*if (underlyingID.Substring(0, 2) == "00") {
                             if (underlyingPrice <= 50)
                                 multiplier = 0.01;
                             else
@@ -282,14 +277,13 @@ namespace WarrantAssistant
                                 multiplier = 1;
                             else if (underlyingPrice > 1000)
                                 multiplier = 5;
-                        }
+                        }*/
                         jumpSize = delta * multiplier;
 
                         double vol_ = vol;
                         double price_ = price;
                         double lowerLimit = 0.0;
-                        double totalValue = 0.0;
-                        totalValue = price_ * shares * 1000;
+                        double totalValue = price_ * shares * 1000;                       
                         double volLimit = 2 * vol_;
                         while (totalValue < 15000000 && vol_ < volLimit) {
                             vol_ += 0.01;
@@ -300,9 +294,8 @@ namespace WarrantAssistant
                             else
                                 price_ = Pricing.NormalWarrantPrice(cp, underlyingPrice, k, GlobalVar.globalParameter.interestRate, vol_, t, cr);
                             totalValue = price_ * shares * 1000;
-                        }
-                        lowerLimit = price_ - underlyingPrice * 0.1 * cr;
-                        lowerLimit = Math.Max(0.01, lowerLimit);
+                        }                        
+                        lowerLimit = Math.Max(0.01, price_ - underlyingPrice * 0.1 * cr);
 
                         dr["IV*"] = vol_ * 100;
                         dr["發行價格*"] = Math.Round(price_, 2);
@@ -310,8 +303,7 @@ namespace WarrantAssistant
 
                         dr["Delta"] = Math.Round(delta, 4);
                         dr["跳動價差"] = Math.Round(jumpSize, 4);
-
-
+                        
                         dt.Rows.Add(dr);
                     }
                 }
@@ -357,29 +349,30 @@ namespace WarrantAssistant
 
                 string sql = @"INSERT INTO [ApplyTempList] (SerialNum, UnderlyingID, K, T, R, HV, IV, IssueNum, ResetR, BarrierR, FinancialR, Type, CP, UseReward, ConfirmChecked, Apply1500W, UserID, MDate, TempName, TempType, TraderID, IVNew) "
                 + "VALUES(@SerialNum, @UnderlyingID, @K, @T, @R, @HV, @IV, @IssueNum, @ResetR, @BarrierR, @FinancialR, @Type, @CP, @UseReward, @ConfirmChecked, @Apply1500W, @UserID, @MDate, @TempName ,@TempType, @TraderID, @IVNew)";
-                List<SqlParameter> ps = new List<SqlParameter>();
-                ps.Add(new SqlParameter("@SerialNum", SqlDbType.VarChar));
-                ps.Add(new SqlParameter("@UnderlyingID", SqlDbType.VarChar));
-                ps.Add(new SqlParameter("@K", SqlDbType.Float));
-                ps.Add(new SqlParameter("@T", SqlDbType.Int));
-                ps.Add(new SqlParameter("@R", SqlDbType.Float));
-                ps.Add(new SqlParameter("@HV", SqlDbType.Float));
-                ps.Add(new SqlParameter("@IV", SqlDbType.Float));
-                ps.Add(new SqlParameter("@IssueNum", SqlDbType.Float));
-                ps.Add(new SqlParameter("@ResetR", SqlDbType.Float));
-                ps.Add(new SqlParameter("@BarrierR", SqlDbType.Float));
-                ps.Add(new SqlParameter("@FinancialR", SqlDbType.Float));
-                ps.Add(new SqlParameter("@Type", SqlDbType.VarChar));
-                ps.Add(new SqlParameter("@CP", SqlDbType.VarChar));
-                ps.Add(new SqlParameter("@UseReward", SqlDbType.VarChar));
-                ps.Add(new SqlParameter("@ConfirmChecked", SqlDbType.VarChar));
-                ps.Add(new SqlParameter("@Apply1500W", SqlDbType.VarChar));
-                ps.Add(new SqlParameter("@UserID", SqlDbType.VarChar));
-                ps.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                ps.Add(new SqlParameter("@TempName", SqlDbType.VarChar));
-                ps.Add(new SqlParameter("@TempType", SqlDbType.VarChar));
-                ps.Add(new SqlParameter("@TraderID", SqlDbType.VarChar));
-                ps.Add(new SqlParameter("@IVNew", SqlDbType.Float));
+                List<SqlParameter> ps = new List<SqlParameter> {
+                    new SqlParameter("@SerialNum", SqlDbType.VarChar),
+                    new SqlParameter("@UnderlyingID", SqlDbType.VarChar),
+                    new SqlParameter("@K", SqlDbType.Float),
+                    new SqlParameter("@T", SqlDbType.Int),
+                    new SqlParameter("@R", SqlDbType.Float),
+                    new SqlParameter("@HV", SqlDbType.Float),
+                    new SqlParameter("@IV", SqlDbType.Float),
+                    new SqlParameter("@IssueNum", SqlDbType.Float),
+                    new SqlParameter("@ResetR", SqlDbType.Float),
+                    new SqlParameter("@BarrierR", SqlDbType.Float),
+                    new SqlParameter("@FinancialR", SqlDbType.Float),
+                    new SqlParameter("@Type", SqlDbType.VarChar),
+                    new SqlParameter("@CP", SqlDbType.VarChar),
+                    new SqlParameter("@UseReward", SqlDbType.VarChar),
+                    new SqlParameter("@ConfirmChecked", SqlDbType.VarChar),
+                    new SqlParameter("@Apply1500W", SqlDbType.VarChar),
+                    new SqlParameter("@UserID", SqlDbType.VarChar),
+                    new SqlParameter("@MDate", SqlDbType.DateTime),
+                    new SqlParameter("@TempName", SqlDbType.VarChar),
+                    new SqlParameter("@TempType", SqlDbType.VarChar),
+                    new SqlParameter("@TraderID", SqlDbType.VarChar),
+                    new SqlParameter("@IVNew", SqlDbType.Float)
+                };
 
                 SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sql, ps);
 
@@ -569,9 +562,10 @@ namespace WarrantAssistant
                 DataTable dv = MSSQL.ExecSqlQry(sql5, GlobalVar.loginSet.edisSqlConnString);
 
                 string cmdText = "UPDATE [ApplyTotalList] SET WarrantName=@WarrantName WHERE SerialNum=@SerialNum";
-                List<System.Data.SqlClient.SqlParameter> pars = new List<System.Data.SqlClient.SqlParameter>();
-                pars.Add(new SqlParameter("@WarrantName", SqlDbType.VarChar));
-                pars.Add(new SqlParameter("@SerialNum", SqlDbType.VarChar));
+                List<SqlParameter> pars = new List<SqlParameter> {
+                    new SqlParameter("@WarrantName", SqlDbType.VarChar),
+                    new SqlParameter("@SerialNum", SqlDbType.VarChar)
+                };
                 SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, cmdText, pars);
 
                 foreach (DataRow dr in dv.Rows) {
@@ -661,18 +655,7 @@ namespace WarrantAssistant
                 ultraGrid1.DisplayLayout.Bands[0].Columns["約當張數"].Hidden = true;
                 ultraGrid1.DisplayLayout.Bands[0].Columns["今日額度"].Hidden = true;
                 ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵額度"].Hidden = true;
-
-                /*
-                for (int x = 0; x < 20; x++)
-                {
-                    ultraGrid1.DisplayLayout.Bands[0].AddNew();
-                    ultraGrid1.Rows[x].Cells[1].Value = (x + 1).ToString();
-                    //ultraGrid1.Rows[x].Cells[9].Value = DateTime.Now;
-                }
-
-                ultraGrid1.ActiveRowScrollRegion.ScrollRowIntoView(ultraGrid1.Rows[0]);
-                //ultraGrid1.Rows[0].Selected = true;
-                 * */
+                               
             } else {
                 bands0.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
                 bands0.Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
@@ -729,7 +712,7 @@ namespace WarrantAssistant
             }
         }
 
-        private void ultraGrid1_InitializeLayout(object sender, Infragistics.Win.UltraWinGrid.InitializeLayoutEventArgs e) {
+        private void UltraGrid1_InitializeLayout(object sender, InitializeLayoutEventArgs e) {
             ultraGrid1.DisplayLayout.Override.RowSelectorHeaderStyle = RowSelectorHeaderStyle.ColumnChooserButton;
 
             if (!e.Layout.ValueLists.Exists("MyValueList")) {
@@ -752,11 +735,13 @@ namespace WarrantAssistant
             if (!e.Layout.ValueLists.Exists("MyValueList3")) {
                 ValueList v3;
                 v3 = e.Layout.ValueLists.Add("MyValueList3");
-                v3.ValueListItems.Add("0005986", "0005986");
+                foreach (var item in GlobalVar.globalParameter.traders)
+                    v3.ValueListItems.Add(item, item);
+                /*v3.ValueListItems.Add("0005986", "0005986");
                 v3.ValueListItems.Add("0007643", "0007643");
                 v3.ValueListItems.Add("0008570", "0008570");
                 v3.ValueListItems.Add("0008730", "0008730");
-                v3.ValueListItems.Add("0010120", "0010120");
+                v3.ValueListItems.Add("0010120", "0010120");*/
             }
             e.Layout.Bands[0].Columns["交易員"].ValueList = e.Layout.ValueLists["MyValueList3"];
 
@@ -774,12 +759,12 @@ namespace WarrantAssistant
 
         }
 
-        private void buttonEdit_Click(object sender, EventArgs e) {
+        private void ButtonEdit_Click(object sender, EventArgs e) {
             isEdit = true;
             SetButton();
         }
 
-        private void buttonConfirm_Click(object sender, EventArgs e) {
+        private void ButtonConfirm_Click(object sender, EventArgs e) {
             ultraGrid1.PerformAction(Infragistics.Win.UltraWinGrid.UltraGridAction.ExitEditMode);
             isEdit = false;
             //if (!CheckData())
@@ -789,7 +774,7 @@ namespace WarrantAssistant
             LoadData();
         }
 
-        private void buttonDelete_Click(object sender, EventArgs e) {
+        private void ButtonDelete_Click(object sender, EventArgs e) {
             isEdit = true;
 
             DialogResult result = MessageBox.Show("將全部刪除，確定?", "刪除資料", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
@@ -804,13 +789,13 @@ namespace WarrantAssistant
             SetButton();
         }
 
-        private void buttonCancel_Click(object sender, EventArgs e) {
+        private void ButtonCancel_Click(object sender, EventArgs e) {
             isEdit = false;
             LoadData();
             SetButton();
         }
 
-        private void ultraGrid1_InitializeRow(object sender, InitializeRowEventArgs e) {
+        private void UltraGrid1_InitializeRow(object sender, InitializeRowEventArgs e) {
             string cp = "C";
             string underlyingID = e.Row.Cells["標的代號"].Value.ToString();
             cp = e.Row.Cells["CP"].Value.ToString();
@@ -830,9 +815,10 @@ namespace WarrantAssistant
             string toolTip3 = "非此使用者所屬標的";
             string toolTip4 = "此檔Put須告知主管";
             string sqlTemp = "SELECT [TraderID], [Issuable], [PutIssuable] FROM [EDIS].[dbo].[WarrantUnderlyingSummary] WHERE UnderlyingID = '" + underlyingID + "'";
-            DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
-            if (dvTemp.Count > 0) {
-                foreach (DataRowView drTemp in dvTemp) {
+            //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+            DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+            if (dvTemp.Rows.Count > 0) {
+                foreach (DataRow drTemp in dvTemp.Rows) {
                     traderID = drTemp["TraderID"].ToString().PadLeft(7, '0');
                     issuable = drTemp["Issuable"].ToString();
                     putIssuable = drTemp["PutIssuable"].ToString();
@@ -883,7 +869,7 @@ namespace WarrantAssistant
 
         }
 
-        private void ultraGrid1_DoubleClickCell(object sender, DoubleClickCellEventArgs e) {
+        private void UltraGrid1_DoubleClickCell(object sender, DoubleClickCellEventArgs e) {
             if (e.Cell.Row.Cells[0].Value == DBNull.Value)
                 return;
             string target = (string) e.Cell.Row.Cells[0].Value;
@@ -906,17 +892,17 @@ namespace WarrantAssistant
             LoadData();
         }
 
-        private void ultraGrid1_MouseDown(object sender, MouseEventArgs e) {
+        private void UltraGrid1_MouseDown(object sender, MouseEventArgs e) {
             if (e.Button == MouseButtons.Right) {
                 contextMenuStrip1.Show();
             }
         }
 
-        private void ultraGrid1_BeforeRowsDeleted(object sender, BeforeRowsDeletedEventArgs e) {
+        private void UltraGrid1_BeforeRowsDeleted(object sender, BeforeRowsDeletedEventArgs e) {
             e.DisplayPromptMsg = false;
         }
 
-        private void ultraGrid1_AfterCellUpdate(object sender, CellEventArgs e) {
+        private void UltraGrid1_AfterCellUpdate(object sender, CellEventArgs e) {
             if (e.Cell.Column.Key == "標的代號") {
                 string underlyingID = e.Cell.Row.Cells["標的代號"].Value.ToString();
                 string underlyingName = "";
@@ -929,8 +915,9 @@ namespace WarrantAssistant
                                       LEFT JOIN [EDIS].[dbo].[WarrantPrices] b ON a.UnderlyingID=b.CommodityID ";
                 sqlTemp += "WHERE  CAST(UnderlyingID as varbinary(100)) = CAST('" + underlyingID + "' as varbinary(100))";
                 // sqlTemp += "WHERE UnderlyingID = '" + underlyingID + "'";
-                DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
-                foreach (DataRowView drTemp in dvTemp) {
+                //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+                DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+                foreach (DataRow drTemp in dvTemp.Rows) {
                     underlyingName = drTemp["UnderlyingName"].ToString();
                     traderID = drTemp["TraderID"].ToString().PadLeft(7, '0');
                     underlyingPrice = Convert.ToDouble(drTemp["MPrice"]);
@@ -1007,8 +994,8 @@ namespace WarrantAssistant
                         delta = 1.0;
                     else
                         delta = Pricing.Delta(cp, underlyingPrice, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
-
-                    if (underlyingID.Substring(0, 2) == "00") {
+                    multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice);
+                    /*if (underlyingID.Substring(0, 2) == "00") {
                         if (underlyingPrice <= 50)
                             multiplier = 0.01;
                         else
@@ -1026,7 +1013,7 @@ namespace WarrantAssistant
                             multiplier = 1;
                         else if (underlyingPrice > 1000)
                             multiplier = 5;
-                    }
+                    }*/
                 }
 
                 jumpSize = delta * multiplier;
@@ -1060,7 +1047,7 @@ namespace WarrantAssistant
             }
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e) {
+        private void ToolStripButton1_Click(object sender, EventArgs e) {
             if (GlobalVar.globalParameter.userGroup == "FE") {
                 OfficiallyApply();
                 LoadData();
@@ -1083,12 +1070,12 @@ namespace WarrantAssistant
             }
         }
 
-        private void ultraGrid1_CellChange(object sender, CellEventArgs e) {
+        private void UltraGrid1_CellChange(object sender, CellEventArgs e) {
             if (e.Cell.Column.Key == "確認" || e.Cell.Column.Key == "1500W" || e.Cell.Column.Key == "獎勵")
                 ultraGrid1.PerformAction(Infragistics.Win.UltraWinGrid.UltraGridAction.ExitEditMode);
         }
 
-        private void ultraGrid1_DoubleClickHeader(object sender, DoubleClickHeaderEventArgs e) {
+        private void UltraGrid1_DoubleClickHeader(object sender, DoubleClickHeaderEventArgs e) {
             if (e.Header.Column.Key == "確認") {
                 foreach (Infragistics.Win.UltraWinGrid.UltraGridRow r in ultraGrid1.Rows) {
                     r.Cells["確認"].Value = true;
@@ -1102,15 +1089,15 @@ namespace WarrantAssistant
             //UpdateData();
         }
 
-        private void ultraGrid1_AfterRowInsert(object sender, RowEventArgs e) {
+        private void UltraGrid1_AfterRowInsert(object sender, RowEventArgs e) {
             //UpdateData();
         }
 
-        private void toolStripButton2_Click(object sender, EventArgs e) {
+        private void ToolStripButton2_Click(object sender, EventArgs e) {
             LoadData();
         }
 
-        private void toolStripButton3_Click(object sender, EventArgs e) {
+        private void ToolStripButton3_Click(object sender, EventArgs e) {
             UpdateData();
             LoadData();
         }

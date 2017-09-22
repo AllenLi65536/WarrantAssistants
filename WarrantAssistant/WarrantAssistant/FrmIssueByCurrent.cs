@@ -28,12 +28,14 @@ namespace WarrantAssistant
 
         private void FrmIssueByCurrent_Load(object sender, EventArgs e)
         {
-            toolStripComboBox1.Items.Add("5986");
+            foreach (var item in GlobalVar.globalParameter.traders)
+                toolStripComboBox1.Items.Add(item.TrimStart('0'));
+            /*toolStripComboBox1.Items.Add("5986");
             toolStripComboBox1.Items.Add("7643");
             toolStripComboBox1.Items.Add("8570");
             toolStripComboBox1.Items.Add("8730");
-            toolStripComboBox1.Items.Add("10120");
-            toolStripComboBox1.Text = userID;
+            toolStripComboBox1.Items.Add("10120");*/
+            toolStripComboBox1.Text = userID.TrimStart('0');
             InitialGrid();
             LoadTraderSql();
             LoadData();

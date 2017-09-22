@@ -225,7 +225,7 @@ namespace WarrantAssistant
 
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
             if (workThread != null && workThread.IsAlive) { workThread.Abort(); }
-            GlobalUtility.close();
+            GlobalUtility.Close();
         }
 
         private void toolStripButton1_Click(object sender, EventArgs e) {

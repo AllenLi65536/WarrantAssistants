@@ -29,7 +29,7 @@ namespace WarrantAssistant
 
                     if (now.TimeOfDay.TotalSeconds > 60 && (!globalDataOK))
                     {
-                        GlobalUtility.loadGlobalParameters();
+                        GlobalUtility.LoadGlobalParameters();
                         globalDataOK = true;
                     }
                     /*

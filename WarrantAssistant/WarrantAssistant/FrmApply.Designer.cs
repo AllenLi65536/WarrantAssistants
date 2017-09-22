@@ -94,7 +94,7 @@
             this.toolStripButton2.Name = "toolStripButton2";
             this.toolStripButton2.Size = new System.Drawing.Size(64, 22);
             this.toolStripButton2.Text = "重新整理";
-            this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
+            this.toolStripButton2.Click += new System.EventHandler(this.ToolStripButton2_Click);
             // 
             // toolStripSeparator3
             // 
@@ -109,7 +109,7 @@
             this.toolStripButton3.Name = "toolStripButton3";
             this.toolStripButton3.Size = new System.Drawing.Size(38, 22);
             this.toolStripButton3.Text = "存檔";
-            this.toolStripButton3.Click += new System.EventHandler(this.toolStripButton3_Click);
+            this.toolStripButton3.Click += new System.EventHandler(this.ToolStripButton3_Click);
             // 
             // toolStripSeparator2
             // 
@@ -126,7 +126,7 @@
             this.toolStripButton1.Name = "toolStripButton1";
             this.toolStripButton1.Size = new System.Drawing.Size(64, 22);
             this.toolStripButton1.Text = "確認發行";
-            this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+            this.toolStripButton1.Click += new System.EventHandler(this.ToolStripButton1_Click);
             // 
             // toolStripLabel2
             // 
@@ -172,15 +172,15 @@
             this.ultraGrid1.Name = "ultraGrid1";
             this.ultraGrid1.Size = new System.Drawing.Size(1664, 480);
             this.ultraGrid1.TabIndex = 0;
-            this.ultraGrid1.AfterCellUpdate += new Infragistics.Win.UltraWinGrid.CellEventHandler(this.ultraGrid1_AfterCellUpdate);
-            this.ultraGrid1.InitializeLayout += new Infragistics.Win.UltraWinGrid.InitializeLayoutEventHandler(this.ultraGrid1_InitializeLayout);
-            this.ultraGrid1.InitializeRow += new Infragistics.Win.UltraWinGrid.InitializeRowEventHandler(this.ultraGrid1_InitializeRow);
-            this.ultraGrid1.AfterRowInsert += new Infragistics.Win.UltraWinGrid.RowEventHandler(this.ultraGrid1_AfterRowInsert);
-            this.ultraGrid1.CellChange += new Infragistics.Win.UltraWinGrid.CellEventHandler(this.ultraGrid1_CellChange);
-            this.ultraGrid1.BeforeRowsDeleted += new Infragistics.Win.UltraWinGrid.BeforeRowsDeletedEventHandler(this.ultraGrid1_BeforeRowsDeleted);
-            this.ultraGrid1.DoubleClickCell += new Infragistics.Win.UltraWinGrid.DoubleClickCellEventHandler(this.ultraGrid1_DoubleClickCell);
-            this.ultraGrid1.DoubleClickHeader += new Infragistics.Win.UltraWinGrid.DoubleClickHeaderEventHandler(this.ultraGrid1_DoubleClickHeader);
-            this.ultraGrid1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ultraGrid1_MouseDown);
+            this.ultraGrid1.AfterCellUpdate += new Infragistics.Win.UltraWinGrid.CellEventHandler(this.UltraGrid1_AfterCellUpdate);
+            this.ultraGrid1.InitializeLayout += new Infragistics.Win.UltraWinGrid.InitializeLayoutEventHandler(this.UltraGrid1_InitializeLayout);
+            this.ultraGrid1.InitializeRow += new Infragistics.Win.UltraWinGrid.InitializeRowEventHandler(this.UltraGrid1_InitializeRow);
+            this.ultraGrid1.AfterRowInsert += new Infragistics.Win.UltraWinGrid.RowEventHandler(this.UltraGrid1_AfterRowInsert);
+            this.ultraGrid1.CellChange += new Infragistics.Win.UltraWinGrid.CellEventHandler(this.UltraGrid1_CellChange);
+            this.ultraGrid1.BeforeRowsDeleted += new Infragistics.Win.UltraWinGrid.BeforeRowsDeletedEventHandler(this.UltraGrid1_BeforeRowsDeleted);
+            this.ultraGrid1.DoubleClickCell += new Infragistics.Win.UltraWinGrid.DoubleClickCellEventHandler(this.UltraGrid1_DoubleClickCell);
+            this.ultraGrid1.DoubleClickHeader += new Infragistics.Win.UltraWinGrid.DoubleClickHeaderEventHandler(this.UltraGrid1_DoubleClickHeader);
+            this.ultraGrid1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.UltraGrid1_MouseDown);
             // 
             // contextMenuStrip1
             // 
@@ -204,7 +204,7 @@
             this.buttonDelete.TabIndex = 3;
             this.buttonDelete.Text = "全部刪除";
             this.buttonDelete.UseVisualStyleBackColor = true;
-            this.buttonDelete.Click += new System.EventHandler(this.buttonDelete_Click);
+            this.buttonDelete.Click += new System.EventHandler(this.ButtonDelete_Click);
             // 
             // buttonConfirm
             // 
@@ -214,7 +214,7 @@
             this.buttonConfirm.TabIndex = 2;
             this.buttonConfirm.Text = "確認";
             this.buttonConfirm.UseVisualStyleBackColor = true;
-            this.buttonConfirm.Click += new System.EventHandler(this.buttonConfirm_Click);
+            this.buttonConfirm.Click += new System.EventHandler(this.ButtonConfirm_Click);
             // 
             // buttonCancel
             // 
@@ -224,7 +224,7 @@
             this.buttonCancel.TabIndex = 1;
             this.buttonCancel.Text = "取消";
             this.buttonCancel.UseVisualStyleBackColor = true;
-            this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
+            this.buttonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
             // 
             // buttonEdit
             // 
@@ -234,7 +234,7 @@
             this.buttonEdit.TabIndex = 0;
             this.buttonEdit.Text = "編輯";
             this.buttonEdit.UseVisualStyleBackColor = true;
-            this.buttonEdit.Click += new System.EventHandler(this.buttonEdit_Click);
+            this.buttonEdit.Click += new System.EventHandler(this.ButtonEdit_Click);
             // 
             // FrmApply
             // 

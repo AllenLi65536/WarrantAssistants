@@ -17,12 +17,15 @@ namespace WarrantAssistant
         private void FrmWarrant_Load(object sender, EventArgs e) {
             LoadData();
             InitialGrid();
-            toolStripComboBox1.Items.Add("0005986");
+            foreach (var item in GlobalVar.globalParameter.traders)
+                toolStripComboBox1.Items.Add(item);
+
+            /*toolStripComboBox1.Items.Add("0005986");
             toolStripComboBox1.Items.Add("0007643");
             toolStripComboBox1.Items.Add("0008570");
             //toolStripComboBox1.Items.Add("0008629");
             toolStripComboBox1.Items.Add("0008730");
-            toolStripComboBox1.Items.Add("0010120");
+            toolStripComboBox1.Items.Add("0010120");*/
 
         }
 
