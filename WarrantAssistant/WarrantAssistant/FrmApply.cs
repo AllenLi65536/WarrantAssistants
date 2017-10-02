@@ -787,11 +787,12 @@ namespace WarrantAssistant
 
             DialogResult result = MessageBox.Show("將全部刪除，確定?", "刪除資料", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (result == DialogResult.Yes) {
-                SqlCommand cmd = new SqlCommand("DELETE FROM [ApplyTempList] WHERE UserID='" + userID + "'", conn);
+                MSSQL.ExecSqlCmd("DELETE FROM [ApplyTempList] WHERE UserID='" + userID + "'", conn);
+                /*SqlCommand cmd = new SqlCommand("DELETE FROM [ApplyTempList] WHERE UserID='" + userID + "'", conn);
                 conn.Open();
                 cmd.ExecuteNonQuery();
                 cmd.Dispose();
-                conn.Close();
+                conn.Close();*/
             }
             LoadData();
             SetButton();
@@ -804,9 +805,8 @@ namespace WarrantAssistant
         }
 
         private void UltraGrid1_InitializeRow(object sender, InitializeRowEventArgs e) {
-            string cp = "C";
-            string underlyingID = e.Row.Cells["標的代號"].Value.ToString();
-            cp = e.Row.Cells["CP"].Value.ToString();
+            string cp = e.Row.Cells["CP"].Value.ToString();
+            string underlyingID = e.Row.Cells["標的代號"].Value.ToString();            
             string underlyingName = e.Row.Cells["標的名稱"].Value.ToString();
             double price = e.Row.Cells["發行價格"].Value == DBNull.Value ? 0.0 : Convert.ToDouble(e.Row.Cells["發行價格"].Value);
             double price_ = e.Row.Cells["發行價格*"].Value == DBNull.Value ? 0.0 : Convert.ToDouble(e.Row.Cells["發行價格*"].Value);

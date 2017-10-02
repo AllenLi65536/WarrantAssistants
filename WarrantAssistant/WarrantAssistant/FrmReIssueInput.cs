@@ -243,41 +243,50 @@ namespace WarrantAssistant
             dt.Rows.Clear();
             
             //parse TWSE Incr html
-            parsehtml(twseUrl);
+            
+            if (!ParseHtml(twseUrl))
+                return;
 
             //parse OTC Incr html
             twseUrl = "http://siis.twse.com.tw/server-java/t159sa04?step=1&id=9200pd" + id + "&TYPEK=otc&key=" + key + "&cDATE=" + aday + "&co_id=9200";
-            parsehtml(twseUrl);
+            if (!ParseHtml(twseUrl))
+                return;
+
             //LoadData();    
             GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 下載可增額列表");
 
         }
-        private void parsehtml(string url) {
+        private bool ParseHtml(string url) {
+            try {
+                string firstResponse = GlobalUtility.GetHtml(url);
 
-            string FirstResponse = GlobalUtility.GetHtml(url);
+                HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+                doc.LoadHtml(firstResponse);
+                HtmlNodeCollection navNodeChild = doc.DocumentNode.SelectSingleNode("//table[1]").ChildNodes;
+                // /html[1]/body[1]/center[1]/table
 
-            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
-            doc.LoadHtml(FirstResponse);
-            HtmlNodeCollection navNodeChild = doc.DocumentNode.SelectSingleNode("//table[1]").ChildNodes;
-            // /html[1]/body[1]/center[1]/table
+                for (int i = 5; i < navNodeChild.Count; i += 2) {
+                    //MessageBox.Show(navNodeChild[i].InnerText);
 
-            for (int i = 5; i < navNodeChild.Count; i += 2) {
-                //MessageBox.Show(navNodeChild[i].InnerText);
-                                
-                string[] split = navNodeChild[i].InnerText.Split(new string[] { " ", "\t", "&nbsp;", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                DataRow dr = dt.NewRow();
+                    string[] split = navNodeChild[i].InnerText.Split(new string[] { " ", "\t", "&nbsp;", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                    DataRow dr = dt.NewRow();
 
-                dr["權證代號"] = split[0];
-                dr["權證名稱"] = split[1];
-                dr["發行張數"] = split[2];
-                dr["流通在外"] = split[3];
-                dr["前1日"] = split[4];
-                dr["前2日"] = split[5];
-                dr["前3日"] = split[6];
-                dr["最後交易日"] = split[7];
-                dr["符合增額條件"] = split[8];
+                    dr["權證代號"] = split[0];
+                    dr["權證名稱"] = split[1];
+                    dr["發行張數"] = split[2];
+                    dr["流通在外"] = split[3];
+                    dr["前1日"] = split[4];
+                    dr["前2日"] = split[5];
+                    dr["前3日"] = split[6];
+                    dr["最後交易日"] = split[7];
+                    dr["符合增額條件"] = split[8];
 
-                dt.Rows.Add(dr);
+                    dt.Rows.Add(dr);
+                }
+                return true;
+            } catch (Exception e) {
+                MessageBox.Show("可能要更新Key");
+                return false;
             }
         }
     }

@@ -474,7 +474,7 @@ namespace WarrantAssistant
                         //Check for moneyness constraint
                         if (type != "牛熊證") {
                             if ((cp == "C" && k / stockPrice >= 1.5) || (cp == "P" && k / stockPrice <= 0.5)) {
-                                MessageBox.Show(warrantName + " strike price is not valid due to moneyness constraint.");
+                                MessageBox.Show(warrantName + " 超過價外50%限制");
                                 // continue;
                             }
                         }

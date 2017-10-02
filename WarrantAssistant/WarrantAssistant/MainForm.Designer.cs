@@ -49,6 +49,7 @@
             this.可增額列表ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.試算表ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.修正權證名稱ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.轉申請發行TXTToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.權證系統上傳檔ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.增額上傳檔ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -67,7 +68,6 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.ultraGrid1 = new Infragistics.Win.UltraWinGrid.UltraGrid();
             this.monthCalendar1 = new System.Windows.Forms.MonthCalendar();
-            this.修正權證名稱ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -240,6 +240,13 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(160, 6);
             // 
+            // 修正權證名稱ToolStripMenuItem
+            // 
+            this.修正權證名稱ToolStripMenuItem.Name = "修正權證名稱ToolStripMenuItem";
+            this.修正權證名稱ToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.修正權證名稱ToolStripMenuItem.Text = "修正權證名稱";
+            this.修正權證名稱ToolStripMenuItem.Click += new System.EventHandler(this.修正權證名稱ToolStripMenuItem_Click);
+            // 
             // 轉申請發行TXTToolStripMenuItem
             // 
             this.轉申請發行TXTToolStripMenuItem.Name = "轉申請發行TXTToolStripMenuItem";
@@ -409,13 +416,6 @@
             this.monthCalendar1.Location = new System.Drawing.Point(0, -12);
             this.monthCalendar1.Name = "monthCalendar1";
             this.monthCalendar1.TabIndex = 0;
-            // 
-            // 修正權證名稱ToolStripMenuItem
-            // 
-            this.修正權證名稱ToolStripMenuItem.Name = "修正權證名稱ToolStripMenuItem";
-            this.修正權證名稱ToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
-            this.修正權證名稱ToolStripMenuItem.Text = "修正權證名稱";
-            this.修正權證名稱ToolStripMenuItem.Click += new System.EventHandler(this.修正權證名稱ToolStripMenuItem_Click);
             // 
             // MainForm
             // 

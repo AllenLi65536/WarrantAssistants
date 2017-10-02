@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using System.Data.SqlClient;
-using Infragistics.Shared;
-using Infragistics.Win;
 using Infragistics.Win.UltraWinGrid;
-using System.IO;
-using System.Net;
 using HtmlAgilityPack;
+using EDLib.SQL;
 
 namespace WarrantAssistant
 {
@@ -90,7 +84,6 @@ namespace WarrantAssistant
                 toolStripButtonConfirm.Visible = true;
                 toolStripButtonCancel.Visible = true;
                 toolStripButtonGetData.Visible = true;
-                                
                 for (int x = 0; x < 100; x++) {
                     ultraGrid1.DisplayLayout.Bands[0].AddNew();
                     //ultraGrid1.Rows[x].Cells[1].Value = (x + 1).ToString();
@@ -125,9 +118,10 @@ namespace WarrantAssistant
                                   ,[SameUnderlying]
                                   ,[OriApplyTime]
                               FROM [EDIS].[dbo].[Apply_71]";
-            DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+            //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+            DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
-            foreach (DataRowView drv in dv) {
+            foreach (DataRow drv in dv.Rows) {
                 DataRow dr = dt.NewRow();
 
                 dr["發行人"] = drv["Issuer"].ToString();
@@ -158,11 +152,12 @@ namespace WarrantAssistant
                 }
             }
 
-            SqlCommand cmd = new SqlCommand("DELETE FROM [Apply_71]", conn);
+            MSSQL.ExecSqlCmd("DELETE FROM [Apply_71]", conn);
+            /*SqlCommand cmd = new SqlCommand("DELETE FROM [Apply_71]", conn);
             conn.Open();
             cmd.ExecuteNonQuery();
             cmd.Dispose();
-            conn.Close();
+            conn.Close();*/
 
             try {
                 string sql = "INSERT INTO [Apply_71] values(@Issuer,@WarrantName,@UnderlyingID,@IssueNum,@exeRatio,@ApplyTime,@AvailableShares,@LastDayUsedShares,@TodayApplyShares,@AccUsedShares,@SameUnderlying,@OriApplyTime,@Result, @ApplyStatus, @ReIssueResult, @SerialNum)";
@@ -186,7 +181,7 @@ namespace WarrantAssistant
 
                 SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sql, ps);
 
-                foreach (Infragistics.Win.UltraWinGrid.UltraGridRow r in ultraGrid1.Rows) {
+                foreach (UltraGridRow r in ultraGrid1.Rows) {
                     string issuer = r.Cells["發行人"].Value.ToString();
                     string warrantName = r.Cells["權證名稱"].Value.ToString();
                     string underlyingID = r.Cells["標的代號"].Value.ToString();
@@ -213,11 +208,11 @@ namespace WarrantAssistant
 
                     double multiplier = 1.0;
                     string sqlTemp = "SELECT CASE WHEN [StockType]='DS' OR [StockType]='DR' THEN 0.22 ELSE 1 END AS Multiplier FROM [EDIS].[dbo].[WarrantUnderlying] WHERE UnderlyingID = '" + underlyingID + "'";
-                    DataView dv = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
-                    foreach (DataRowView dr in dv) {
+                    //DataView dv = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+                    DataTable dv = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+                    foreach (DataRow dr in dv.Rows) 
                         multiplier = Convert.ToDouble(dr["Multiplier"]);
-                    }
-
+                    
                     double todayAvailable = Math.Round(((availableShares * multiplier - lastDayUsedShares) / 1000), 1);
                     double attempShares = issueNum * exeRatio;
                     double result = 0.0;
@@ -261,13 +256,10 @@ namespace WarrantAssistant
                         }
                     }
 
-                    double accUsed = 0.0;
-                    accUsed = (lastDayUsedShares + todayApplyShares) / availableShares;
+                    double accUsed = (lastDayUsedShares + todayApplyShares) / availableShares;
                     double reIssueResult = 0.0;
                     if (accUsed <= 0.3)
-                        reIssueResult = attempShares;
-                    else
-                        reIssueResult = 0.0;
+                        reIssueResult = attempShares;                    
 
                     h.SetParameterValue("@Issuer", issuer);
                     h.SetParameterValue("@WarrantName", warrantName);
@@ -301,57 +293,33 @@ namespace WarrantAssistant
                                 SET Result= CASE WHEN [RewardCredit]>=[EquivalentNum] THEN [EquivalentNum] ELSE [RewardCredit] END
                                 WHERE [UseReward]='Y'";
 
-                SqlCommand cmd5 = new SqlCommand(sql5, conn);
-                SqlCommand cmd2 = new SqlCommand(sql2, conn);
-                SqlCommand cmd3 = new SqlCommand(sql3, conn);
-                SqlCommand cmd4 = new SqlCommand(sql4, conn);
+                //SqlCommand cmd5 = new SqlCommand(sql5, conn);
+                //SqlCommand cmd2 = new SqlCommand(sql2, conn);
+                //SqlCommand cmd3 = new SqlCommand(sql3, conn);
+                //SqlCommand cmd4 = new SqlCommand(sql4, conn);
 
                 conn.Open();
-                cmd5.ExecuteNonQuery();
+                MSSQL.ExecSqlCmd(sql5, conn);
+                MSSQL.ExecSqlCmd(sql2, conn);
+                MSSQL.ExecSqlCmd(sql3, conn);
+                MSSQL.ExecSqlCmd(sql4, conn);
+                /*cmd5.ExecuteNonQuery();
                 cmd5.Dispose();
                 cmd2.ExecuteNonQuery();
                 cmd2.Dispose();
                 cmd3.ExecuteNonQuery();
                 cmd3.Dispose();
                 cmd4.ExecuteNonQuery();
-                cmd4.Dispose();
+                cmd4.Dispose();*/
                 conn.Close();
 
                 toolStripLabel1.Text = DateTime.Now + "更新成功";
 
                 GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 更新7-1試算表");
-                /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                List<SqlParameter> psInfo = new List<SqlParameter>();
-                psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
-                
-                SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                hInfo.SetParameterValue("@MDate", DateTime.Now);
-                hInfo.SetParameterValue("@InformationType", "Info");
-                hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID+" 更新7-1試算表");
-                hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                hInfo.ExecuteCommand();
-                hInfo.Dispose();*/
-
+               
 
             } catch (Exception ex) {
-                GlobalUtility.LogInfo("Exception", GlobalVar.globalParameter.userID + "7-1試算表" + ex.Message);
-                /*string sqlInfo = "INSERT INTO [InformationLog] values(@MDate, @InformationType, @InformationContent, @MUser)";
-                List<SqlParameter> psInfo = new List<SqlParameter>();
-                psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
-
-                SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                hInfo.SetParameterValue("@MDate", DateTime.Now);
-                hInfo.SetParameterValue("@InformationType", "Exception");
-                hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID + "7-1試算表"+ex.Message);
-                hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                hInfo.ExecuteCommand();
-                hInfo.Dispose();*/
+                GlobalUtility.LogInfo("Exception", GlobalVar.globalParameter.userID + "7-1試算表" + ex.Message);               
 
                 MessageBox.Show(ex.Message);
             }
@@ -410,11 +378,12 @@ namespace WarrantAssistant
 
         private void toolStripButtonGetData_Click(object sender, EventArgs e) {
             //Get key and id
-            DataTable dv = EDLib.SQL.MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='10'"
+            DataTable dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='10'"
                 , GlobalVar.loginSet.warrantSysKeySqlConnString);
             string key = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
+            key = "testetfjklAS";
 
-            dv = EDLib.SQL.MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='20'"
+            dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='20'"
                 , GlobalVar.loginSet.warrantSysKeySqlConnString);
             string id = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
 
@@ -425,58 +394,60 @@ namespace WarrantAssistant
             dt.Rows.Clear();
 
             //parse TWSE 7-1 html
-            parsehtml(twseUrl);
+            if (!ParseHtml(twseUrl))
+                return;
 
             //parse OTC 7-1 html
-            twseUrl = "http://siis.twse.com.tw/server-java/o_t150sa10?step=0&id=9200pd"+id+"&TYPEK=otc&key="+key;
-            parsehtml(twseUrl);
+            twseUrl = "http://siis.twse.com.tw/server-java/o_t150sa10?step=0&id=9200pd" + id + "&TYPEK=otc&key=" + key;
+            if (!ParseHtml(twseUrl))
+                return;
 
             GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 下載7-1試算表");
         }
 
-        private void parsehtml(string url) {
+        private bool ParseHtml(string url) {
+            try {
+                string firstResponse = GlobalUtility.GetHtml(url);
+                HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+                doc.LoadHtml(firstResponse);
+                HtmlNodeCollection navNodeChild = doc.DocumentNode.SelectSingleNode("//table[1]").ChildNodes; // /td[1]/table[1]/tr[2]
 
-            string FirstResponse = GlobalUtility.GetHtml(url);
+                int loopend = navNodeChild.Count;
+                /*if (twse)
+                    loopend = navNodeChild.Count - 4;
+                else
+                    loopend = navNodeChild.Count - 8;*/
 
-            HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
-            doc.LoadHtml(FirstResponse);            
-            HtmlNodeCollection navNodeChild = doc.DocumentNode.SelectSingleNode("//table[1]").ChildNodes; // /td[1]/table[1]/tr[2]
-     
-            // MessageBox.Show(navNodeChild.Count.ToString());
-            // for (int i = 5; i < navNodeChild.Count; i +=2)
-            //   MessageBox.Show(navNodeChild[i].InnerText);
+                for (int i = 5; i < loopend; i += 2) {
+                    //MessageBox.Show(navNodeChild[i].InnerText);
 
-            int loopend = navNodeChild.Count;
-            /*if (twse)
-                loopend = navNodeChild.Count - 4;
-            else
-                loopend = navNodeChild.Count - 8;*/
-            
-            for (int i = 5; i < loopend; i += 2) {
-                //MessageBox.Show(navNodeChild[i].InnerText);
+                    string[] split = navNodeChild[i].InnerText.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries); //" ", "\t", "&nbsp;",
+                    if (split.Length != 12)
+                        continue;
+                    DataRow dr = dt.NewRow();
 
-                string[] split = navNodeChild[i].InnerText.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries); //" ", "\t", "&nbsp;",
-                if (split.Length != 12)
-                    continue;
-                DataRow dr = dt.NewRow();
+                    dr["發行人"] = split[0];
+                    dr["權證名稱"] = split[1];
+                    dr["標的代號"] = split[2];
+                    dr["發行張數"] = split[3];
+                    dr["行使比例"] = split[4];
+                    dr["申報時間"] = split[5];
+                    dr["可發行股數"] = split[6];
+                    dr["截至前一日"] = split[7];
+                    dr["本日累積發行"] = split[8];
+                    dr["累計%"] = split[9];
 
-                dr["發行人"] = split[0];
-                dr["權證名稱"] = split[1];
-                dr["標的代號"] = split[2];
-                dr["發行張數"] = split[3];
-                dr["行使比例"] = split[4];
-                dr["申報時間"] = split[5];
-                dr["可發行股數"] = split[6];
-                dr["截至前一日"] = split[7];
-                dr["本日累積發行"] = split[8];
-                dr["累計%"] = split[9];
+                    if (!split[10].StartsWith("&nbsp"))
+                        dr["同標的2檔"] = split[10];
+                    if (!split[11].StartsWith("&nbsp"))
+                        dr["原始申報時間"] = split[11];
 
-                if (!split[10].StartsWith("&nbsp"))
-                    dr["同標的2檔"] = split[10];
-                if (!split[11].StartsWith("&nbsp"))
-                    dr["原始申報時間"] = split[11];
-
-                dt.Rows.Add(dr);
+                    dt.Rows.Add(dr);
+                }
+                return true;
+            } catch (Exception e) {
+                MessageBox.Show("可能要更新Key");
+                return false;
             }
         }
 
