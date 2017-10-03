@@ -20,7 +20,7 @@ namespace WarrantAssistant
         }
 
         private void ultraGrid1_InitializeLayout(object sender, Infragistics.Win.UltraWinGrid.InitializeLayoutEventArgs e) {
-            ultraGrid1.DataSource
+            
         }
     }
 }
