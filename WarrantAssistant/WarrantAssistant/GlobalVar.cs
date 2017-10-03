@@ -90,7 +90,8 @@ namespace WarrantAssistant
         public static string GetHtml(string url) {
             string firstResponse = null;
             try {
-                WebRequest req = WebRequest.Create(url);
+                WebRequest req = WebRequest.Create(url);  
+                
                 WebResponse resp = req.GetResponse();
                 Stream dataStream = resp.GetResponseStream();
                 StreamReader reader = new StreamReader(dataStream, System.Text.Encoding.Default);

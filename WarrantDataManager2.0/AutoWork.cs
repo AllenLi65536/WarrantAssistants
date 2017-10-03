@@ -31,7 +31,7 @@ namespace WarrantDataManager2._0
                         //if (now.TimeOfDay.TotalSeconds > 10 && now.TimeOfDay.TotalSeconds < 30)
                         if (now.TimeOfDay.TotalMinutes > 424 && now.TimeOfDay.TotalMinutes < 425) {
                             globalDataOK = false;
-                            cleanApplyOK = false;
+                            //cleanApplyOK = false;
                         }
 
                         //0610
@@ -102,9 +102,7 @@ namespace WarrantDataManager2._0
                             pircesOK = false;
 
                         /*價格更新頻率End*/
-
-
-
+                        
                         //if (now.TimeOfDay.TotalSeconds > 60 && (!globalDataOK))
                         if (now.TimeOfDay.TotalMinutes > 425 && (!globalDataOK)) {
                             GlobalUtility.loadGlobalParameters();

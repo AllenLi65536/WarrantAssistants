@@ -68,6 +68,7 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.ultraGrid1 = new Infragistics.Win.UltraWinGrid.UltraGrid();
             this.monthCalendar1 = new System.Windows.Forms.MonthCalendar();
+            this.修改檔案名稱ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -216,7 +217,8 @@
             this.轉申請發行TXTToolStripMenuItem,
             this.權證系統上傳檔ToolStripMenuItem,
             this.增額上傳檔ToolStripMenuItem,
-            this.關係人列表ToolStripMenuItem});
+            this.關係人列表ToolStripMenuItem,
+            this.修改檔案名稱ToolStripMenuItem});
             this.行政ToolStripMenuItem.Name = "行政ToolStripMenuItem";
             this.行政ToolStripMenuItem.Size = new System.Drawing.Size(46, 21);
             this.行政ToolStripMenuItem.Text = "行政";
@@ -417,6 +419,12 @@
             this.monthCalendar1.Name = "monthCalendar1";
             this.monthCalendar1.TabIndex = 0;
             // 
+            // 修改檔案名稱ToolStripMenuItem
+            // 
+            this.修改檔案名稱ToolStripMenuItem.Name = "修改檔案名稱ToolStripMenuItem";
+            this.修改檔案名稱ToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.修改檔案名稱ToolStripMenuItem.Text = "修改檔案名稱";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
@@ -494,6 +502,7 @@
         private System.Windows.Forms.ToolStripMenuItem 增額上傳檔ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 已發權證條件發行ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 修正權證名稱ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 修改檔案名稱ToolStripMenuItem;
     }
 }
 

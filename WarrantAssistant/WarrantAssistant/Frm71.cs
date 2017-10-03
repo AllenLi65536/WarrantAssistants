@@ -380,8 +380,7 @@ namespace WarrantAssistant
             //Get key and id
             DataTable dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='10'"
                 , GlobalVar.loginSet.warrantSysKeySqlConnString);
-            string key = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
-            key = "testetfjklAS";
+            string key = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();            
 
             dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='20'"
                 , GlobalVar.loginSet.warrantSysKeySqlConnString);
