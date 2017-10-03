@@ -51,6 +51,8 @@
     <Reference Include="Infragistics4.Shared.v16.2, Version=16.2.20162.2111, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
       <HintPath>C:\Program Files (x86)\Infragistics\2016.2\Windows Forms\CLR4.0\Bin\Infragistics4.Shared.v16.2.dll</HintPath>
     </Reference>
+    <Reference Include="Infragistics4.Win.Misc.v16.2, Version=16.2.20162.2111, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
+    <Reference Include="Infragistics4.Win.UltraWinDataSource.v16.2, Version=16.2.20162.2111, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
     <Reference Include="Infragistics4.Win.UltraWinGrid.v16.2, Version=16.2.20162.2111, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
       <HintPath>C:\Program Files (x86)\Infragistics\2016.2\Windows Forms\CLR4.0\Bin\Infragistics4.Win.UltraWinGrid.v16.2.dll</HintPath>
     </Reference>
@@ -73,6 +75,8 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoWork.cs" />
@@ -117,6 +121,12 @@
     </Compile>
     <Compile Include="FrmReIssueTotal.Designer.cs">
       <DependentUpon>FrmReIssueTotal.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FrmRename.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmRename.Designer.cs">
+      <DependentUpon>FrmRename.cs</DependentUpon>
     </Compile>
     <Compile Include="Pricing.cs" />
     <Compile Include="Frm71.cs">
@@ -217,6 +227,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FrmReIssueTotal.resx">
       <DependentUpon>FrmReIssueTotal.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FrmRename.resx">
+      <DependentUpon>FrmRename.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FrmWarrant.resx">
       <DependentUpon>FrmWarrant.cs</DependentUpon>

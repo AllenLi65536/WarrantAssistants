@@ -424,6 +424,7 @@
             this.修改檔案名稱ToolStripMenuItem.Name = "修改檔案名稱ToolStripMenuItem";
             this.修改檔案名稱ToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
             this.修改檔案名稱ToolStripMenuItem.Text = "修改檔案名稱";
+            this.修改檔案名稱ToolStripMenuItem.Click += new System.EventHandler(this.修改檔案名稱ToolStripMenuItem_Click);
             // 
             // MainForm
             // 

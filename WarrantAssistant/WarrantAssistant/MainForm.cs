@@ -222,7 +222,7 @@ namespace WarrantAssistant
         private void 發行條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
             GlobalUtility.MenuItemClick<FrmApply>();
         }
-
+       
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
             if (workThread != null && workThread.IsAlive) { workThread.Abort(); }
             GlobalUtility.Close();
@@ -253,6 +253,11 @@ namespace WarrantAssistant
 
         private void 增額總表ToolStripMenuItem_Click(object sender, EventArgs e) {
             GlobalUtility.MenuItemClick<FrmReIssueTotal>();
+        }
+        private void 修改檔案名稱ToolStripMenuItem_Click(object sender, EventArgs e) {
+            GlobalUtility.MenuItemClick<FrmRename>();
+            MessageBox.Show("還沒做好唷別急^_^");
+            //GlobalUtility.MenuItemClick<FrmReIssueTotal>();
         }
 
         private void 代理人發行條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -737,5 +742,7 @@ namespace WarrantAssistant
             else
                 MessageBox.Show("No magic.");
         }
+
+       
     }
 }
