@@ -60,9 +60,9 @@ namespace WarrantAssistant
             ultraGrid1.DataSource = dt;
             UltraGridBand band0 = ultraGrid1.DisplayLayout.Bands[0];
 
-            band0.Columns["張數"].Format = "###,###";
-            band0.Columns["約當張數"].Format = "###,###";
-            band0.Columns["額度結果"].Format = "###,###";
+            band0.Columns["張數"].Format = "N0";
+            band0.Columns["約當張數"].Format = "N0";
+            band0.Columns["額度結果"].Format = "N0";
 
             band0.Columns["交易員"].Width = 60;
             band0.Columns["權證名稱"].Width = 150;

@@ -48,7 +48,7 @@ namespace WarrantDataManager2._0
             getFirstTradeDateOfQuarter();
         }
 
-        private static void checkIsLevelA() { 
+        private static void checkIsLevelA() {
             DataTable isA = MSSQL.ExecSqlQry(@"select FLGDAT_FLGVAR from EDAISYS.dbo.FLAGDATAS 
                                          where FLGDAT_FLGNAM = 'WRT_MARKET_RATING'
                                          and convert(varchar(10), GETDATE(), 112) between FLGDAT_FLGNBR and FLGDAT_ORDERS",
@@ -105,7 +105,8 @@ namespace WarrantDataManager2._0
         }
 
         public static void close() {
-            if (GlobalVar.autoWork != null) { GlobalVar.autoWork.Dispose(); }
+            if (GlobalVar.autoWork != null)
+                GlobalVar.autoWork.Dispose();
         }
     }
 

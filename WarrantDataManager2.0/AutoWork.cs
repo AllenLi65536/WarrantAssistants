@@ -33,6 +33,12 @@ namespace WarrantDataManager2._0
                             globalDataOK = false;
                             cleanApplyOK = false;
                         }
+
+                        //0610
+                        if (now.TimeOfDay.TotalMinutes > 430 && now.TimeOfDay.TotalMinutes < 431) {
+                            underlyingCreditAfterOK = false;
+                        }
+
                         //早上0730
                         if (now.TimeOfDay.TotalMinutes > 449 && now.TimeOfDay.TotalMinutes < 450) {
                             underlyingDataOK = false;
@@ -60,6 +66,8 @@ namespace WarrantDataManager2._0
                             summaryOK = false;
                             pircesOK = false;
                         }
+                        if (now.TimeOfDay.TotalMinutes > 1170 && now.TimeOfDay.TotalMinutes < 1171)
+                            cleanApplyOK = false;
 
                         /*價格更新頻率*/
 
@@ -95,10 +103,7 @@ namespace WarrantDataManager2._0
 
                         /*價格更新頻率End*/
 
-                        //0610
-                        if (now.TimeOfDay.TotalMinutes > 430 && now.TimeOfDay.TotalMinutes < 431) {
-                            underlyingCreditAfterOK = false;
-                        }
+
 
                         //if (now.TimeOfDay.TotalSeconds > 60 && (!globalDataOK))
                         if (now.TimeOfDay.TotalMinutes > 425 && (!globalDataOK)) {

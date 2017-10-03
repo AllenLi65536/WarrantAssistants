@@ -43,10 +43,10 @@ namespace WarrantAssistant
             //dt.PrimaryKey = new DataColumn[] { dt.Columns["權證名稱"] };
             ultraGrid1.DataSource = dt;
 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["發行張數"].Format = "###,###";
-            ultraGrid1.DisplayLayout.Bands[0].Columns["可發行股數"].Format = "###,###";
-            ultraGrid1.DisplayLayout.Bands[0].Columns["截至前一日"].Format = "###,###";
-            ultraGrid1.DisplayLayout.Bands[0].Columns["本日累積發行"].Format = "###,###";
+            ultraGrid1.DisplayLayout.Bands[0].Columns["發行張數"].Format = "N0";
+            ultraGrid1.DisplayLayout.Bands[0].Columns["可發行股數"].Format = "N0";
+            ultraGrid1.DisplayLayout.Bands[0].Columns["截至前一日"].Format = "N0";
+            ultraGrid1.DisplayLayout.Bands[0].Columns["本日累積發行"].Format = "N0";
 
             ultraGrid1.DisplayLayout.Bands[0].Columns["發行人"].Width = 80;
             ultraGrid1.DisplayLayout.Bands[0].Columns["權證名稱"].Width = 130;

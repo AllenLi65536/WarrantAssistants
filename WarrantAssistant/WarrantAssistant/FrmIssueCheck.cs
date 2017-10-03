@@ -27,7 +27,7 @@ namespace WarrantAssistant
             dataGridView1.Columns[9].HeaderText = "警示分數";
             dataGridView1.Columns[10].HeaderText = "損益(累計)";
 
-            dataGridView1.Columns[10].DefaultCellStyle.Format = "###,###";
+            dataGridView1.Columns[10].DefaultCellStyle.Format = "N0";
 
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = false;

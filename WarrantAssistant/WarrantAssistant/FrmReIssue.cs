@@ -51,9 +51,9 @@ namespace WarrantAssistant
 
             band0.Columns["TraderID"].Hidden = true;
 
-            band0.Columns["ReIssueNum"].Format = "###,###";
-            band0.Columns["EquivalentNum"].Format = "###,###";
-            band0.Columns["RewardIssueCredit"].Format = "###,###";
+            band0.Columns["ReIssueNum"].Format = "N0";
+            band0.Columns["EquivalentNum"].Format = "N0";
+            band0.Columns["RewardIssueCredit"].Format = "N0";
 
             band0.Columns["MarketTmr"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.DropDownList;
             band0.Columns["ConfirmChecked"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;

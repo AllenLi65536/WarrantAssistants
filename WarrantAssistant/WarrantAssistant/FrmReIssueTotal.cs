@@ -22,10 +22,10 @@ namespace WarrantAssistant
 
         private void InitialGrid() {           
             UltraGridBand band0 = ultraGrid1.DisplayLayout.Bands[0];
-            band0.Columns["ReIssueNum"].Format = "###,###";
-            band0.Columns["EquivalentNum"].Format = "###,###";
-            band0.Columns["Result"].Format = "###,###";
-            band0.Columns["RewardIssueCredit"].Format = "###,###";
+            band0.Columns["ReIssueNum"].Format = "N0";
+            band0.Columns["EquivalentNum"].Format = "N0";
+            band0.Columns["Result"].Format = "N0";
+            band0.Columns["RewardIssueCredit"].Format = "N0";
 
             band0.Columns["TraderID"].Width = 70;
             band0.Columns["UnderlyingID"].Width = 70;

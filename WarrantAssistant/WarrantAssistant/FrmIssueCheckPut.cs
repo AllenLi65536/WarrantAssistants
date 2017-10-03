@@ -30,7 +30,7 @@ namespace WarrantAssistant
             dataGridView1.Columns[8].HeaderText = "季報酬";
             dataGridView1.Columns[9].HeaderText = "年報酬";
 
-            dataGridView1.Columns[4].DefaultCellStyle.Format = "###,###";
+            dataGridView1.Columns[4].DefaultCellStyle.Format = "N0";
 
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = false;

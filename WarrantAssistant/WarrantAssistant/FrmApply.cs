@@ -73,10 +73,10 @@ namespace WarrantAssistant
             UltraGridBand band0 = ultraGrid1.DisplayLayout.Bands[0];
 
             //ultraGrid1.DisplayLayout.Bands[0].Columns["確認"].Header.Appearance.
-            band0.Columns["張數"].Format = "###,###";
-            band0.Columns["約當張數"].Format = "###,###";
-            band0.Columns["今日額度"].Format = "###,###";
-            band0.Columns["獎勵額度"].Format = "###,###";
+            band0.Columns["張數"].Format = "N0";
+            band0.Columns["約當張數"].Format = "N0";
+            band0.Columns["今日額度"].Format = "N0";
+            band0.Columns["獎勵額度"].Format = "N0";
 
             band0.Columns["類型"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.DropDownList;
             band0.Columns["CP"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.DropDownList;

@@ -44,8 +44,8 @@ namespace WarrantAssistant
             dataGridView1.Columns[10].Width = 80;
             dataGridView1.Columns[11].Width = 80;
 
-            dataGridView1.Columns[7].DefaultCellStyle.Format = "###,###";
-            dataGridView1.Columns[8].DefaultCellStyle.Format = "###,###";
+            dataGridView1.Columns[7].DefaultCellStyle.Format = "N0";
+            dataGridView1.Columns[8].DefaultCellStyle.Format = "N0";
 
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = false;

@@ -27,11 +27,11 @@ namespace WarrantAssistant
         private void InitialGrid() {
             
             UltraGridBand band0 = ultraGrid1.DisplayLayout.Bands[0];
-            band0.Columns["IssueNum"].Format = "###,###";
-            band0.Columns["EquivalentNum"].Format = "###,###";
-            band0.Columns["Result"].Format = "###,###";
-            band0.Columns["Credit"].Format = "###,###";
-            band0.Columns["RewardCredit"].Format = "###,###";
+            band0.Columns["IssueNum"].Format = "N0";
+            band0.Columns["EquivalentNum"].Format = "N0";
+            band0.Columns["Result"].Format = "N0";
+            band0.Columns["Credit"].Format = "N0";
+            band0.Columns["RewardCredit"].Format = "N0";
 
             band0.Columns["IssueNum"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Right;
             band0.Columns["EquivalentNum"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Right;
