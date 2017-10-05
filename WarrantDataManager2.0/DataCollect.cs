@@ -334,7 +334,7 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
         private void deleteApplyLists() {
             conn.Open();
             MSSQL.ExecSqlCmd("INSERT INTO [dbo].[ReIssueReward] ([UnderlyingId], [RewardQuotaUsed], [MDate])"
-                +"(select UnderlyingID, exeRatio * ReIssueNum, GETDATE() from ReIssueOfficial where UseReward = 'Y')", conn);
+                +" (select UnderlyingID, exeRatio * ReIssueNum, GETDATE() from ReIssueOfficial where UseReward = 'Y')", conn);
             MSSQL.ExecSqlCmd("DELETE FROM [ApplyOfficial]", conn);
             MSSQL.ExecSqlCmd("DELETE FROM [ReIssueOfficial]", conn);
             MSSQL.ExecSqlCmd("DELETE FROM [ApplyTotalList]", conn);

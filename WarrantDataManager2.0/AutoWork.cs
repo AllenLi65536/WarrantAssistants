@@ -110,7 +110,7 @@ namespace WarrantDataManager2._0
                         }
 
                         //if (now.TimeOfDay.TotalSeconds > 60 && (!cleanApplyOK) && GlobalVar.globalParameter.isTodayTradeDate)
-                        if (now.TimeOfDay.TotalMinutes > 425 && (!cleanApplyOK) && GlobalVar.globalParameter.isTodayTradeDate) {
+                        if (now.TimeOfDay.TotalMinutes > 1171 && (!cleanApplyOK) && GlobalVar.globalParameter.isTodayTradeDate) {
                             GlobalVar.mainForm.AddWork(new CleanApplyList("CleanApplyList", "申請表清空"));
                             cleanApplyOK = true;
                         }

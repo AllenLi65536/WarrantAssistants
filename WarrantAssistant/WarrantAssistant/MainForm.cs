@@ -256,7 +256,7 @@ namespace WarrantAssistant
         }
         private void 修改檔案名稱ToolStripMenuItem_Click(object sender, EventArgs e) {
             GlobalUtility.MenuItemClick<FrmRename>();
-            MessageBox.Show("還沒做好唷別急^_^");
+            //MessageBox.Show("還沒做好唷別急^_^");
             //GlobalUtility.MenuItemClick<FrmReIssueTotal>();
         }
 

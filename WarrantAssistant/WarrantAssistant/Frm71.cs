@@ -386,8 +386,8 @@ namespace WarrantAssistant
                 , GlobalVar.loginSet.warrantSysKeySqlConnString);
             string id = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
 
-            DateTime lastTrade = TradeDate.LastNTradeDateDT(1);
-            string aday = (lastTrade.Year - 1911) + lastTrade.ToString("MMdd");
+           // DateTime lastTrade = TradeDate.LastNTradeDateDT(1);
+            //string aday = (lastTrade.Year - 1911) + lastTrade.ToString("MMdd");
             string twseUrl = "http://siis.twse.com.tw/server-java/t150sa10?step=0&id=9200pd" + id + "&TYPEK=sii&key=" + key;
 
             dt.Rows.Clear();
