@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 using EDLib.SQL;
 using HtmlAgilityPack;
@@ -21,7 +17,6 @@ namespace WarrantAssistant
             e.Layout.Override.CellAppearance.BackColor = Color.LightCyan;
             //e.Layout.Bands[0].Columns["WName"]
             //e.Layout.Bands[0].Columns["WName"].CellAppearance.ForeColor = Color.Gray;           
-
         }
         private void FrmRename_Load(object sender, EventArgs e) {
 
@@ -42,9 +37,6 @@ namespace WarrantAssistant
                     ultraDataSource1.Rows[count]["WName"] = split[1];
                     ultraDataSource1.Rows[count++]["SerialNumber"] = split[0];
                 }
-
-                //ultraDataSource1.Rows[0]["WName"] = "國泰金凱基74購01";
-                //ultraDataSource1.Rows[0]["SerialNumber"] = "920020171005001";
 
                 return true;
             } catch (Exception e) {
@@ -75,15 +67,20 @@ namespace WarrantAssistant
             if (Directory.Exists("C:\\WarrantDocuments\\Renamed" + now))
                 Directory.Delete("C:\\WarrantDocuments\\Renamed" + now);
             Directory.CreateDirectory("C:\\WarrantDocuments\\Renamed" + now);
-            for (int i = 0; i < ultraDataSource1.Rows.Count; i++) {
+
+            for (int i = 0; i < ultraDataSource1.Rows.Count; i++)
                 if (Directory.Exists("C:\\WarrantDocuments\\" + ultraDataSource1.Rows[i]["WName"])) {
                     string[] files = Directory.GetFiles("C:\\WarrantDocuments\\" + ultraDataSource1.Rows[i]["WName"]);
-                    foreach (string file in files) {                        
-                        File.Copy(file,
-                             "C:\\WarrantDocuments\\Renamed" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + "-" + Path.GetFileName(file), true);
+                    foreach (string file in files) {
+                        if (Path.GetExtension(file).ToLower() == ".xml")
+                            File.Copy(file,
+                                "C:\\WarrantDocuments\\Renamed" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + ".xml", true);
+                        else
+                            File.Copy(file,
+                                 "C:\\WarrantDocuments\\Renamed" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + "-" + Path.GetFileName(file), true);
                     }
                 }
-            }
+
             MessageBox.Show("完成");
         }
     }
