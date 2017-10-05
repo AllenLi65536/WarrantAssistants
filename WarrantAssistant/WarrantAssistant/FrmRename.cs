@@ -72,16 +72,34 @@ namespace WarrantAssistant
                 if (Directory.Exists("C:\\WarrantDocuments\\" + ultraDataSource1.Rows[i]["WName"])) {
                     string[] files = Directory.GetFiles("C:\\WarrantDocuments\\" + ultraDataSource1.Rows[i]["WName"]);
                     foreach (string file in files) {
-                        if (Path.GetExtension(file).ToLower() == ".xml")
-                            File.Copy(file,
-                                "C:\\WarrantDocuments\\Renamed" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + ".xml", true);
-                        else
+                        if (Path.GetExtension(file).ToLower() != ".xml")                           
                             File.Copy(file,
                                  "C:\\WarrantDocuments\\Renamed" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + "-" + Path.GetFileName(file), true);
                     }
                 }
+            
+            MessageBox.Show("完成");
+        }
+
+        private void RenameXML_Click(object sender, EventArgs e) {
+            string now = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+
+            if (Directory.Exists("C:\\WarrantDocuments\\Xml" + now))
+                Directory.Delete("C:\\WarrantDocuments\\Xml" + now);
+            Directory.CreateDirectory("C:\\WarrantDocuments\\Xml" + now);
+
+            for (int i = 0; i < ultraDataSource1.Rows.Count; i++)
+                if (Directory.Exists("C:\\WarrantDocuments\\" + ultraDataSource1.Rows[i]["WName"])) {
+                    string[] files = Directory.GetFiles("C:\\WarrantDocuments\\" + ultraDataSource1.Rows[i]["WName"]);
+                    foreach (string file in files) {
+                        if (Path.GetExtension(file).ToLower() == ".xml")
+                            File.Copy(file,
+                                "C:\\WarrantDocuments\\Xml" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + ".xml", true);                       
+                    }
+                }
 
             MessageBox.Show("完成");
+
         }
     }
 }
