@@ -222,7 +222,7 @@
             this.ultraGrid1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.ultraGrid1.Location = new System.Drawing.Point(0, 28);
             this.ultraGrid1.Name = "ultraGrid1";
-            this.ultraGrid1.Size = new System.Drawing.Size(430, 569);
+            this.ultraGrid1.Size = new System.Drawing.Size(430, 245);
             this.ultraGrid1.TabIndex = 1;
             this.ultraGrid1.Text = "Grid Caption Area";
             this.ultraGrid1.UseOsThemes = Infragistics.Win.DefaultableBoolean.False;
@@ -262,7 +262,7 @@
             this.toolStripLabel1});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(430, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(429, 25);
             this.toolStrip1.TabIndex = 4;
             this.toolStrip1.Text = "toolStrip1";
             this.toolStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.toolStrip1_ItemClicked);
@@ -277,7 +277,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(430, 594);
+            this.ClientSize = new System.Drawing.Size(429, 270);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.ultraGrid1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;

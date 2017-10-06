@@ -14,7 +14,7 @@ namespace WarrantAssistant
             InitializeComponent();
         }
         private void ultraGrid1_InitializeLayout(object sender, Infragistics.Win.UltraWinGrid.InitializeLayoutEventArgs e) {
-            e.Layout.Override.CellAppearance.BackColor = Color.LightCyan;
+            e.Layout.Override.CellAppearance.BackColor = Color.LightCyan;           
             //e.Layout.Bands[0].Columns["WName"]
             //e.Layout.Bands[0].Columns["WName"].CellAppearance.ForeColor = Color.Gray;           
         }
