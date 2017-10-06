@@ -58,14 +58,14 @@
             Infragistics.Win.Appearance appearance25 = new Infragistics.Win.Appearance();
             Infragistics.Win.Appearance appearance26 = new Infragistics.Win.Appearance();
             Infragistics.Win.Appearance appearance27 = new Infragistics.Win.Appearance();
-            Infragistics.Win.UltraWinDataSource.UltraDataColumn ultraDataColumn5 = new Infragistics.Win.UltraWinDataSource.UltraDataColumn("WName");
-            Infragistics.Win.UltraWinDataSource.UltraDataColumn ultraDataColumn6 = new Infragistics.Win.UltraWinDataSource.UltraDataColumn("SerialNumber");
+            Infragistics.Win.UltraWinDataSource.UltraDataColumn ultraDataColumn1 = new Infragistics.Win.UltraWinDataSource.UltraDataColumn("WName");
+            Infragistics.Win.UltraWinDataSource.UltraDataColumn ultraDataColumn2 = new Infragistics.Win.UltraWinDataSource.UltraDataColumn("SerialNumber");
             this.ultraGrid1 = new Infragistics.Win.UltraWinGrid.UltraGrid();
             this.ultraDataSource1 = new Infragistics.Win.UltraWinDataSource.UltraDataSource(this.components);
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.GetData = new System.Windows.Forms.ToolStripButton();
             this.RenameFiles = new System.Windows.Forms.ToolStripButton();
             this.RenameXML = new System.Windows.Forms.ToolStripButton();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             ((System.ComponentModel.ISupportInitialize)(this.ultraGrid1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ultraDataSource1)).BeginInit();
             this.toolStrip1.SuspendLayout();
@@ -222,7 +222,7 @@
             this.ultraGrid1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.ultraGrid1.Location = new System.Drawing.Point(0, 28);
             this.ultraGrid1.Name = "ultraGrid1";
-            this.ultraGrid1.Size = new System.Drawing.Size(317, 569);
+            this.ultraGrid1.Size = new System.Drawing.Size(430, 569);
             this.ultraGrid1.TabIndex = 1;
             this.ultraGrid1.Text = "Grid Caption Area";
             this.ultraGrid1.UseOsThemes = Infragistics.Win.DefaultableBoolean.False;
@@ -231,30 +231,8 @@
             // ultraDataSource1
             // 
             this.ultraDataSource1.Band.Columns.AddRange(new object[] {
-            ultraDataColumn5,
-            ultraDataColumn6});
-            // 
-            // toolStrip1
-            // 
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.GetData,
-            this.RenameFiles,
-            this.RenameXML});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(317, 25);
-            this.toolStrip1.TabIndex = 4;
-            this.toolStrip1.Text = "toolStrip1";
-            // 
-            // GetData
-            // 
-            this.GetData.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.GetData.Image = ((System.Drawing.Image)(resources.GetObject("GetData.Image")));
-            this.GetData.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.GetData.Name = "GetData";
-            this.GetData.Size = new System.Drawing.Size(60, 22);
-            this.GetData.Text = "取得資料";
-            this.GetData.Click += new System.EventHandler(this.GetData_Click);
+            ultraDataColumn1,
+            ultraDataColumn2});
             // 
             // RenameFiles
             // 
@@ -276,13 +254,33 @@
             this.RenameXML.Text = "修改XML檔名";
             this.RenameXML.Click += new System.EventHandler(this.RenameXML_Click);
             // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.RenameFiles,
+            this.RenameXML,
+            this.toolStripLabel1});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(430, 25);
+            this.toolStrip1.TabIndex = 4;
+            this.toolStrip1.Text = "toolStrip1";
+            this.toolStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.toolStrip1_ItemClicked);
+            // 
+            // toolStripLabel1
+            // 
+            this.toolStripLabel1.Name = "toolStripLabel1";
+            this.toolStripLabel1.Size = new System.Drawing.Size(95, 22);
+            this.toolStripLabel1.Text = "toolStripLabel1";
+            // 
             // FrmRename
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(317, 594);
+            this.ClientSize = new System.Drawing.Size(430, 594);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.ultraGrid1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "FrmRename";
             this.Text = "修改檔案名稱";
@@ -299,9 +297,9 @@
         #endregion
         private Infragistics.Win.UltraWinGrid.UltraGrid ultraGrid1;
         private Infragistics.Win.UltraWinDataSource.UltraDataSource ultraDataSource1;
-        private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripButton GetData;
         private System.Windows.Forms.ToolStripButton RenameFiles;
         private System.Windows.Forms.ToolStripButton RenameXML;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel1;
     }
 }

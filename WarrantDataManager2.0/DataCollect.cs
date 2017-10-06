@@ -174,16 +174,28 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
         }
 
         private void insertWarrantUnderlyingCredit() {
-            string sql = @"INSERT INTO [WarrantReward]
+            string sql = @"INSERT INTO [WarrantReward]"
+        + " select ID, sum(sum1), sum(count1)"
+        + " from ((SELECT UnderlyingId as ID, SUM([exeRatio]*([FurthurIssueNum]/1000+[IssueNum]/1000)) as sum1, COUNT(WarrantID) as count1"
+                + " FROM [EDIS].[dbo].[WarrantBasic] "
+                + " WHERE isReward='1' AND IssueDate > '" + GlobalVar.globalParameter.firstTradeDateQ.ToString("yyyyMMdd") + "'"
+                + " GROUP BY UnderlyingId)"
+            + " UNION "
+                + " (Select UnderlyingID as ID, Sum(ISNULL(RewardQuotaUsed, 0)) as sum1, count(RewardQuotaUsed) as count1"
+                + " FROM [EDIS].[dbo].[ReIssueReward]"
+                + " WHERE MDate >= '" + GlobalVar.globalParameter.firstTradeDateQ.ToString("yyyyMMdd") + "'"
+                + " GROUP BY UnderlyingID)) as A"
+        + " Group By ID;";
+
+            /*string sql = @"INSERT INTO [WarrantReward]
                            SELECT UnderlyingId, SUM([exeRatio]*([FurthurIssueNum]/1000+[IssueNum]/1000)), COUNT(WarrantID)
                            FROM [EDIS].[dbo].[WarrantBasic]
-                           WHERE isReward='1' AND IssueDate > ";
-
+                           WHERE isReward='1' AND IssueDate > "
+                      + "'" + GlobalVar.globalParameter.firstTradeDateQ.ToString("yyyyMMdd") + "'"
+                      + " GROUP BY UnderlyingID, isReward;";*/
             /*DateTime dt = DateTime.Now;
             DateTime startQuarter = dt.AddMonths(0 - (dt.Month - 1) % 3).AddDays(1 - dt.Day);
             string startQuarterDate = startQuarter.ToString("yyyy-MM-dd");*/
-            sql += "'" + GlobalVar.globalParameter.firstTradeDateQ.ToString("yyyyMMdd") + "'";
-            sql += " GROUP BY UnderlyingID, isReward;";
 
             conn.Open();
             MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantUnderlyingCredit (UnderlyingID, MDate, DataDate, Market, AvailableShares, IssuedPercent, CanIssue, CanFurthurIssue)
@@ -334,7 +346,7 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
         private void deleteApplyLists() {
             conn.Open();
             MSSQL.ExecSqlCmd("INSERT INTO [dbo].[ReIssueReward] ([UnderlyingId], [RewardQuotaUsed], [MDate])"
-                +" (select UnderlyingID, exeRatio * ReIssueNum, GETDATE() from ReIssueOfficial where UseReward = 'Y')", conn);
+                + " (select UnderlyingID, exeRatio * ReIssueNum, GETDATE() from ReIssueOfficial where UseReward = 'Y')", conn);
             MSSQL.ExecSqlCmd("DELETE FROM [ApplyOfficial]", conn);
             MSSQL.ExecSqlCmd("DELETE FROM [ReIssueOfficial]", conn);
             MSSQL.ExecSqlCmd("DELETE FROM [ApplyTotalList]", conn);

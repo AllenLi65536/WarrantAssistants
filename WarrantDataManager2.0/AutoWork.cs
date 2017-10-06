@@ -102,7 +102,7 @@ namespace WarrantDataManager2._0
                             pircesOK = false;
 
                         /*價格更新頻率End*/
-                        
+
                         //if (now.TimeOfDay.TotalSeconds > 60 && (!globalDataOK))
                         if (now.TimeOfDay.TotalMinutes > 425 && (!globalDataOK)) {
                             GlobalUtility.loadGlobalParameters();
