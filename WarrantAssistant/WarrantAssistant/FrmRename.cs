@@ -90,8 +90,8 @@ namespace WarrantAssistant
                     string[] files = Directory.GetFiles("C:\\WarrantDocuments\\" + ultraDataSource1.Rows[i]["WName"]);
                     foreach (string file in files) {
                         if (Path.GetExtension(file).ToLower() != ".xml" && !Path.GetFileName(file).StartsWith("02") && !Path.GetFileName(file).StartsWith("08")
-                            && !Path.GetFileName(file).StartsWith("15") && !Path.GetFileName(file).StartsWith("16") && !Path.GetFileName(file).StartsWith("19") 
-                            && !Path.GetFileName(file).StartsWith("20") && !Path.GetFileName(file).StartsWith("21"))
+                             && !Path.GetFileName(file).StartsWith("14") && !Path.GetFileName(file).StartsWith("15") && !Path.GetFileName(file).StartsWith("16")
+                             && !Path.GetFileName(file).StartsWith("19") && !Path.GetFileName(file).StartsWith("20") && !Path.GetFileName(file).StartsWith("21"))
                             File.Copy(file,
                                  "C:\\WarrantDocuments\\RenamedB" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + "-" + Path.GetFileName(file), true);
                     }

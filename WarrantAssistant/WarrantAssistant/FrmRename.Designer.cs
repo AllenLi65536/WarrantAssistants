@@ -58,8 +58,8 @@
             Infragistics.Win.Appearance appearance25 = new Infragistics.Win.Appearance();
             Infragistics.Win.Appearance appearance26 = new Infragistics.Win.Appearance();
             Infragistics.Win.Appearance appearance27 = new Infragistics.Win.Appearance();
-            Infragistics.Win.UltraWinDataSource.UltraDataColumn ultraDataColumn1 = new Infragistics.Win.UltraWinDataSource.UltraDataColumn("WName");
-            Infragistics.Win.UltraWinDataSource.UltraDataColumn ultraDataColumn2 = new Infragistics.Win.UltraWinDataSource.UltraDataColumn("SerialNumber");
+            Infragistics.Win.UltraWinDataSource.UltraDataColumn ultraDataColumn3 = new Infragistics.Win.UltraWinDataSource.UltraDataColumn("WName");
+            Infragistics.Win.UltraWinDataSource.UltraDataColumn ultraDataColumn4 = new Infragistics.Win.UltraWinDataSource.UltraDataColumn("SerialNumber");
             this.ultraGrid1 = new Infragistics.Win.UltraWinGrid.UltraGrid();
             this.ultraDataSource1 = new Infragistics.Win.UltraWinDataSource.UltraDataSource(this.components);
             this.RenameFiles = new System.Windows.Forms.ToolStripButton();
@@ -232,8 +232,8 @@
             // ultraDataSource1
             // 
             this.ultraDataSource1.Band.Columns.AddRange(new object[] {
-            ultraDataColumn1,
-            ultraDataColumn2});
+            ultraDataColumn3,
+            ultraDataColumn4});
             // 
             // RenameFiles
             // 
@@ -284,7 +284,7 @@
             this.RenameFilesB.Name = "RenameFilesB";
             this.RenameFilesB.Size = new System.Drawing.Size(91, 22);
             this.RenameFilesB.Text = "修改發行檔名B";
-            this.RenameFilesB.ToolTipText = "修改下午產製發行檔名，即除了附表6~10與附件3, 8 以外之所有檔案";
+            this.RenameFilesB.ToolTipText = "修改下午產製發行檔名，即除了附表6~10與附件3, 5, 8 以外之所有檔案";
             this.RenameFilesB.Click += new System.EventHandler(this.RenameFilesB_Click);
             // 
             // FrmRename
