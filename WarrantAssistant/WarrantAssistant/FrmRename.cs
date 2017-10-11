@@ -14,7 +14,7 @@ namespace WarrantAssistant
             InitializeComponent();
         }
         private void ultraGrid1_InitializeLayout(object sender, Infragistics.Win.UltraWinGrid.InitializeLayoutEventArgs e) {
-            e.Layout.Override.CellAppearance.BackColor = Color.LightCyan;           
+            e.Layout.Override.CellAppearance.BackColor = Color.LightCyan;
             //e.Layout.Bands[0].Columns["WName"]
             //e.Layout.Bands[0].Columns["WName"].CellAppearance.ForeColor = Color.Gray;           
         }
@@ -54,7 +54,7 @@ namespace WarrantAssistant
 
                 return true;
             } catch (Exception e) {
-                MessageBox.Show("可能要更新Key");
+                MessageBox.Show("可能要更新Key，或是還沒有資料");
                 //MessageBox.Show(e.Message);
                 return false;
             }
@@ -76,7 +76,28 @@ namespace WarrantAssistant
                                  "C:\\WarrantDocuments\\Renamed" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + "-" + Path.GetFileName(file), true);
                     }
                 }
-            toolStripLabel1.Text = DateTime.Now + "修改發行檔名完成";
+            toolStripLabel1.Text = DateTime.Now + "修改發行檔名A完成";
+        }
+        private void RenameFilesB_Click(object sender, EventArgs e) {
+            string now = DateTime.Now.ToString("yyyyMMdd-HHmmss");
+
+            if (Directory.Exists("C:\\WarrantDocuments\\RenamedB" + now))
+                Directory.Delete("C:\\WarrantDocuments\\RenamedB" + now);
+            Directory.CreateDirectory("C:\\WarrantDocuments\\RenamedB" + now);
+
+            for (int i = 0; i < ultraDataSource1.Rows.Count; i++)
+                if (Directory.Exists("C:\\WarrantDocuments\\" + ultraDataSource1.Rows[i]["WName"])) {
+                    string[] files = Directory.GetFiles("C:\\WarrantDocuments\\" + ultraDataSource1.Rows[i]["WName"]);
+                    foreach (string file in files) {
+                        if (Path.GetExtension(file).ToLower() != ".xml" && !Path.GetFileName(file).StartsWith("02") && !Path.GetFileName(file).StartsWith("08")
+                            && !Path.GetFileName(file).StartsWith("15") && !Path.GetFileName(file).StartsWith("16") && !Path.GetFileName(file).StartsWith("19") 
+                            && !Path.GetFileName(file).StartsWith("20") && !Path.GetFileName(file).StartsWith("21"))
+                            File.Copy(file,
+                                 "C:\\WarrantDocuments\\RenamedB" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + "-" + Path.GetFileName(file), true);
+                    }
+                }
+            toolStripLabel1.Text = DateTime.Now + "修改發行檔名B完成";
+
         }
 
         private void RenameXML_Click(object sender, EventArgs e) {
@@ -101,5 +122,7 @@ namespace WarrantAssistant
         private void toolStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e) {
 
         }
+
+
     }
 }

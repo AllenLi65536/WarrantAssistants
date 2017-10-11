@@ -66,6 +66,7 @@
             this.RenameXML = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
+            this.RenameFilesB = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)(this.ultraGrid1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ultraDataSource1)).BeginInit();
             this.toolStrip1.SuspendLayout();
@@ -222,7 +223,7 @@
             this.ultraGrid1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
             this.ultraGrid1.Location = new System.Drawing.Point(0, 28);
             this.ultraGrid1.Name = "ultraGrid1";
-            this.ultraGrid1.Size = new System.Drawing.Size(430, 245);
+            this.ultraGrid1.Size = new System.Drawing.Size(543, 245);
             this.ultraGrid1.TabIndex = 1;
             this.ultraGrid1.Text = "Grid Caption Area";
             this.ultraGrid1.UseOsThemes = Infragistics.Win.DefaultableBoolean.False;
@@ -240,8 +241,9 @@
             this.RenameFiles.Image = ((System.Drawing.Image)(resources.GetObject("RenameFiles.Image")));
             this.RenameFiles.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.RenameFiles.Name = "RenameFiles";
-            this.RenameFiles.Size = new System.Drawing.Size(84, 22);
-            this.RenameFiles.Text = "修改發行檔名";
+            this.RenameFiles.Size = new System.Drawing.Size(92, 22);
+            this.RenameFiles.Text = "修改發行檔名A";
+            this.RenameFiles.ToolTipText = "修改全部發行檔名";
             this.RenameFiles.Click += new System.EventHandler(this.RenameFiles_Click);
             // 
             // RenameXML
@@ -258,11 +260,12 @@
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.RenameFiles,
+            this.RenameFilesB,
             this.RenameXML,
             this.toolStripLabel1});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(429, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(543, 25);
             this.toolStrip1.TabIndex = 4;
             this.toolStrip1.Text = "toolStrip1";
             this.toolStrip1.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.toolStrip1_ItemClicked);
@@ -273,11 +276,22 @@
             this.toolStripLabel1.Size = new System.Drawing.Size(95, 22);
             this.toolStripLabel1.Text = "toolStripLabel1";
             // 
+            // RenameFilesB
+            // 
+            this.RenameFilesB.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.RenameFilesB.Image = ((System.Drawing.Image)(resources.GetObject("RenameFilesB.Image")));
+            this.RenameFilesB.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.RenameFilesB.Name = "RenameFilesB";
+            this.RenameFilesB.Size = new System.Drawing.Size(91, 22);
+            this.RenameFilesB.Text = "修改發行檔名B";
+            this.RenameFilesB.ToolTipText = "修改下午產製發行檔名，即除了附表6~10與附件3, 8 以外之所有檔案";
+            this.RenameFilesB.Click += new System.EventHandler(this.RenameFilesB_Click);
+            // 
             // FrmRename
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(429, 270);
+            this.ClientSize = new System.Drawing.Size(543, 270);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.ultraGrid1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -301,5 +315,6 @@
         private System.Windows.Forms.ToolStripButton RenameXML;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
+        private System.Windows.Forms.ToolStripButton RenameFilesB;
     }
 }
