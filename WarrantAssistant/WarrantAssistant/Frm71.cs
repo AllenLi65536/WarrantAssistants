@@ -406,7 +406,7 @@ namespace WarrantAssistant
 
         private bool ParseHtml(string url) {
             try {
-                string firstResponse = GlobalUtility.GetHtml(url);
+                string firstResponse = EDLib.Utility.GetHtml(url, System.Text.Encoding.Default);
                 HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
                 doc.LoadHtml(firstResponse);
                 HtmlNodeCollection navNodeChild = doc.DocumentNode.SelectSingleNode("//table[1]").ChildNodes; // /td[1]/table[1]/tr[2]

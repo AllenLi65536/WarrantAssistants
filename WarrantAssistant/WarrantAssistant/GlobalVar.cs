@@ -87,7 +87,7 @@ namespace WarrantAssistant
             e.Handled = true;
         }
 
-        public static string GetHtml(string url) {
+        /*public static string GetHtml(string url) {
             string firstResponse = null;
             try {
                 WebRequest req = WebRequest.Create(url);  
@@ -106,7 +106,7 @@ namespace WarrantAssistant
                 MessageBox.Show(err.ToString());
             }
             return firstResponse;
-        }
+        }*/
 
         public static void LogInfo(string type, string content) {
             string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
