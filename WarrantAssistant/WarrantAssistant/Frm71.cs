@@ -431,10 +431,16 @@ namespace WarrantAssistant
                     dr["發行張數"] = split[3];
                     dr["行使比例"] = split[4];
                     dr["申報時間"] = split[5];
-                    dr["可發行股數"] = split[6];
-                    dr["截至前一日"] = split[7];
-                    dr["本日累積發行"] = split[8];
-                    dr["累計%"] = split[9];
+                    if (split[6] != "NA") {
+                        dr["可發行股數"] = split[6];
+                        dr["截至前一日"] = split[7];
+                        dr["本日累積發行"] = split[8];
+                        dr["累計%"] = split[9];
+                    } else {
+                        dr["可發行股數"] = 0;
+                        dr["截至前一日"] = 0;
+                        dr["本日累積發行"] = 0;
+                    }
 
                     if (!split[10].StartsWith("&nbsp"))
                         dr["同標的2檔"] = split[10];
@@ -445,6 +451,7 @@ namespace WarrantAssistant
                 }
                 return true;
             } catch (Exception e) {
+                MessageBox.Show(e.Message);
                 MessageBox.Show("可能要更新Key");
                 return false;
             }
