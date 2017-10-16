@@ -430,8 +430,8 @@ namespace WarrantAssistant
                     dr["標的代號"] = split[2];
                     dr["發行張數"] = split[3];
                     dr["行使比例"] = split[4];
-                    dr["申報時間"] = split[5];
-                    if (split[6] != "NA") {
+                    dr["申報時間"] = split[5];                    
+                    if (double.TryParse(split[6], out double result)) {
                         dr["可發行股數"] = split[6];
                         dr["截至前一日"] = split[7];
                         dr["本日累積發行"] = split[8];
