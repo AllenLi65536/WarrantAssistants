@@ -32,6 +32,8 @@ namespace WarrantAssistant
 
         private void MainForm_Load(object sender, EventArgs e) {
             GlobalVar.mainForm = this;
+            Text += System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+            //Text += System.Windows.Forms.Application.ProductVersion;
             FrmLogIn frmLogin = new FrmLogIn();
             if (!frmLogin.TryIPLogin()) {
                 MessageBox.Show("Auto login failed. Please e-mail your IP address to allen.li@kgi.com");

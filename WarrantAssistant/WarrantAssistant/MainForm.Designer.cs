@@ -54,6 +54,7 @@
             this.權證系統上傳檔ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.增額上傳檔ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.關係人列表ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.修改檔案名稱ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.財工ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.詳細LOGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
@@ -68,7 +69,6 @@
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.ultraGrid1 = new Infragistics.Win.UltraWinGrid.UltraGrid();
             this.monthCalendar1 = new System.Windows.Forms.MonthCalendar();
-            this.修改檔案名稱ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -277,6 +277,13 @@
             this.關係人列表ToolStripMenuItem.Text = "關係人列表";
             this.關係人列表ToolStripMenuItem.Click += new System.EventHandler(this.關係人列表ToolStripMenuItem_Click);
             // 
+            // 修改檔案名稱ToolStripMenuItem
+            // 
+            this.修改檔案名稱ToolStripMenuItem.Name = "修改檔案名稱ToolStripMenuItem";
+            this.修改檔案名稱ToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
+            this.修改檔案名稱ToolStripMenuItem.Text = "修改檔案名稱";
+            this.修改檔案名稱ToolStripMenuItem.Click += new System.EventHandler(this.修改檔案名稱ToolStripMenuItem_Click);
+            // 
             // 財工ToolStripMenuItem
             // 
             this.財工ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -419,13 +426,6 @@
             this.monthCalendar1.Name = "monthCalendar1";
             this.monthCalendar1.TabIndex = 0;
             // 
-            // 修改檔案名稱ToolStripMenuItem
-            // 
-            this.修改檔案名稱ToolStripMenuItem.Name = "修改檔案名稱ToolStripMenuItem";
-            this.修改檔案名稱ToolStripMenuItem.Size = new System.Drawing.Size(163, 22);
-            this.修改檔案名稱ToolStripMenuItem.Text = "修改檔案名稱";
-            this.修改檔案名稱ToolStripMenuItem.Click += new System.EventHandler(this.修改檔案名稱ToolStripMenuItem_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 17F);
@@ -440,7 +440,7 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MainForm";
-            this.Text = "權證小幫手2.0";
+            this.Text = "權證小幫手";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.menuStrip1.ResumeLayout(false);
