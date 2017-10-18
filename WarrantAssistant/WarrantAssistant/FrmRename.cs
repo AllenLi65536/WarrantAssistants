@@ -45,23 +45,14 @@ namespace WarrantAssistant
                 string firstResponse = EDLib.Utility.GetHtml(url, System.Text.Encoding.Default);
                 HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
                 doc.LoadHtml(firstResponse);
-                HtmlNodeCollection navNodeChild;
-                string market;
-
-                if (twse) {
-                    navNodeChild = doc.DocumentNode.SelectSingleNode("//table[1]/tr[1]/td/table").ChildNodes;
-                    market = "TWSE";
-                } else {
-                    navNodeChild = doc.DocumentNode.SelectSingleNode("//table[1]").ChildNodes;
-                    market = "OTC";
-                }
-
+                HtmlNodeCollection navNodeChild = doc.DocumentNode.SelectSingleNode("//table[1]/tr[1]/td/table").ChildNodes;
+                                               
                 for (int i = 3; i < navNodeChild.Count; i += 2) {
                     string[] split = navNodeChild[i].InnerText.Split(new string[] { " ", "\t", "&nbsp;", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                     ultraDataSource1.Rows.Add();
                     ultraDataSource1.Rows[ultraDataSource1.Rows.Count - 1]["WName"] = split[1];
                     ultraDataSource1.Rows[ultraDataSource1.Rows.Count - 1]["SerialNumber"] = split[0];
-                    ultraDataSource1.Rows[ultraDataSource1.Rows.Count - 1]["Market"] = market;
+                    ultraDataSource1.Rows[ultraDataSource1.Rows.Count - 1]["Market"] = twse ? "TWSE" : "OTC";
                 }
 
                 return true;
@@ -164,7 +155,7 @@ namespace WarrantAssistant
                                 if (fileExtension != ".xml") {
                                     if (ultraDataSource1.Rows[i]["Market"].ToString() == "TWSE" && !fileName.Contains("OTC"))
                                         toFile = "C:\\WarrantDocuments\\Renamed" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + "-" + fileName;
-                                    else if(ultraDataSource1.Rows[i]["Market"].ToString() == "OTC" && fileName.Contains("OTC"))
+                                    else if (ultraDataSource1.Rows[i]["Market"].ToString() == "OTC" && fileName.Contains("OTC"))
                                         toFile = "C:\\WarrantDocuments\\RenamedOTC" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + "-" + fileName;
                                 }
                                 break;
