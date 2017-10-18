@@ -14,7 +14,7 @@ namespace WarrantAssistant
     public partial class FrmReIssueInput:Form
     {
         public SqlConnection conn = new SqlConnection(GlobalVar.loginSet.edisSqlConnString);
-        private DataTable dt = new DataTable();
+        private DataTable dt;// = new DataTable();
         private bool isEdit = false;
 
         public FrmReIssueInput() {
@@ -22,44 +22,34 @@ namespace WarrantAssistant
         }
 
         private void FrmReIssueInput_Load(object sender, EventArgs e) {
-            InitialGrid();
             LoadData();
+            InitialGrid();
         }
 
         private void InitialGrid() {
-            dt.Columns.Add("權證代號", typeof(string));
-            dt.Columns.Add("權證名稱", typeof(string));
-            dt.Columns.Add("發行張數", typeof(double));
-            dt.Columns.Add("流通在外", typeof(double));
-            dt.Columns.Add("前1日", typeof(double));
-            dt.Columns.Add("前2日", typeof(double));
-            dt.Columns.Add("前3日", typeof(double));
-            dt.Columns.Add("最後交易日", typeof(string));
-            dt.Columns.Add("符合增額條件", typeof(string));
-            //dt.Columns.Add("維護時間", typeof(DateTime));
 
             //dt.PrimaryKey = new DataColumn[] { dt.Columns["權證代號"] };
-            ultraGrid1.DataSource = dt;
+            //ultraGrid1.DataSource = dt;
+            UltraGridBand bands0 = ultraGrid1.DisplayLayout.Bands[0];
+            bands0.Columns["IssueNum"].Format = "N0";
+            bands0.Columns["SoldNum"].Format = "N0";
 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["發行張數"].Format = "N0";
-            ultraGrid1.DisplayLayout.Bands[0].Columns["流通在外"].Format = "N0";
-
-            ultraGrid1.DisplayLayout.Bands[0].Columns["權證代號"].Width = 90;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["權證名稱"].Width = 135;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["發行張數"].Width = 90;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["流通在外"].Width = 90;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["前1日"].Width = 70;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["前2日"].Width = 70;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["前3日"].Width = 70;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["最後交易日"].Width = 90;
-            //ultraGrid1.DisplayLayout.Bands[0].Columns["符合增額條件"].Width = 90;
+            bands0.Columns["WarrantID"].Width = 90;
+            bands0.Columns["WarrantName"].Width = 135;
+            bands0.Columns["IssueNum"].Width = 90;
+            bands0.Columns["SoldNum"].Width = 90;
+            bands0.Columns["Last1Sold"].Width = 70;
+            bands0.Columns["Last2Sold"].Width = 70;
+            bands0.Columns["Last3Sold"].Width = 70;
+            bands0.Columns["LastTradingDate"].Width = 90;
+            //ultraGrid1.DisplayLayout.Bands[0].Columns["ReIssuable"].Width = 90;
             //ultraGrid1.DisplayLayout.Bands[0].Columns["維護時間"].Width = 120;
             ultraGrid1.DisplayLayout.AutoFitStyle = AutoFitStyle.ResizeAllColumns;
 
-            ultraGrid1.DisplayLayout.Bands[0].Override.HeaderAppearance.TextHAlign = Infragistics.Win.HAlign.Left;
-            ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
-            ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
-            ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.False;
+            bands0.Override.HeaderAppearance.TextHAlign = Infragistics.Win.HAlign.Left;
+            bands0.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
+            bands0.Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
+            bands0.Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.False;
 
             SetButton();
         }
@@ -68,31 +58,19 @@ namespace WarrantAssistant
             if (isEdit) {
                 ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.Yes;
                 ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.True;
-                toolStripButtonEdit.Visible = false;
-                toolStripButtonConfirm.Visible = true;
-                toolStripButtonCancel.Visible = true;
-                toolStripButtonGetData.Visible = true;
-
-                for (int x = 0; x < 30; x++) {
-                    ultraGrid1.DisplayLayout.Bands[0].AddNew();
-                    //ultraGrid1.Rows[x].Cells[0].Value = (x+1).ToString();
-                    //ultraGrid1.Rows[x].Cells[9].Value = DateTime.Now;
-                }
-                ultraGrid1.ActiveRowScrollRegion.ScrollRowIntoView(ultraGrid1.Rows[0]);
+                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.True;                               
             } else {
                 ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
                 ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.False;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
-                toolStripButtonEdit.Visible = true;
-                toolStripButtonConfirm.Visible = false;
-                toolStripButtonCancel.Visible = false;
-                toolStripButtonGetData.Visible = false;
+                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;                
             }
+            toolStripButtonEdit.Visible = !isEdit;
+            toolStripButtonConfirm.Visible = isEdit;
+            toolStripButtonCancel.Visible = isEdit;
+            Edit2.Visible = isEdit;
         }
 
         private void LoadData() {
-            dt.Rows.Clear();
             string sql = @"SELECT [WarrantID]
                                   ,[WarrantName]
                                   ,[IssueNum]
@@ -103,42 +81,37 @@ namespace WarrantAssistant
                                   ,[LastTradingDate]
                                   ,[ReIssuable]
                               FROM [EDIS].[dbo].[WarrantReIssuable]";
-            DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+            dt = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+            ultraGrid1.DataSource = dt;
 
-            foreach (DataRowView drv in dv) {
-                DataRow dr = dt.NewRow();
+            dt.Columns[0].Caption = "權證代號";
+            dt.Columns[1].Caption = "權證名稱";
+            dt.Columns[2].Caption = "發行張數";
+            dt.Columns[3].Caption = "流通在外";
+            dt.Columns[4].Caption = "前1日";
+            dt.Columns[5].Caption = "前2日";
+            dt.Columns[6].Caption = "前3日";
+            dt.Columns[7].Caption = "最後交易日";
+            dt.Columns[8].Caption = "符合增額條件";
 
-                dr["權證代號"] = drv["WarrantID"].ToString();
-                dr["權證名稱"] = drv["WarrantName"].ToString();
-                dr["發行張數"] = Convert.ToDouble(drv["IssueNum"]) / 1000;
-                dr["流通在外"] = Convert.ToDouble(drv["SoldNum"]) / 1000;
-                dr["前1日"] = Convert.ToDouble(drv["Last1Sold"]);
-                dr["前2日"] = Convert.ToDouble(drv["Last2Sold"]);
-                dr["前3日"] = Convert.ToDouble(drv["Last3Sold"]);
-                dr["最後交易日"] = drv["LastTradingDate"].ToString();
-                dr["符合增額條件"] = drv["ReIssuable"].ToString();
-                //dr["維護時間"] = Convert.ToDateTime(drv["MDate"]);
-
-                dt.Rows.Add(dr);
+            foreach (DataRow row in dt.Rows) {
+                row["IssueNum"] = (double) row["IssueNum"] / 1000;
+                row["SoldNum"] = (double) row["SoldNum"] / 1000;
             }
         }
 
         private void UpdateDB() {
             for (int x = ultraGrid1.Rows.Count - 1; x >= 0; x--) {
                 try {
-                    if (ultraGrid1.Rows[x].Cells[1].Value.ToString() == "") {
+                    if (ultraGrid1.Rows[x].Cells[1].Value.ToString() == "")
                         ultraGrid1.Rows[x].Delete(false);
-                    }
+
                 } catch (Exception ex) {
                     MessageBox.Show(ex.Message);
                 }
             }
 
-            SqlCommand cmd = new SqlCommand("DELETE FROM [WarrantReIssuable]", conn);
-            conn.Open();
-            cmd.ExecuteNonQuery();
-            cmd.Dispose();
-            conn.Close();
+            EDLib.SQL.MSSQL.ExecSqlCmd("DELETE FROM [WarrantReIssuable]", conn);
 
             try {
                 string sql = "INSERT INTO [WarrantReIssuable] values(@WarrantID,@WarrantName,@IssueNum,@SoldNum,@Last1Sold,@Last2Sold,@Last3Sold,@LastTradingDate,@ReIssuable,@MDate)";
@@ -157,15 +130,15 @@ namespace WarrantAssistant
                 SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sql, ps);
 
                 foreach (Infragistics.Win.UltraWinGrid.UltraGridRow r in ultraGrid1.Rows) {
-                    string warrantID = r.Cells["權證代號"].Value.ToString();
-                    string warrantName = r.Cells["權證名稱"].Value.ToString();
-                    double issueNum = Convert.ToDouble(r.Cells["發行張數"].Value);
-                    double soldNum = Convert.ToDouble(r.Cells["流通在外"].Value);
-                    double last1Sold = Convert.ToDouble(r.Cells["前1日"].Value);
-                    double last2Sold = Convert.ToDouble(r.Cells["前2日"].Value);
-                    double last3Sold = Convert.ToDouble(r.Cells["前3日"].Value);
-                    string lastTradingDate = r.Cells["最後交易日"].Value.ToString();
-                    string reIssuable = r.Cells["符合增額條件"].Value.ToString();
+                    string warrantID = r.Cells["WarrantID"].Value.ToString();
+                    string warrantName = r.Cells["WarrantName"].Value.ToString();
+                    double issueNum = Convert.ToDouble(r.Cells["IssueNum"].Value);
+                    double soldNum = Convert.ToDouble(r.Cells["SoldNum"].Value);
+                    double last1Sold = Convert.ToDouble(r.Cells["Last1Sold"].Value);
+                    double last2Sold = Convert.ToDouble(r.Cells["Last2Sold"].Value);
+                    double last3Sold = Convert.ToDouble(r.Cells["Last3Sold"].Value);
+                    string lastTradingDate = r.Cells["LastTradingDate"].Value.ToString();
+                    string reIssuable = r.Cells["ReIssuable"].Value.ToString();
 
 
                     h.SetParameterValue("@WarrantID", warrantID);
@@ -186,20 +159,6 @@ namespace WarrantAssistant
                 toolStripLabel1.Text = DateTime.Now + "更新成功";
 
                 GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 更新可增額列表");
-                /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-                List<SqlParameter> psInfo = new List<SqlParameter>();
-                psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-                psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-                psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
-
-                SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-                hInfo.SetParameterValue("@MDate", DateTime.Now);
-                hInfo.SetParameterValue("@InformationType", "Info");
-                hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID + " 更新可增額列表");
-                hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-                hInfo.ExecuteCommand();
-                hInfo.Dispose();*/
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
@@ -210,6 +169,33 @@ namespace WarrantAssistant
             dt.Rows.Clear();
             isEdit = true;
             SetButton();
+
+            //Get key and id
+            DataTable dv = EDLib.SQL.MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='10'"
+                , GlobalVar.loginSet.warrantSysKeySqlConnString);
+            string key = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
+
+            dv = EDLib.SQL.MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='20'"
+                , GlobalVar.loginSet.warrantSysKeySqlConnString);
+            string id = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
+
+            DateTime lastTrade = TradeDate.LastNTradeDateDT(1);
+            string aday = (lastTrade.Year - 1911) + lastTrade.ToString("MMdd");
+            string twseUrl = "http://siis.twse.com.tw/server-java/t159sa04?step=1&id=9200pd" + id + "&TYPEK=sii&key=" + key + "&cDATE=" + aday + "&co_id=9200";
+
+            //dt.Rows.Clear();
+
+            //parse TWSE Incr html
+            if (!ParseHtml(twseUrl))
+                return;
+
+            //parse OTC Incr html
+            twseUrl = "http://siis.twse.com.tw/server-java/t159sa04?step=1&id=9200pd" + id + "&TYPEK=otc&key=" + key + "&cDATE=" + aday + "&co_id=9200";
+            if (!ParseHtml(twseUrl))
+                return;
+
+            //LoadData();    
+            GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 下載可增額列表");
         }
 
         private void toolStripButtonConfirm_Click(object sender, EventArgs e) {
@@ -225,37 +211,6 @@ namespace WarrantAssistant
             SetButton();
         }
 
-        private void toolStripButtonGetData_Click(object sender, EventArgs e) {
-
-            //Get key and id
-            DataTable dv = EDLib.SQL.MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='10'"
-                , GlobalVar.loginSet.warrantSysKeySqlConnString);
-            string key = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
-
-            dv = EDLib.SQL.MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='20'"
-                , GlobalVar.loginSet.warrantSysKeySqlConnString);
-            string id = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
-
-            DateTime lastTrade = TradeDate.LastNTradeDateDT(1);
-            string aday = (lastTrade.Year - 1911) + lastTrade.ToString("MMdd");
-            string twseUrl = "http://siis.twse.com.tw/server-java/t159sa04?step=1&id=9200pd" + id + "&TYPEK=sii&key=" + key + "&cDATE=" + aday + "&co_id=9200";
-            
-            dt.Rows.Clear();
-            
-            //parse TWSE Incr html
-            
-            if (!ParseHtml(twseUrl))
-                return;
-
-            //parse OTC Incr html
-            twseUrl = "http://siis.twse.com.tw/server-java/t159sa04?step=1&id=9200pd" + id + "&TYPEK=otc&key=" + key + "&cDATE=" + aday + "&co_id=9200";
-            if (!ParseHtml(twseUrl))
-                return;
-
-            //LoadData();    
-            GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 下載可增額列表");
-
-        }
         private bool ParseHtml(string url) {
             try {
                 string firstResponse = EDLib.Utility.GetHtml(url, System.Text.Encoding.Default);
@@ -266,28 +221,38 @@ namespace WarrantAssistant
                 // /html[1]/body[1]/center[1]/table
 
                 for (int i = 5; i < navNodeChild.Count; i += 2) {
-                    //MessageBox.Show(navNodeChild[i].InnerText);
 
                     string[] split = navNodeChild[i].InnerText.Split(new string[] { " ", "\t", "&nbsp;", "\n" }, StringSplitOptions.RemoveEmptyEntries);
                     DataRow dr = dt.NewRow();
 
-                    dr["權證代號"] = split[0];
-                    dr["權證名稱"] = split[1];
-                    dr["發行張數"] = split[2];
-                    dr["流通在外"] = split[3];
-                    dr["前1日"] = split[4];
-                    dr["前2日"] = split[5];
-                    dr["前3日"] = split[6];
-                    dr["最後交易日"] = split[7];
-                    dr["符合增額條件"] = split[8];
+                    dr["WarrantID"] = split[0];
+                    dr["WarrantName"] = split[1];
+                    dr["IssueNum"] = split[2];
+                    dr["SoldNum"] = split[3];
+                    dr["Last1Sold"] = split[4];
+                    dr["Last2Sold"] = split[5];
+                    dr["Last3Sold"] = split[6];
+                    dr["LastTradingDate"] = split[7];
+                    dr["ReIssuable"] = split[8];
 
                     dt.Rows.Add(dr);
                 }
                 return true;
             } catch (Exception e) {
-                MessageBox.Show("可能要更新Key");
+                MessageBox.Show("可能要更新Key或是還沒有資料");
                 return false;
             }
+        }
+
+        private void Edit2_Click(object sender, EventArgs e) {
+            ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.Yes;
+            ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
+            ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.True;
+            dt.Rows.Clear();
+            for (int x = 0; x < 30; x++) 
+                ultraGrid1.DisplayLayout.Bands[0].AddNew();                
+            
+            ultraGrid1.ActiveRowScrollRegion.ScrollRowIntoView(ultraGrid1.Rows[0]);
         }
     }
 }

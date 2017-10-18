@@ -36,7 +36,7 @@
             this.toolStripButtonCancel = new System.Windows.Forms.ToolStripButton();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.ultraGrid1 = new Infragistics.Win.UltraWinGrid.UltraGrid();
-            this.toolStripButtonGetData = new System.Windows.Forms.ToolStripButton();
+            this.Edit2 = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ultraGrid1)).BeginInit();
             this.SuspendLayout();
@@ -46,8 +46,8 @@
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButtonEdit,
             this.toolStripButtonConfirm,
+            this.Edit2,
             this.toolStripSeparator3,
-            this.toolStripButtonGetData,
             this.toolStripButtonCancel,
             this.toolStripLabel1});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
@@ -63,8 +63,8 @@
             this.toolStripButtonEdit.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonEdit.Image")));
             this.toolStripButtonEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonEdit.Name = "toolStripButtonEdit";
-            this.toolStripButtonEdit.Size = new System.Drawing.Size(36, 22);
-            this.toolStripButtonEdit.Text = "編輯";
+            this.toolStripButtonEdit.Size = new System.Drawing.Size(96, 22);
+            this.toolStripButtonEdit.Text = "取得資料及編輯";
             this.toolStripButtonEdit.Click += new System.EventHandler(this.toolStripButtonEdit_Click);
             // 
             // toolStripButtonConfirm
@@ -117,15 +117,16 @@
             this.ultraGrid1.Size = new System.Drawing.Size(840, 537);
             this.ultraGrid1.TabIndex = 1;
             // 
-            // toolStripButtonGetData
+            // Edit2
             // 
-            this.toolStripButtonGetData.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButtonGetData.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonGetData.Image")));
-            this.toolStripButtonGetData.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButtonGetData.Name = "toolStripButtonGetData";
-            this.toolStripButtonGetData.Size = new System.Drawing.Size(60, 22);
-            this.toolStripButtonGetData.Text = "取得資料";
-            this.toolStripButtonGetData.Click += new System.EventHandler(this.toolStripButtonGetData_Click);
+            this.Edit2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.Edit2.Image = ((System.Drawing.Image)(resources.GetObject("Edit2.Image")));
+            this.Edit2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Edit2.Name = "Edit2";
+            this.Edit2.Overflow = System.Windows.Forms.ToolStripItemOverflow.Never;
+            this.Edit2.Size = new System.Drawing.Size(36, 22);
+            this.Edit2.Text = "編輯";
+            this.Edit2.Click += new System.EventHandler(this.Edit2_Click);
             // 
             // FrmReIssueInput
             // 
@@ -157,6 +158,6 @@
         private System.Windows.Forms.ToolStripButton toolStripButtonEdit;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripButton toolStripButtonCancel;
-        private System.Windows.Forms.ToolStripButton toolStripButtonGetData;
+        private System.Windows.Forms.ToolStripButton Edit2;
     }
 }

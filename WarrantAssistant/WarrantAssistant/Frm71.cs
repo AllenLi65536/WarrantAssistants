@@ -13,7 +13,7 @@ namespace WarrantAssistant
     public partial class Frm71:Form
     {
         public SqlConnection conn = new SqlConnection(GlobalVar.loginSet.edisSqlConnString);
-        private DataTable dt = new DataTable();
+        private DataTable dt;// = new DataTable();
         private bool isEdit = false;
 
         public Frm71() {
@@ -21,56 +21,44 @@ namespace WarrantAssistant
         }
 
         private void Frm71_Load(object sender, EventArgs e) {
-            toolStripLabel1.Text = "";
-            InitialGrid();
+            //toolStripLabel1.Text = "";
             LoadData();
+            InitialGrid();
         }
 
         private void InitialGrid() {
-            dt.Columns.Add("發行人", typeof(string));
-            dt.Columns.Add("權證名稱", typeof(string));
-            dt.Columns.Add("標的代號", typeof(string));
-            dt.Columns.Add("發行張數", typeof(double));
-            dt.Columns.Add("行使比例", typeof(double));
-            dt.Columns.Add("申報時間", typeof(string));
-            dt.Columns.Add("可發行股數", typeof(double));
-            dt.Columns.Add("截至前一日", typeof(double));
-            dt.Columns.Add("本日累積發行", typeof(double));
-            dt.Columns.Add("累計%", typeof(string));
-            dt.Columns.Add("同標的2檔", typeof(string));
-            dt.Columns.Add("原始申報時間", typeof(string));
-
             //dt.PrimaryKey = new DataColumn[] { dt.Columns["權證名稱"] };
-            ultraGrid1.DataSource = dt;
+            //ultraGrid1.DataSource = dt;
 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["發行張數"].Format = "N0";
-            ultraGrid1.DisplayLayout.Bands[0].Columns["可發行股數"].Format = "N0";
-            ultraGrid1.DisplayLayout.Bands[0].Columns["截至前一日"].Format = "N0";
-            ultraGrid1.DisplayLayout.Bands[0].Columns["本日累積發行"].Format = "N0";
+            UltraGridBand bands0 = ultraGrid1.DisplayLayout.Bands[0];
+            bands0.Columns["IssueNum"].Format = "N0";
+            bands0.Columns["AvailableShares"].Format = "N0";
+            bands0.Columns["LastDayUsedShares"].Format = "N0";
+            bands0.Columns["TodayApplyShares"].Format = "N0";
 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["發行人"].Width = 80;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["權證名稱"].Width = 130;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["標的代號"].Width = 80;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["發行張數"].Width = 80;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["行使比例"].Width = 80;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["申報時間"].Width = 110;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["可發行股數"].Width = 120;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["截至前一日"].Width = 120;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["本日累積發行"].Width = 120;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["累計%"].Width = 80;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["同標的2檔"].Width = 80;
-            //ultraGrid1.DisplayLayout.Bands[0].Columns["原始申報時間"].Width = 110;
+            bands0.Columns["Issuer"].Width = 80;
+            bands0.Columns["WarrantName"].Width = 130;
+            bands0.Columns["UnderlyingID"].Width = 80;
+            bands0.Columns["IssueNum"].Width = 80;
+            bands0.Columns["exeRatio"].Width = 80;
+            bands0.Columns["ApplyTime"].Width = 110;
+            bands0.Columns["AvailableShares"].Width = 120;
+            bands0.Columns["LastDayUsedShares"].Width = 120;
+            bands0.Columns["TodayApplyShares"].Width = 120;
+            bands0.Columns["AccUsedShares"].Width = 80;
+            bands0.Columns["SameUnderlying"].Width = 80;
+            //ultraGrid1.DisplayLayout.Bands[0].Columns["OriApplyTime"].Width = 110;
             ultraGrid1.DisplayLayout.AutoFitStyle = AutoFitStyle.ResizeAllColumns;
 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["可發行股數"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Right;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["截至前一日"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Right;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["本日累積發行"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Right;
-            ultraGrid1.DisplayLayout.Bands[0].Columns["累計%"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Center;
+            bands0.Columns["AvailableShares"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Right;
+            bands0.Columns["LastDayUsedShares"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Right;
+            bands0.Columns["TodayApplyShares"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Right;
+            bands0.Columns["AccUsedShares"].CellAppearance.TextHAlign = Infragistics.Win.HAlign.Center;
 
-            ultraGrid1.DisplayLayout.Bands[0].Override.HeaderAppearance.TextHAlign = Infragistics.Win.HAlign.Left;
-            ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
-            ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
-            ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.False;
+            bands0.Override.HeaderAppearance.TextHAlign = Infragistics.Win.HAlign.Left;
+            bands0.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
+            bands0.Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
+            bands0.Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.False;
 
             SetButton();
         }
@@ -79,32 +67,19 @@ namespace WarrantAssistant
             if (isEdit) {
                 ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.Yes;
                 ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.True;
-                toolStripButtonEdit.Visible = false;
-                toolStripButtonConfirm.Visible = true;
-                toolStripButtonCancel.Visible = true;
-                toolStripButtonGetData.Visible = true;
-                for (int x = 0; x < 100; x++) {
-                    ultraGrid1.DisplayLayout.Bands[0].AddNew();
-                    //ultraGrid1.Rows[x].Cells[1].Value = (x + 1).ToString();
-                    //ultraGrid1.Rows[x].Cells[9].Value = DateTime.Now;
-                }
-
-                ultraGrid1.ActiveRowScrollRegion.ScrollRowIntoView(ultraGrid1.Rows[0]);
-                //ultraGrid1.Rows[0].Selected = true;
+                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.True;                          
             } else {
                 ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
                 ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.False;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
-                toolStripButtonEdit.Visible = true;
-                toolStripButtonConfirm.Visible = false;
-                toolStripButtonCancel.Visible = false;
-                toolStripButtonGetData.Visible = false;
+                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;                
             }
+            toolStripButtonEdit.Visible = !isEdit;
+            toolStripButtonConfirm.Visible = isEdit;
+            toolStripButtonCancel.Visible = isEdit;
+            Edit2.Visible = isEdit;
         }
 
         private void LoadData() {
-            dt.Rows.Clear();
             string sql = @"SELECT [Issuer]
                                   ,[WarrantName]
                                   ,[UnderlyingID]
@@ -118,46 +93,37 @@ namespace WarrantAssistant
                                   ,[SameUnderlying]
                                   ,[OriApplyTime]
                               FROM [EDIS].[dbo].[Apply_71]";
-            //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
-            DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
-            foreach (DataRow drv in dv.Rows) {
-                DataRow dr = dt.NewRow();
+            dt = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+            ultraGrid1.DataSource = dt;
 
-                dr["發行人"] = drv["Issuer"].ToString();
-                dr["權證名稱"] = drv["WarrantName"].ToString();
-                dr["標的代號"] = drv["UnderlyingID"].ToString();
-                dr["發行張數"] = Convert.ToDouble(drv["IssueNum"]);
-                dr["行使比例"] = Convert.ToDouble(drv["exeRatio"]);
-                dr["申報時間"] = drv["ApplyTime"].ToString();
-                dr["可發行股數"] = Convert.ToDouble(drv["AvailableShares"]);
-                dr["截至前一日"] = Convert.ToDouble(drv["LastDayUsedShares"]);
-                dr["本日累積發行"] = Convert.ToDouble(drv["TodayApplyShares"]);
-                dr["累計%"] = drv["AccUsedShares"].ToString();
-                dr["同標的2檔"] = drv["SameUnderlying"].ToString();
-                dr["原始申報時間"] = drv["OriApplyTime"].ToString();
+            dt.Columns[0].Caption = "發行人";
+            dt.Columns[1].Caption = "權證名稱";
+            dt.Columns[2].Caption = "標的代號";
+            dt.Columns[3].Caption = "發行張數";
+            dt.Columns[4].Caption = "行使比例";
+            dt.Columns[5].Caption = "申報時間";
+            dt.Columns[6].Caption = "可發行股數";
+            dt.Columns[7].Caption = "截至前一日";
+            dt.Columns[8].Caption = "本日累積發行";
+            dt.Columns[9].Caption = "累計%";
+            dt.Columns[10].Caption = "同標的2檔";
+            dt.Columns[11].Caption = "原始申報時間";
 
-                dt.Rows.Add(dr);
-            }
         }
 
         private void UpdateDB() {
             for (int x = ultraGrid1.Rows.Count - 1; x >= 0; x--) {
                 try {
-                    if (ultraGrid1.Rows[x].Cells[0].Value.ToString() == "") {
+                    if (ultraGrid1.Rows[x].Cells[0].Value.ToString() == "")
                         ultraGrid1.Rows[x].Delete(false);
-                    }
+
                 } catch (Exception ex) {
                     MessageBox.Show(ex.Message);
                 }
             }
 
             MSSQL.ExecSqlCmd("DELETE FROM [Apply_71]", conn);
-            /*SqlCommand cmd = new SqlCommand("DELETE FROM [Apply_71]", conn);
-            conn.Open();
-            cmd.ExecuteNonQuery();
-            cmd.Dispose();
-            conn.Close();*/
 
             try {
                 string sql = "INSERT INTO [Apply_71] values(@Issuer,@WarrantName,@UnderlyingID,@IssueNum,@exeRatio,@ApplyTime,@AvailableShares,@LastDayUsedShares,@TodayApplyShares,@AccUsedShares,@SameUnderlying,@OriApplyTime,@Result, @ApplyStatus, @ReIssueResult, @SerialNum)";
@@ -182,12 +148,12 @@ namespace WarrantAssistant
                 SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sql, ps);
 
                 foreach (UltraGridRow r in ultraGrid1.Rows) {
-                    string issuer = r.Cells["發行人"].Value.ToString();
-                    string warrantName = r.Cells["權證名稱"].Value.ToString();
-                    string underlyingID = r.Cells["標的代號"].Value.ToString();
-                    double issueNum = Convert.ToDouble(r.Cells["發行張數"].Value);
-                    double exeRatio = Convert.ToDouble(r.Cells["行使比例"].Value);
-                    string applyTime = r.Cells["申報時間"].Value.ToString();
+                    string issuer = r.Cells["Issuer"].Value.ToString();
+                    string warrantName = r.Cells["WarrantName"].Value.ToString();
+                    string underlyingID = r.Cells["UnderlyingID"].Value.ToString();
+                    double issueNum = Convert.ToDouble(r.Cells["IssueNum"].Value);
+                    double exeRatio = Convert.ToDouble(r.Cells["exeRatio"].Value);
+                    string applyTime = r.Cells["ApplyTime"].Value.ToString();
                     double availableShares = 0.0;
                     double lastDayUsedShares = 0.0;
                     double todayApplyShares = 0.0;
@@ -196,13 +162,13 @@ namespace WarrantAssistant
                         lastDayUsedShares = 0.0;
                         todayApplyShares = 0.0;
                     } else {
-                        availableShares = Convert.ToDouble(r.Cells["可發行股數"].Value);
-                        lastDayUsedShares = Convert.ToDouble(r.Cells["截至前一日"].Value);
-                        todayApplyShares = Convert.ToDouble(r.Cells["本日累積發行"].Value);
+                        availableShares = Convert.ToDouble(r.Cells["AvailableShares"].Value);
+                        lastDayUsedShares = Convert.ToDouble(r.Cells["LastDayUsedShares"].Value);
+                        todayApplyShares = Convert.ToDouble(r.Cells["TodayApplyShares"].Value);
                     }
-                    string accUsedShares = r.Cells["累計%"].Value.ToString();
-                    string sameUnderlying = r.Cells["同標的2檔"].Value.ToString();
-                    string oriApplyTime = r.Cells["原始申報時間"].Value.ToString();
+                    string accUsedShares = r.Cells["AccUsedShares"].Value.ToString();
+                    string sameUnderlying = r.Cells["SameUnderlying"].Value.ToString();
+                    string oriApplyTime = r.Cells["OriApplyTime"].Value.ToString();
 
                     //string underlyingName = warrantName.Substring(1, warrantName.Length - 7);//需考慮以前的短權證名稱
 
@@ -210,9 +176,9 @@ namespace WarrantAssistant
                     string sqlTemp = "SELECT CASE WHEN [StockType]='DS' OR [StockType]='DR' THEN 0.22 ELSE 1 END AS Multiplier FROM [EDIS].[dbo].[WarrantUnderlying] WHERE UnderlyingID = '" + underlyingID + "'";
                     //DataView dv = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                     DataTable dv = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
-                    foreach (DataRow dr in dv.Rows) 
+                    foreach (DataRow dr in dv.Rows)
                         multiplier = Convert.ToDouble(dr["Multiplier"]);
-                    
+
                     double todayAvailable = Math.Round(((availableShares * multiplier - lastDayUsedShares) / 1000), 1);
                     double attempShares = issueNum * exeRatio;
                     double result = 0.0;
@@ -259,7 +225,7 @@ namespace WarrantAssistant
                     double accUsed = (lastDayUsedShares + todayApplyShares) / availableShares;
                     double reIssueResult = 0.0;
                     if (accUsed <= 0.3)
-                        reIssueResult = attempShares;                    
+                        reIssueResult = attempShares;
 
                     h.SetParameterValue("@Issuer", issuer);
                     h.SetParameterValue("@WarrantName", warrantName);
@@ -291,35 +257,22 @@ namespace WarrantAssistant
                                 WHERE [ApplyTotalList].[WarrantName]=B.WarrantName";
                 string sql4 = @"UPDATE [EDIS].[dbo].[ApplyTotalList]
                                 SET Result= CASE WHEN [RewardCredit]>=[EquivalentNum] THEN [EquivalentNum] ELSE [RewardCredit] END
-                                WHERE [UseReward]='Y'";
-
-                //SqlCommand cmd5 = new SqlCommand(sql5, conn);
-                //SqlCommand cmd2 = new SqlCommand(sql2, conn);
-                //SqlCommand cmd3 = new SqlCommand(sql3, conn);
-                //SqlCommand cmd4 = new SqlCommand(sql4, conn);
+                               WHERE [UseReward]='Y'";
 
                 conn.Open();
                 MSSQL.ExecSqlCmd(sql5, conn);
                 MSSQL.ExecSqlCmd(sql2, conn);
                 MSSQL.ExecSqlCmd(sql3, conn);
                 MSSQL.ExecSqlCmd(sql4, conn);
-                /*cmd5.ExecuteNonQuery();
-                cmd5.Dispose();
-                cmd2.ExecuteNonQuery();
-                cmd2.Dispose();
-                cmd3.ExecuteNonQuery();
-                cmd3.Dispose();
-                cmd4.ExecuteNonQuery();
-                cmd4.Dispose();*/
                 conn.Close();
 
                 toolStripLabel1.Text = DateTime.Now + "更新成功";
 
                 GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 更新7-1試算表");
-               
+
 
             } catch (Exception ex) {
-                GlobalUtility.LogInfo("Exception", GlobalVar.globalParameter.userID + "7-1試算表" + ex.Message);               
+                GlobalUtility.LogInfo("Exception", GlobalVar.globalParameter.userID + "7-1試算表" + ex.Message);
 
                 MessageBox.Show(ex.Message);
             }
@@ -330,6 +283,29 @@ namespace WarrantAssistant
             dt.Rows.Clear();
             isEdit = true;
             SetButton();
+
+            //Get key and id
+            DataTable dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='10'"
+                , GlobalVar.loginSet.warrantSysKeySqlConnString);
+            string key = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
+
+            dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='20'"
+                , GlobalVar.loginSet.warrantSysKeySqlConnString);
+            string id = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
+
+            string twseUrl = "http://siis.twse.com.tw/server-java/t150sa10?step=0&id=9200pd" + id + "&TYPEK=sii&key=" + key;
+            //dt.Rows.Clear();
+
+            //parse TWSE 7-1 html
+            if (!ParseHtml(twseUrl))
+                return;
+
+            //parse OTC 7-1 html
+            twseUrl = "http://siis.twse.com.tw/server-java/o_t150sa10?step=0&id=9200pd" + id + "&TYPEK=otc&key=" + key;
+            if (!ParseHtml(twseUrl))
+                return;
+
+            GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 下載7-1試算表");
         }
 
         private void toolStripButtonConfirm_Click(object sender, EventArgs e) {
@@ -346,25 +322,23 @@ namespace WarrantAssistant
         }
 
         private void ultraGrid1_InitializeRow(object sender, Infragistics.Win.UltraWinGrid.InitializeRowEventArgs e) {
-            string applyTime = e.Row.Cells["申報時間"].Value == DBNull.Value ? "" : e.Row.Cells["申報時間"].Value.ToString();
-            double issueNum = e.Row.Cells["發行張數"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Row.Cells["發行張數"].Value);
-            string underlyingID = e.Row.Cells["標的代號"].Value.ToString();
+            string applyTime = e.Row.Cells["ApplyTime"].Value == DBNull.Value ? "" : e.Row.Cells["ApplyTime"].Value.ToString();
+            double issueNum = e.Row.Cells["IssueNum"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Row.Cells["IssueNum"].Value);
+            string underlyingID = e.Row.Cells["UnderlyingID"].Value.ToString();
 
 
             if (applyTime.Length > 0) {
                 applyTime = applyTime.Substring(0, 2);
 
                 if (applyTime == "22")
-                    e.Row.Cells["申報時間"].Appearance.ForeColor = Color.Red;
+                    e.Row.Cells["ApplyTime"].Appearance.ForeColor = Color.Red;
 
                 if (applyTime == "09")
-                    e.Row.Cells["申報時間"].Appearance.ForeColor = Color.Green;
+                    e.Row.Cells["ApplyTime"].Appearance.ForeColor = Color.Green;
 
                 if (applyTime == "10" && issueNum != 10000)
-                    e.Row.Cells["發行張數"].Appearance.ForeColor = Color.Red;
+                    e.Row.Cells["IssueNum"].Appearance.ForeColor = Color.Red;
             }
-
-
         }
 
         private void ultraGrid1_Error(object sender, Infragistics.Win.UltraWinGrid.ErrorEventArgs e) {
@@ -374,34 +348,6 @@ namespace WarrantAssistant
 
         private void toolStripLabel1_Click(object sender, EventArgs e) {
 
-        }
-
-        private void toolStripButtonGetData_Click(object sender, EventArgs e) {
-            //Get key and id
-            DataTable dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='10'"
-                , GlobalVar.loginSet.warrantSysKeySqlConnString);
-            string key = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();            
-
-            dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='20'"
-                , GlobalVar.loginSet.warrantSysKeySqlConnString);
-            string id = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
-
-           // DateTime lastTrade = TradeDate.LastNTradeDateDT(1);
-            //string aday = (lastTrade.Year - 1911) + lastTrade.ToString("MMdd");
-            string twseUrl = "http://siis.twse.com.tw/server-java/t150sa10?step=0&id=9200pd" + id + "&TYPEK=sii&key=" + key;
-
-            dt.Rows.Clear();
-
-            //parse TWSE 7-1 html
-            if (!ParseHtml(twseUrl))
-                return;
-
-            //parse OTC 7-1 html
-            twseUrl = "http://siis.twse.com.tw/server-java/o_t150sa10?step=0&id=9200pd" + id + "&TYPEK=otc&key=" + key;
-            if (!ParseHtml(twseUrl))
-                return;
-
-            GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 下載7-1試算表");
         }
 
         private bool ParseHtml(string url) {
@@ -425,48 +371,47 @@ namespace WarrantAssistant
                         continue;
                     DataRow dr = dt.NewRow();
 
-                    dr["發行人"] = split[0];
-                    dr["權證名稱"] = split[1];
-                    dr["標的代號"] = split[2];
-                    dr["發行張數"] = split[3];
-                    dr["行使比例"] = split[4];
-                    dr["申報時間"] = split[5];                    
+                    dr["Issuer"] = split[0];
+                    dr["WarrantName"] = split[1];
+                    dr["UnderlyingID"] = split[2];
+                    dr["IssueNum"] = split[3];
+                    dr["exeRatio"] = split[4];
+                    dr["ApplyTime"] = split[5];
                     if (double.TryParse(split[6], out double result)) {
-                        dr["可發行股數"] = split[6];
-                        dr["截至前一日"] = split[7];
-                        dr["本日累積發行"] = split[8];
-                        dr["累計%"] = split[9];
+                        dr["AvailableShares"] = split[6];
+                        dr["LastDayUsedShares"] = split[7];
+                        dr["TodayApplyShares"] = split[8];
+                        dr["AccUsedShares"] = split[9];
                     } else {
-                        dr["可發行股數"] = 0;
-                        dr["截至前一日"] = 0;
-                        dr["本日累積發行"] = 0;
+                        dr["AvailableShares"] = 0;
+                        dr["LastDayUsedShares"] = 0;
+                        dr["TodayApplyShares"] = 0;
                     }
 
                     if (!split[10].StartsWith("&nbsp"))
-                        dr["同標的2檔"] = split[10];
+                        dr["SameUnderlying"] = split[10];
                     if (!split[11].StartsWith("&nbsp"))
-                        dr["原始申報時間"] = split[11];
+                        dr["OriApplyTime"] = split[11];
 
                     dt.Rows.Add(dr);
                 }
                 return true;
             } catch (Exception e) {
-                MessageBox.Show(e.Message);
-                MessageBox.Show("可能要更新Key");
+                //MessageBox.Show(e.Message);
+                MessageBox.Show("可能要更新Key或是還沒有資料");
                 return false;
             }
         }
 
-        /*
-private void ultraGrid1_CellDataError(object sender, Infragistics.Win.UltraWinGrid.CellDataErrorEventArgs e)
-{
-if (isEdit)
-{
-e.RaiseErrorEvent = false;
-e.StayInEditMode = false;
-}
-}
-*/
+        private void Edit2_Click(object sender, EventArgs e) {
+            ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.Yes;
+            ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
+            ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.True;
+            dt.Rows.Clear();
+            for (int x = 0; x < 100; x++)
+                ultraGrid1.DisplayLayout.Bands[0].AddNew();
 
+            ultraGrid1.ActiveRowScrollRegion.ScrollRowIntoView(ultraGrid1.Rows[0]);
+        }
     }
 }
