@@ -922,7 +922,7 @@ namespace WarrantAssistant
                                       FROM [EDIS].[dbo].[WarrantUnderlying] a
                                       LEFT JOIN [EDIS].[dbo].[WarrantPrices] b ON a.UnderlyingID=b.CommodityID ";
                 sqlTemp += "WHERE  CAST(UnderlyingID as varbinary(100)) = CAST('" + underlyingID + "' as varbinary(100))";
-                // sqlTemp += "WHERE UnderlyingID = '" + underlyingID + "'";
+               
                 //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                 DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                 foreach (DataRow drTemp in dvTemp.Rows) {
@@ -936,6 +936,21 @@ namespace WarrantAssistant
                 e.Cell.Row.Cells["標的名稱"].Value = underlyingName;
                 e.Cell.Row.Cells["交易員"].Value = traderID;
                 e.Cell.Row.Cells["股價"].Value = underlyingPrice;
+
+                // TODO Check Relation
+                sqlTemp = "Select count(1) from [VOLDB].[dbo].[ED_RelationUnderlying]" 
+                    + " where RecordDate = '" + DateTime.Today.ToString("yyyyMMdd") +"' and CS8010 = '"+underlyingID + "'";
+                dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edis20SqlConnString);
+                if (dvTemp.Rows[0][0].ToString() != "0") {
+                    sqlTemp = "SELECT MAX([IssueVol]), min(IssueVol) FROM[dbo].[WARRANTS] where kgiwrt = '他家' " 
+                        + " and stkid = '" + underlyingID + "' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0";
+                    dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edis20SqlConnString);
+                    if (dvTemp.Rows[0][1] != DBNull.Value)
+                        MessageBox.Show("此為關係人標的，波動度需介於 " + dvTemp.Rows[0][1] + " 與 " + dvTemp.Rows[0][0] + " 之間");
+                    else
+                        MessageBox.Show("此為關係人標的，須注意波動度");
+                }
+                
             }
 
             if (e.Cell.Column.Key == "重設比") {

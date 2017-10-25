@@ -129,6 +129,7 @@ namespace WarrantAssistant
 
         public static void LoadLoginSet() {
             GlobalVar.loginSet = new LoginSet {
+                edis20SqlConnString = "SERVER=10.19.1.20;DATABASE=EDIS;UID=WarrantWeb;PWD=WarrantWeb",
                 edisSqlConnString = "SERVER=10.10.1.30;DATABASE=EDIS;UID=WarrantWeb;PWD=WarrantWeb",
                 tsquoteSqlConnString = "SERVER=10.60.0.37;DATABASE=TsQuote;UID=WarrantWeb;PWD=WarrantWeb",
                 warrantSysSqlConnString = "SERVER=10.7.0.52;DATABASE=WAFT;UID=eduser;PWD=eduser",
@@ -203,6 +204,7 @@ namespace WarrantAssistant
 
     public class LoginSet
     {
+        public string edis20SqlConnString = "";
         public string edisSqlConnString = "";
         public string tsquoteSqlConnString = "";
         public string warrantSysSqlConnString = "";
