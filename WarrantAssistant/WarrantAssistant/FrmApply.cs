@@ -55,7 +55,7 @@ namespace WarrantAssistant
             dt.Columns.Add("確認", typeof(bool));
             dt.Columns["確認"].ReadOnly = false;
             dt.Columns.Add("Adj", typeof(double));
-            dt.Columns.Add("發行原因", typeof(string));            
+            dt.Columns.Add("發行原因", typeof(string));
             dt.Columns.Add("發行價格", typeof(double));
             dt.Columns.Add("標的名稱", typeof(string));
             dt.Columns.Add("股價", typeof(double));
@@ -233,12 +233,12 @@ namespace WarrantAssistant
                         dr["發行原因"] = drv["Reason"] == DBNull.Value ? 0 : Convert.ToInt32(drv["Reason"]);
                         dr["1500W"] = drv["Apply1500W"];
                         dr["標的名稱"] = drv["UnderlyingName"].ToString();
-                        double underlyingPrice = Convert.ToDouble(drv["MPrice"]);                        
+                        double underlyingPrice = Convert.ToDouble(drv["MPrice"]);
                         dr["股價"] = underlyingPrice;
                         dr["市場"] = drv["Market"].ToString();
                         dr["約當張數"] = Convert.ToDouble(drv["EquivalentNum"]);
-                        double credit = Math.Floor((double) drv["IssueCredit"]);                        
-                        double rewardCredit = Math.Floor((double) drv["RewardIssueCredit"]);                        
+                        double credit = Math.Floor((double) drv["IssueCredit"]);
+                        double rewardCredit = Math.Floor((double) drv["RewardIssueCredit"]);
                         dr["今日額度"] = credit;
                         dr["獎勵額度"] = rewardCredit;
                         double adj = (double) drv["Adj"];
@@ -263,7 +263,7 @@ namespace WarrantAssistant
                         dr["發行價格"] = Math.Round(price, 2);
 
                         double jumpSize = 0.0;
-                        double multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);                       
+                        double multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);
                         /*if (underlyingID.Substring(0, 2) == "00") {
                             if (underlyingPrice <= 50)
                                 multiplier = 0.01;
@@ -288,7 +288,7 @@ namespace WarrantAssistant
                         double vol_ = vol;
                         double price_ = price;
                         double lowerLimit = 0.0;
-                        double totalValue = price_ * shares * 1000;                       
+                        double totalValue = price_ * shares * 1000;
                         double volLimit = 2 * vol_;
                         while (totalValue < 15000000 && vol_ < volLimit) {
                             vol_ += 0.01;
@@ -299,7 +299,7 @@ namespace WarrantAssistant
                             else
                                 price_ = Pricing.NormalWarrantPrice(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol_, t, cr);
                             totalValue = price_ * shares * 1000;
-                        }                        
+                        }
                         lowerLimit = Math.Max(0.01, price_ - (underlyingPrice + adj) * 0.1 * cr);
 
                         dr["IV*"] = vol_ * 100;
@@ -308,7 +308,7 @@ namespace WarrantAssistant
 
                         dr["Delta"] = Math.Round(delta, 4);
                         dr["跳動價差"] = Math.Round(jumpSize, 4);
-                        
+
                         dt.Rows.Add(dr);
                     }
                 }
@@ -336,14 +336,29 @@ namespace WarrantAssistant
             bool dataOK = true;
             string sql2 = "SELECT [UnderlyingID]"
              + " FROM [EDIS].[dbo].[ApplyTempList]"
-             + " WHERE [UserID]='" + userID + "' AND [ConfirmChecked]='Y' and (HV = 0 or IV = 0 or IssueNum = 0 or T = 0 or K = 0)";
+             + $" WHERE [UserID]='{userID}' AND [ConfirmChecked]='Y' and (HV = 0 or IV = 0 or IssueNum = 0 or T = 0 or K = 0)";
 
-            DataTable noReason = MSSQL.ExecSqlQry(sql2, conn);// new DataTable("noReason");            
+            DataTable badParam = MSSQL.ExecSqlQry(sql2, conn);// new DataTable("noReason");            
 
-            foreach (DataRow Row in noReason.Rows) {
+            foreach (DataRow Row in badParam.Rows) {
                 MessageBox.Show(Row["UnderlyingID"] + " 發行條件輸入有誤，會被後臺某些人罵，避免他們該該叫，請修改條件。");
                 dataOK = false;
             }
+
+            sql2 = "SELECT [UnderlyingID] FROM [EDIS].[dbo].[ApplyTempList] as A "
+                + " left join (Select CS8010, count(1) as count from [10.19.1.20].[VOLDB].[dbo].[ED_RelationUnderlying] "
+                          + $" where RecordDate = '{DateTime.Today.ToString("yyyyMMdd")}'"
+                           + " group by CS8010) as B on A.UnderlyingID = B.CS8010 "
+                 + " left join (SELECT stkid, MAX([IssueVol]) as MAX, min(IssueVol) as min FROM[10.19.1.20].[EDIS].[dbo].[WARRANTS]"
+                            + " where kgiwrt = '他家' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0 "
+                            + " group by stkid ) as C on A.UnderlyingID = C.stkid "
+                + $" WHERE [UserID] = '{userID}' AND [ConfirmChecked] = 'Y' and B.count > 0 and (IV > C.MAX or IV < C.min)";
+            badParam = MSSQL.ExecSqlQry(sql2, conn);
+            foreach (DataRow Row in badParam.Rows) {
+                MessageBox.Show(Row["UnderlyingID"] + " 為關係人標的，波動度超過可發範圍，會被稽核該該叫，請修改條件。");
+                dataOK = false;
+            }
+
             return dataOK;
         }
 
@@ -663,7 +678,7 @@ namespace WarrantAssistant
                 ultraGrid1.DisplayLayout.Bands[0].Columns["約當張數"].Hidden = true;
                 ultraGrid1.DisplayLayout.Bands[0].Columns["今日額度"].Hidden = true;
                 ultraGrid1.DisplayLayout.Bands[0].Columns["獎勵額度"].Hidden = true;
-                               
+
             } else {
                 bands0.Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
                 bands0.Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
@@ -744,12 +759,7 @@ namespace WarrantAssistant
                 ValueList v3;
                 v3 = e.Layout.ValueLists.Add("MyValueList3");
                 foreach (var item in GlobalVar.globalParameter.traders)
-                    v3.ValueListItems.Add(item, item);
-                /*v3.ValueListItems.Add("0005986", "0005986");
-                v3.ValueListItems.Add("0007643", "0007643");
-                v3.ValueListItems.Add("0008570", "0008570");
-                v3.ValueListItems.Add("0008730", "0008730");
-                v3.ValueListItems.Add("0010120", "0010120");*/
+                    v3.ValueListItems.Add(item, item);                
             }
             e.Layout.Bands[0].Columns["交易員"].ValueList = e.Layout.ValueLists["MyValueList3"];
 
@@ -787,12 +797,7 @@ namespace WarrantAssistant
 
             DialogResult result = MessageBox.Show("將全部刪除，確定?", "刪除資料", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (result == DialogResult.Yes) {
-                MSSQL.ExecSqlCmd("DELETE FROM [ApplyTempList] WHERE UserID='" + userID + "'", conn);
-                /*SqlCommand cmd = new SqlCommand("DELETE FROM [ApplyTempList] WHERE UserID='" + userID + "'", conn);
-                conn.Open();
-                cmd.ExecuteNonQuery();
-                cmd.Dispose();
-                conn.Close();*/
+                MSSQL.ExecSqlCmd("DELETE FROM [ApplyTempList] WHERE UserID='" + userID + "'", conn);               
             }
             LoadData();
             SetButton();
@@ -806,7 +811,7 @@ namespace WarrantAssistant
 
         private void UltraGrid1_InitializeRow(object sender, InitializeRowEventArgs e) {
             string cp = e.Row.Cells["CP"].Value.ToString();
-            string underlyingID = e.Row.Cells["標的代號"].Value.ToString();            
+            string underlyingID = e.Row.Cells["標的代號"].Value.ToString();
             string underlyingName = e.Row.Cells["標的名稱"].Value.ToString();
             double price = e.Row.Cells["發行價格"].Value == DBNull.Value ? 0.0 : Convert.ToDouble(e.Row.Cells["發行價格"].Value);
             double price_ = e.Row.Cells["發行價格*"].Value == DBNull.Value ? 0.0 : Convert.ToDouble(e.Row.Cells["發行價格*"].Value);
@@ -921,8 +926,8 @@ namespace WarrantAssistant
                                           ,a.TraderID TraderID
                                       FROM [EDIS].[dbo].[WarrantUnderlying] a
                                       LEFT JOIN [EDIS].[dbo].[WarrantPrices] b ON a.UnderlyingID=b.CommodityID ";
-                sqlTemp += "WHERE  CAST(UnderlyingID as varbinary(100)) = CAST('" + underlyingID + "' as varbinary(100))";
-               
+                sqlTemp += $"WHERE  CAST(UnderlyingID as varbinary(100)) = CAST('{underlyingID}' as varbinary(100))";
+
                 //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                 DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                 foreach (DataRow drTemp in dvTemp.Rows) {
@@ -937,30 +942,30 @@ namespace WarrantAssistant
                 e.Cell.Row.Cells["交易員"].Value = traderID;
                 e.Cell.Row.Cells["股價"].Value = underlyingPrice;
 
-                // TODO Check Relation
-                sqlTemp = "Select count(1) from [VOLDB].[dbo].[ED_RelationUnderlying]" 
-                    + " where RecordDate = '" + DateTime.Today.ToString("yyyyMMdd") +"' and CS8010 = '"+underlyingID + "'";
+                // Check Relation
+                sqlTemp = "Select count(1) from [VOLDB].[dbo].[ED_RelationUnderlying]"
+                    + $" where RecordDate = '{DateTime.Today.ToString("yyyyMMdd")}' and CS8010 = '{underlyingID}'";
                 dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edis20SqlConnString);
                 if (dvTemp.Rows[0][0].ToString() != "0") {
-                    sqlTemp = "SELECT MAX([IssueVol]), min(IssueVol) FROM[dbo].[WARRANTS] where kgiwrt = '他家' " 
-                        + " and stkid = '" + underlyingID + "' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0";
+                    sqlTemp = "SELECT MAX([IssueVol]), min(IssueVol) FROM[dbo].[WARRANTS] where kgiwrt = '他家' "
+                        + $" and stkid = '{underlyingID}' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0";
                     dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edis20SqlConnString);
                     if (dvTemp.Rows[0][1] != DBNull.Value)
-                        MessageBox.Show("此為關係人標的，波動度需介於 " + dvTemp.Rows[0][1] + " 與 " + dvTemp.Rows[0][0] + " 之間");
+                        MessageBox.Show($"此為關係人標的，波動度需介於 {dvTemp.Rows[0][1]} 與 {dvTemp.Rows[0][0]} 之間，不然會被稽核該該叫。");
                     else
-                        MessageBox.Show("此為關係人標的，須注意波動度");
+                        MessageBox.Show("此為關係人標的，須注意波動度，不然會被稽核該該叫。");
                 }
-                
+
             }
 
             if (e.Cell.Column.Key == "重設比") {
                 double underlyingPrice = e.Cell.Row.Cells["股價"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["股價"].Value);
                 double resetR = e.Cell.Row.Cells["重設比"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["重設比"].Value) / 100;
-                double k = Math.Round(underlyingPrice * resetR, 2);                
+                double k = Math.Round(underlyingPrice * resetR, 2);
                 e.Cell.Row.Cells["履約價"].Value = k;
             }
 
-            if (e.Cell.Column.Key == "履約價" || e.Cell.Column.Key == "期間(月)" || e.Cell.Column.Key == "行使比例" || e.Cell.Column.Key == "IV" 
+            if (e.Cell.Column.Key == "履約價" || e.Cell.Column.Key == "期間(月)" || e.Cell.Column.Key == "行使比例" || e.Cell.Column.Key == "IV"
                 || e.Cell.Column.Key == "財務費用" || e.Cell.Column.Key == "類型" || e.Cell.Column.Key == "CP" || e.Cell.Column.Key == "張數" || e.Cell.Column.Key == "Adj") {
                 double price = 0.0;
                 double delta = 0.0;
@@ -1018,26 +1023,7 @@ namespace WarrantAssistant
                         delta = 1.0;
                     else
                         delta = Pricing.Delta(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
-                    multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);
-                    /*if (underlyingID.Substring(0, 2) == "00") {
-                        if (underlyingPrice <= 50)
-                            multiplier = 0.01;
-                        else
-                            multiplier = 0.05;
-                    } else {
-                        if (underlyingPrice <= 10)
-                            multiplier = 0.01;
-                        else if (underlyingPrice > 10 && underlyingPrice <= 50)
-                            multiplier = 0.05;
-                        else if (underlyingPrice > 50 && underlyingPrice <= 100)
-                            multiplier = 0.1;
-                        else if (underlyingPrice > 100 && underlyingPrice <= 500)
-                            multiplier = 0.5;
-                        else if (underlyingPrice > 500 && underlyingPrice <= 1000)
-                            multiplier = 1;
-                        else if (underlyingPrice > 1000)
-                            multiplier = 5;
-                    }*/
+                    multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);                   
                 }
 
                 jumpSize = delta * multiplier;

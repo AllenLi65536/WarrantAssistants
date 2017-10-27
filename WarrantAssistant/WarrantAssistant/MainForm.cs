@@ -503,9 +503,7 @@ namespace WarrantAssistant
                         if (is1500W == "Y") {
                             CallPutType cpType = CallPutType.Call;
                             if (cp == "P")
-                                cpType = CallPutType.Put;
-                            else
-                                cpType = CallPutType.Call;
+                                cpType = CallPutType.Put;                            
 
                             if (type == "牛熊證")
                                 p = Pricing.BullBearWarrantPrice(cpType, stockPrice, resetR, GlobalVar.globalParameter.interestRate, vol, t, financialR, cr);
@@ -540,6 +538,20 @@ namespace WarrantAssistant
                                 h.SetParameterValue("@SerialNumber", serialNum);
                                 h.ExecuteCommand();
                                 h.Dispose();
+                            }
+
+                            string sql2 = "SELECT [UnderlyingID] FROM [EDIS].[dbo].[ApplyOfficial] as A "
+                                       + " left join (Select CS8010, count(1) as count from [10.19.1.20].[VOLDB].[dbo].[ED_RelationUnderlying] "
+                                                  + $" where RecordDate = '{DateTime.Today.ToString("yyyyMMdd")}'"
+                                                   + " group by CS8010) as B on A.UnderlyingID = B.CS8010 "
+                                       + " left join (SELECT stkid, MAX([IssueVol]) as MAX, min(IssueVol) as min FROM[10.19.1.20].[EDIS].[dbo].[WARRANTS]"
+                                                  + " where kgiwrt = '他家' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0 "
+                                                  + " group by stkid ) as C on A.UnderlyingID = C.stkid "
+                                        + " WHERE B.count > 0 and (IVNew > C.MAX or IVNew < C.min)";
+                            System.Data.DataTable badParam = MSSQL.ExecSqlQry(sql2, GlobalVar.loginSet.edisSqlConnString);
+                            foreach (DataRow Row in badParam.Rows) {
+                                MessageBox.Show(Row["UnderlyingID"] + " 為關係人標的，波動度超過可發範圍，會被稽核該該叫，請修改條件。");
+                                //dataOK = false;
                             }
                         }
 
