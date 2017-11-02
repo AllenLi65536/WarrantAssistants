@@ -264,25 +264,7 @@ namespace WarrantAssistant
 
                         double jumpSize = 0.0;
                         double multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);
-                        /*if (underlyingID.Substring(0, 2) == "00") {
-                            if (underlyingPrice <= 50)
-                                multiplier = 0.01;
-                            else
-                                multiplier = 0.05;
-                        } else {
-                            if (underlyingPrice <= 10)
-                                multiplier = 0.01;
-                            else if (underlyingPrice > 10 && underlyingPrice <= 50)
-                                multiplier = 0.05;
-                            else if (underlyingPrice > 50 && underlyingPrice <= 100)
-                                multiplier = 0.1;
-                            else if (underlyingPrice > 100 && underlyingPrice <= 500)
-                                multiplier = 0.5;
-                            else if (underlyingPrice > 500 && underlyingPrice <= 1000)
-                                multiplier = 1;
-                            else if (underlyingPrice > 1000)
-                                multiplier = 5;
-                        }*/
+                        
                         jumpSize = delta * multiplier;
 
                         double vol_ = vol;
@@ -321,7 +303,7 @@ namespace WarrantAssistant
             bool undoneReason = true;
             string sql2 = "SELECT [UnderlyingID]"
              + " FROM [EDIS].[dbo].[ApplyTempList] as A left join Underlying_TraderIssue as B on A.UnderlyingID = B.UID " //or(A.UnderlyingID = 'IX0001' and B.UID ='TWA00')
-             + " WHERE [UserID]='" + userID + "' AND [ConfirmChecked]='Y' and ((Reason=0  and A.CP='C') or (ReasonP = 0 and A.CP = 'P'))";//
+             + $" WHERE [UserID]='{userID}' AND [ConfirmChecked]='Y' and ((Reason=0  and A.CP='C') or (ReasonP = 0 and A.CP = 'P'))";//
 
             DataTable noReason = MSSQL.ExecSqlQry(sql2, conn);// new DataTable("noReason");            
 
@@ -347,7 +329,7 @@ namespace WarrantAssistant
 
             sql2 = "SELECT [UnderlyingID] FROM [EDIS].[dbo].[ApplyTempList] as A "
                 + " left join (Select CS8010, count(1) as count from [10.19.1.20].[VOLDB].[dbo].[ED_RelationUnderlying] "
-                          + $" where RecordDate = '{DateTime.Today.ToString("yyyyMMdd")}'"
+                          + $" where RecordDate = (select top 1 RecordDate from [VOLDB].[dbo].[ED_RelationUnderlying])"
                            + " group by CS8010) as B on A.UnderlyingID = B.CS8010 "
                  + " left join (SELECT stkid, MAX([IssueVol]) as MAX, min(IssueVol) as min FROM[10.19.1.20].[EDIS].[dbo].[WARRANTS]"
                             + " where kgiwrt = '他家' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0 "
@@ -355,7 +337,7 @@ namespace WarrantAssistant
                 + $" WHERE [UserID] = '{userID}' AND [ConfirmChecked] = 'Y' and B.count > 0 and (IV > C.MAX or IV < C.min)";
             badParam = MSSQL.ExecSqlQry(sql2, conn);
             foreach (DataRow Row in badParam.Rows) {
-                MessageBox.Show(Row["UnderlyingID"] + " 為關係人標的，波動度超過可發範圍，會被稽核該該叫，請修改條件。");
+                MessageBox.Show(Row["UnderlyingID"] + " 為關係人標的，波動度超過可發範圍，會被稽核靠邀，請修改條件。");
                 dataOK = false;
             }
 
@@ -462,7 +444,7 @@ namespace WarrantAssistant
                         DateTime expiryDate = GlobalVar.globalParameter.nextTradeDate3.AddMonths(t);
                         if (expiryDate.Day == GlobalVar.globalParameter.nextTradeDate3.Day)
                             expiryDate = expiryDate.AddDays(-1);
-                        string sqlTemp = "SELECT TOP 1 TradeDate from TradeDate WHERE IsTrade='Y' AND TradeDate >= '" + expiryDate.ToString("yyyy-MM-dd") + "'";
+                        string sqlTemp = $"SELECT TOP 1 TradeDate from TradeDate WHERE IsTrade='Y' AND TradeDate >= '{expiryDate.ToString("yyyy-MM-dd")}'";
                         //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.tsquoteSqlConnString);
                         DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.tsquoteSqlConnString);
                         foreach (DataRow drTemp in dvTemp.Rows) {
@@ -559,19 +541,19 @@ namespace WarrantAssistant
                 if (!CheckData())
                     return;
 
-                string sql1 = "DELETE FROM [EDIS].[dbo].[ApplyOfficial] WHERE [UserID]='" + userID + "'";
+                string sql1 = $"DELETE FROM [EDIS].[dbo].[ApplyOfficial] WHERE [UserID]='{userID}'";
                 string sql2 = @"INSERT INTO [EDIS].[dbo].[ApplyOfficial] ([SerialNumber],[UnderlyingID],[K],[T],[R],[HV],[IV],[IssueNum],[ResetR],[BarrierR],[FinancialR],[Type],[CP],[UseReward],[Apply1500W],[TempName],[TraderID],[MDate],UserID, IVNew)
                                 SELECT [SerialNum],[UnderlyingID],[K],[T],[R],[HV],[IV],[IssueNum],[ResetR],[BarrierR],[FinancialR],[Type],[CP],[UseReward],[Apply1500W],[TempName],[TraderID],[MDate],UserID, IVNew"
                 //sql2 += "'"+userID + "', [MDate]" ;
                  + " FROM [EDIS].[dbo].[ApplyTempList]"
-                 + " WHERE [UserID]='" + userID + "' AND [ConfirmChecked]='Y'";
+                 + $" WHERE [UserID]='{userID}' AND [ConfirmChecked]='Y'";
 
-                string sql3 = "DELETE FROM [EDIS].[dbo].[ApplyTotalList] WHERE [UserID]='" + userID + "' AND [ApplyKind]='1'";
+                string sql3 = $"DELETE FROM [EDIS].[dbo].[ApplyTotalList] WHERE [UserID]='{userID}' AND [ApplyKind]='1'";
                 string sql4 = @"INSERT INTO [EDIS].[dbo].[ApplyTotalList] ([ApplyKind],[SerialNum],[Market],[UnderlyingID],[WarrantName],[CR] ,[IssueNum],[EquivalentNum],[Credit],[RewardCredit],[Type],[CP],[UseReward],[MarketTmr],[TraderID],[MDate],UserID)
                                 SELECT '1',a.SerialNumber, b.Market, a.UnderlyingID, a.TempName, a.R, a.IssueNum, ROUND(a.R*a.IssueNum, 2), b.IssueCredit, b.RewardIssueCredit, a.Type, a.CP, a.UseReward,'N', a.TraderID, GETDATE(), a.UserID
                                 FROM [EDIS].[dbo].[ApplyOfficial] a
                                 LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingSummary] b ON a.UnderlyingID=b.UnderlyingID"
-                  + " WHERE a.[UserID]='" + userID + "'";
+                  + $" WHERE a.[UserID]='{userID}'";
 
                 conn.Open();
                 MSSQL.ExecSqlCmd(sql1, conn);
@@ -595,8 +577,8 @@ namespace WarrantAssistant
                     string serialNum = dr["SerialNum"].ToString();
                     string warrantName = dr["WarrantName"].ToString();
 
-                    string sqlTemp = "select top (1) WarrantName from (SELECT [WarrantName] FROM [EDIS].[dbo].[WarrantBasic] WHERE SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 1) + "' union "
-                     + " SELECT [WarrantName] FROM [EDIS].[dbo].[ApplyTotalList] WHERE [ApplyKind]='1' AND [SerialNum]<" + serialNum + " AND SUBSTRING(WarrantName,1,(len(WarrantName)-3))='" + warrantName.Substring(0, warrantName.Length - 1) + "') as tb1 "
+                    string sqlTemp = $"select top (1) WarrantName from (SELECT [WarrantName] FROM [EDIS].[dbo].[WarrantBasic] WHERE SUBSTRING(WarrantName,1,(len(WarrantName)-3))='{warrantName.Substring(0, warrantName.Length - 1)}' union "
+                     + $" SELECT [WarrantName] FROM [EDIS].[dbo].[ApplyTotalList] WHERE [ApplyKind]='1' AND [SerialNum]< {serialNum} AND SUBSTRING(WarrantName,1,(len(WarrantName)-3))='{warrantName.Substring(0, warrantName.Length - 1)}') as tb1 "
                      + " order by SUBSTRING(WarrantName,len(WarrantName)-1,len(WarrantName)) desc";
                     //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                     DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
@@ -797,7 +779,7 @@ namespace WarrantAssistant
 
             DialogResult result = MessageBox.Show("將全部刪除，確定?", "刪除資料", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (result == DialogResult.Yes) {
-                MSSQL.ExecSqlCmd("DELETE FROM [ApplyTempList] WHERE UserID='" + userID + "'", conn);               
+                MSSQL.ExecSqlCmd($"DELETE FROM [ApplyTempList] WHERE UserID='{userID}'", conn);               
             }
             LoadData();
             SetButton();
@@ -827,7 +809,7 @@ namespace WarrantAssistant
             string toolTip2 = "發行檢查=N";
             string toolTip3 = "非此使用者所屬標的";
             string toolTip4 = "此檔Put須告知主管";
-            string sqlTemp = "SELECT [TraderID], [Issuable], [PutIssuable] FROM [EDIS].[dbo].[WarrantUnderlyingSummary] WHERE UnderlyingID = '" + underlyingID + "'";
+            string sqlTemp = $"SELECT [TraderID], [Issuable], [PutIssuable] FROM [EDIS].[dbo].[WarrantUnderlyingSummary] WHERE UnderlyingID = '{underlyingID}'";
             //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
             DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
             if (dvTemp.Rows.Count > 0) {
@@ -944,16 +926,16 @@ namespace WarrantAssistant
 
                 // Check Relation
                 sqlTemp = "Select count(1) from [VOLDB].[dbo].[ED_RelationUnderlying]"
-                    + $" where RecordDate = '{DateTime.Today.ToString("yyyyMMdd")}' and CS8010 = '{underlyingID}'";
+                    + $" where RecordDate = (select top 1 RecordDate from [VOLDB].[dbo].[ED_RelationUnderlying]) and CS8010 = '{underlyingID}'";
                 dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edis20SqlConnString);
                 if (dvTemp.Rows[0][0].ToString() != "0") {
                     sqlTemp = "SELECT MAX([IssueVol]), min(IssueVol) FROM[dbo].[WARRANTS] where kgiwrt = '他家' "
                         + $" and stkid = '{underlyingID}' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0";
                     dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edis20SqlConnString);
                     if (dvTemp.Rows[0][1] != DBNull.Value)
-                        MessageBox.Show($"此為關係人標的，波動度需介於 {dvTemp.Rows[0][1]} 與 {dvTemp.Rows[0][0]} 之間，不然會被稽核該該叫。");
+                        MessageBox.Show($"此為關係人標的，波動度需介於 {dvTemp.Rows[0][1]} 與 {dvTemp.Rows[0][0]} 之間，不然稽核會該該叫。");
                     else
-                        MessageBox.Show("此為關係人標的，須注意波動度，不然會被稽核該該叫。");
+                        MessageBox.Show("此為關係人標的，須注意波動度，不然稽核會該該叫。");
                 }
 
             }

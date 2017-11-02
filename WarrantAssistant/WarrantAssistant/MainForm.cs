@@ -542,7 +542,7 @@ namespace WarrantAssistant
 
                             string sql2 = "SELECT [UnderlyingID] FROM [EDIS].[dbo].[ApplyOfficial] as A "
                                        + " left join (Select CS8010, count(1) as count from [10.19.1.20].[VOLDB].[dbo].[ED_RelationUnderlying] "
-                                                  + $" where RecordDate = '{DateTime.Today.ToString("yyyyMMdd")}'"
+                                                  + $" where RecordDate = (select top 1 RecordDate from [VOLDB].[dbo].[ED_RelationUnderlying])"
                                                    + " group by CS8010) as B on A.UnderlyingID = B.CS8010 "
                                        + " left join (SELECT stkid, MAX([IssueVol]) as MAX, min(IssueVol) as min FROM[10.19.1.20].[EDIS].[dbo].[WARRANTS]"
                                                   + " where kgiwrt = '他家' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0 "

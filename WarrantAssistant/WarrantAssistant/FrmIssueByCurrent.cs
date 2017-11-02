@@ -30,11 +30,7 @@ namespace WarrantAssistant
         {
             foreach (var item in GlobalVar.globalParameter.traders)
                 toolStripComboBox1.Items.Add(item.TrimStart('0'));
-            /*toolStripComboBox1.Items.Add("5986");
-            toolStripComboBox1.Items.Add("7643");
-            toolStripComboBox1.Items.Add("8570");
-            toolStripComboBox1.Items.Add("8730");
-            toolStripComboBox1.Items.Add("10120");*/
+
             toolStripComboBox1.Text = userID.TrimStart('0');
             InitialGrid();
             LoadTraderSql();
