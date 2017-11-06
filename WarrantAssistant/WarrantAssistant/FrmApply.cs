@@ -337,7 +337,7 @@ namespace WarrantAssistant
                 + $" WHERE [UserID] = '{userID}' AND [ConfirmChecked] = 'Y' and B.count > 0 and (IV > C.MAX or IV < C.min)";
             badParam = MSSQL.ExecSqlQry(sql2, conn);
             foreach (DataRow Row in badParam.Rows) {
-                MessageBox.Show(Row["UnderlyingID"] + " 為關係人標的，波動度超過可發範圍，會被稽核靠邀，請修改條件。");
+                MessageBox.Show(Row["UnderlyingID"] + " 為關係人標的，波動度超過可發範圍，會被稽核稽稽歪歪，請修改條件。");
                 dataOK = false;
             }
 
@@ -933,9 +933,9 @@ namespace WarrantAssistant
                         + $" and stkid = '{underlyingID}' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0";
                     dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edis20SqlConnString);
                     if (dvTemp.Rows[0][1] != DBNull.Value)
-                        MessageBox.Show($"此為關係人標的，波動度需介於 {dvTemp.Rows[0][1]} 與 {dvTemp.Rows[0][0]} 之間，不然稽核會該該叫。");
+                        MessageBox.Show($"此為關係人標的，波動度需介於 {dvTemp.Rows[0][1]} 與 {dvTemp.Rows[0][0]} 之間，不然雞盒會該該叫。");
                     else
-                        MessageBox.Show("此為關係人標的，須注意波動度，不然稽核會該該叫。");
+                        MessageBox.Show("此為關係人標的，須注意波動度，不然雞盒會靠邀。");
                 }
 
             }

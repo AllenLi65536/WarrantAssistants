@@ -30,15 +30,21 @@ namespace WarrantDataManager2._0
             GlobalVar.loginSet.edisSqlConnString = "SERVER=10.10.1.30;DATABASE=EDIS;UID=WarrantWeb;PWD=WarrantWeb";
             GlobalVar.loginSet.tsquoteSqlConnString = "SERVER=10.60.0.37;DATABASE=TsQuote;UID=WarrantWeb;PWD=WarrantWeb";
             GlobalVar.loginSet.warrantSysSqlConnString = "SERVER=10.7.0.52;DATABASE=WAFT;UID=warpap;PWD=warpap";
+            GlobalVar.loginSet.edaisysConnString = "SERVER=10.7.0.52;DATABASE=EDAISYS;UID=eduser;PWD=eduser";
         }
 
         public static void loadGlobalParameters() {
             if (GlobalVar.globalParameter == null)
                 GlobalVar.globalParameter = new GlobalParameter();
 
-            GlobalVar.globalParameter.interestRate = 0.025;
+            DataTable dt = MSSQL.ExecSqlQry("SELECT [InterestRate],[GivenRewardPercent] FROM [EDIS].[dbo].[Global]", GlobalVar.loginSet.edisSqlConnString);
+            GlobalVar.globalParameter.interestRate = Convert.ToDouble(dt.Rows[0]["InterestRate"]);
+            GlobalVar.globalParameter.givenRewardPercent = Convert.ToDouble(dt.Rows[0]["GivenRewardPercent"]);
+            //GlobalVar.globalParameter.isLevelA = Convert.ToBoolean(dt.Rows[0]["IsLevelA"]);
+
+            //GlobalVar.globalParameter.interestRate = 0.025;
             //A集券商獎勵額度目前為1%
-            GlobalVar.globalParameter.givenRewardPercent = 0.01;
+            //GlobalVar.globalParameter.givenRewardPercent = 0.01;
             //本季是否為A級券商
             //GlobalVar.globalParameter.isLevelA = true;
             checkIsLevelA();
@@ -49,18 +55,20 @@ namespace WarrantDataManager2._0
         }
 
         private static void checkIsLevelA() {
-            DataTable isA = MSSQL.ExecSqlQry(@"select FLGDAT_FLGVAR from EDAISYS.dbo.FLAGDATAS 
-                                         where FLGDAT_FLGNAM = 'WRT_MARKET_RATING'
-                                         and convert(varchar(10), GETDATE(), 112) between FLGDAT_FLGNBR and FLGDAT_ORDERS",
-                                         "SERVER=10.7.0.52;DATABASE=EDAISYS;UID=eduser;PWD=eduser");
-            if (isA.Rows.Count > 0 && isA.Rows[0][0].ToString() == "A")
+            DataTable isA = MSSQL.ExecSqlQry(@"select top 1 FLGDAT_FLGVAR from EDAISYS.dbo.FLAGDATAS 
+                                            where FLGDAT_FLGNAM = 'WRT_MARKET_RATING'
+                                            order by FLGDAT_ORDERS desc",
+                                            GlobalVar.loginSet.edaisysConnString);
+            if (isA.Rows.Count > 0 && isA.Rows[0][0].ToString() == "A") {
+                MSSQL.ExecSqlCmd("Update [Global] Set IsLevelA = 1", GlobalVar.loginSet.edisSqlConnString);
                 GlobalVar.globalParameter.isLevelA = true;
-            else
+            } else {
+                MSSQL.ExecSqlCmd("Update [Global] Set IsLevelA = 0", GlobalVar.loginSet.edisSqlConnString);
                 GlobalVar.globalParameter.isLevelA = false;
+            }
             //MessageBox.Show(GlobalVar.globalParameter.isLevelA.ToString());
         }
         private static void checkIsTodayTradeDate() {
-            //DataView dv = DeriLib.Util.ExecSqlQry("SELECT IsTrade FROM [TradeDate] WHERE CONVERT(VARCHAR, TradeDate, 112) = CONVERT(VARCHAR, GETDATE(), 112)", GlobalVar.loginSet.tsquoteSqlConnString);
             DataTable dv = MSSQL.ExecSqlQry("SELECT IsTrade FROM [TradeDate] WHERE CONVERT(VARCHAR, TradeDate, 112) = CONVERT(VARCHAR, GETDATE(), 112)", GlobalVar.loginSet.tsquoteSqlConnString);
             if (dv.Rows[0]["IsTrade"].ToString() == "Y")
                 GlobalVar.globalParameter.isTodayTradeDate = true;
@@ -71,7 +79,7 @@ namespace WarrantDataManager2._0
         private static void getLastTradeDate() {
             try {
                 string sql = "SELECT TOP 1 TradeDate FROM TradeDate WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate desc";
-                //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
+
                 DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
 
                 GlobalVar.globalParameter.lastTradeDate = Convert.ToDateTime(dv.Rows[0]["TradeDate"]);
@@ -83,7 +91,6 @@ namespace WarrantDataManager2._0
         private static void getNextTradeDate() {
             try {
                 string sql = "SELECT TOP 3 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)>CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate";
-                //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
                 DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
 
                 GlobalVar.globalParameter.nextTradeDate1 = Convert.ToDateTime(dv.Rows[0]["TradeDate"]);
@@ -99,7 +106,6 @@ namespace WarrantDataManager2._0
             string startQuarter = dt.AddMonths(0 - (dt.Month - 1) % 3).AddDays(1 - dt.Day).ToString("yyyyMMdd");
 
             string sql = "SELECT TOP 1 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND TradeDate >= '" + startQuarter + "' ORDER BY TradeDate";
-            //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
             DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.tsquoteSqlConnString);
             GlobalVar.globalParameter.firstTradeDateQ = Convert.ToDateTime(dv.Rows[0][0]);
         }
@@ -115,6 +121,7 @@ namespace WarrantDataManager2._0
         public string edisSqlConnString = "";
         public string tsquoteSqlConnString = "";
         public string warrantSysSqlConnString = "";
+        public string edaisysConnString = "";
     }
 
     public class GlobalParameter

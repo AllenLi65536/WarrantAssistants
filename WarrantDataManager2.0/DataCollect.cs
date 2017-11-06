@@ -246,14 +246,24 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
                                               LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID) i where i.UnderlyingID =WarrantUnderlyingSummary.UnderlyingID ", conn);*/
 
             conn.Open();
-            MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssuedPercent, AccNetIncome)
-                               SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), b.CanIssue, b.IssuedPercent, IsNull(c.AccNetIncome,0)
-                               FROM [EDIS].[dbo].[WarrantUnderlying] a
-                               LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingCredit] b on a.UnderlyingID=b.UnderlyingID
-                               LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID", conn);
+
+            if (GlobalVar.globalParameter.isLevelA) {
+                MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssuedPercent, AccNetIncome, Issuable, RewardIssueCredit) "
+                          + $" SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), b.CanIssue, b.IssuedPercent, IsNull(c.AccNetIncome,0), 'Y', b.AvailableShares * {GlobalVar.globalParameter.givenRewardPercent} - IsNull(d.[UsedRewardNum],0) "
+                          + " FROM [EDIS].[dbo].[WarrantUnderlying] a "
+                          + " LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingCredit] b on a.UnderlyingID=b.UnderlyingID "
+                          + " LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID "
+                          + " LEFT JOIN [EDIS].[dbo].[WarrantReward] d on a.UnderlyingID=d.UnderlyingID", conn);
+
+            } else
+                MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssuedPercent, AccNetIncome, Issuable, RewardIssueCredit) "
+                           + " SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), b.CanIssue, b.IssuedPercent, IsNull(c.AccNetIncome,0), 'Y', 0 "
+                           + " FROM [EDIS].[dbo].[WarrantUnderlying] a "
+                           + " LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingCredit] b on a.UnderlyingID=b.UnderlyingID "
+                           + " LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID ", conn);
 
             //更新獎勵額度
-            string sql = @"SELECT a.[UnderlyingID], a.[AvailableShares], IsNull(b.[UsedRewardNum],0) UsedRewardNum
+            /*string sql = @"SELECT a.[UnderlyingID], a.[AvailableShares], IsNull(b.[UsedRewardNum],0) UsedRewardNum
                            FROM [EDIS].[dbo].[WarrantUnderlyingCredit] a
                            LEFT JOIN [EDIS].[dbo].[WarrantReward] b on a.UnderlyingID=b.UnderlyingID
                            ORDER BY [UnderlyingID]";
@@ -280,11 +290,11 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
 
                 h.ExecuteCommand();
             }
-            h.Dispose();
+            h.Dispose();*/
 
             //更新是否可發行
             //先預設都可以發行            
-            MSSQL.ExecSqlCmd("UPDATE [EDIS].[dbo].[WarrantUnderlyingSummary] SET [Issuable]='Y'", conn);
+            //MSSQL.ExecSqlCmd("UPDATE [EDIS].[dbo].[WarrantUnderlyingSummary] SET [Issuable]='Y'", conn);
 
             //從WarrantIssueCheck比對
             string sql2 = @"SELECT [UnderlyingID]
