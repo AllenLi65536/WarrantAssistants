@@ -70,7 +70,7 @@ namespace WarrantAssistant
         }
         private void RoutineWork() {
             try {
-                for (;;) {
+                for (; ; ) {
                     try {
                         if (ultraGrid1.InvokeRequired)
                             ultraGrid1.Invoke(new System.Action(LoadUltraGrid1));
@@ -224,7 +224,7 @@ namespace WarrantAssistant
         private void 發行條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
             GlobalUtility.MenuItemClick<FrmApply>();
         }
-       
+
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
             if (workThread != null && workThread.IsAlive) { workThread.Abort(); }
             GlobalUtility.Close();
@@ -450,8 +450,6 @@ namespace WarrantAssistant
                     //workBook.EnvelopeVisible = false;
                     Worksheet workSheet = (Worksheet) workBook.Sheets[1];
                     workSheet.get_Range("A3:BZ1000").ClearContents();
-                    //workBook.
-                        //Visible = XlSheetVisibility.xlSheetHidden;
                     //workSheet.UsedRange.
 
                     foreach (DataRow dr in dv.Rows) {
@@ -505,7 +503,7 @@ namespace WarrantAssistant
                         if (is1500W == "Y") {
                             CallPutType cpType = CallPutType.Call;
                             if (cp == "P")
-                                cpType = CallPutType.Put;                            
+                                cpType = CallPutType.Put;
 
                             if (type == "牛熊證")
                                 p = Pricing.BullBearWarrantPrice(cpType, stockPrice, resetR, GlobalVar.globalParameter.interestRate, vol, t, financialR, cr);
@@ -549,11 +547,14 @@ namespace WarrantAssistant
                                        + " left join (SELECT stkid, MAX([IssueVol]) as MAX, min(IssueVol) as min FROM[10.19.1.20].[EDIS].[dbo].[WARRANTS]"
                                                   + " where kgiwrt = '他家' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0 "
                                                   + " group by stkid ) as C on A.UnderlyingID = C.stkid "
-                                        + " WHERE B.count > 0 and (((IVNew > C.MAX or IVNew < C.min) and Apply1500W = 'Y') or ((IV > C.MAX or IV < C.min) and Apply1500W = 'N'))";
+                                        + " WHERE B.count > 0 ";// and (((IVNew > C.MAX or IVNew < C.min) and Apply1500W = 'Y') or ((IV > C.MAX or IV < C.min) and Apply1500W = 'N'))";
                             System.Data.DataTable badParam = MSSQL.ExecSqlQry(sql2, GlobalVar.loginSet.edisSqlConnString);
                             foreach (DataRow Row in badParam.Rows) {
+                                //WindowState = FormWindowState.Minimized;
+                                //Show();
+                                //WindowState = FormWindowState.Normal;
+                                Activate();
                                 MessageBox.Show(Row["UnderlyingID"] + " 為關係人標的，波動度超過可發範圍，會被稽核該該叫，請修改條件。");
-                                //dataOK = false;
                             }
                         }
 
@@ -750,7 +751,7 @@ namespace WarrantAssistant
                     h.SetParameterValue("@WarrantName", warrantName);
                     h.SetParameterValue("@SerialNum", serialNum);
                     h.ExecuteCommand();
-                }            
+                }
             }
             h.Dispose();
             if (updated)
@@ -759,6 +760,6 @@ namespace WarrantAssistant
                 MessageBox.Show("No magic.");
         }
 
-       
+
     }
 }
