@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Data;
 using System.Data.SqlClient;
 using EDLib.SQL;
+using System.Linq;
 
 namespace WarrantDataManager2._0
 {
@@ -233,7 +234,7 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
         }
 
         private void deleteWarrantUnderlyingSummary() {
-            MSSQL.ExecSqlCmd("DELETE FROM [WarrantUnderlyingSummary]", conn);
+
         }
 
         private void insertWarrantUnderlyingSummary() {
@@ -246,21 +247,45 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
                                               LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID) i where i.UnderlyingID =WarrantUnderlyingSummary.UnderlyingID ", conn);*/
 
             conn.Open();
+            DataTable notIssuable = MSSQL.ExecSqlQry("Select UnderlyingID from EDIS.dbo.WarrantUnderlyingSummary where Issuable='N'", conn);
 
-            if (GlobalVar.globalParameter.isLevelA) {
-                MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssuedPercent, AccNetIncome, Issuable, RewardIssueCredit) "
+            MSSQL.ExecSqlCmd("DELETE FROM [WarrantUnderlyingSummary]", conn);
+
+            if (GlobalVar.globalParameter.isLevelA)
+                MSSQL.ExecSqlCmd("INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssuedPercent, AccNetIncome, Issuable, RewardIssueCredit) "
                           + $" SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), b.CanIssue, b.IssuedPercent, IsNull(c.AccNetIncome,0), 'Y', b.AvailableShares * {GlobalVar.globalParameter.givenRewardPercent} - IsNull(d.[UsedRewardNum],0) "
                           + " FROM [EDIS].[dbo].[WarrantUnderlying] a "
                           + " LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingCredit] b on a.UnderlyingID=b.UnderlyingID "
                           + " LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID "
                           + " LEFT JOIN [EDIS].[dbo].[WarrantReward] d on a.UnderlyingID=d.UnderlyingID", conn);
-
-            } else
-                MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssuedPercent, AccNetIncome, Issuable, RewardIssueCredit) "
+            else
+                MSSQL.ExecSqlCmd("INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssuedPercent, AccNetIncome, Issuable, RewardIssueCredit) "
                            + " SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), b.CanIssue, b.IssuedPercent, IsNull(c.AccNetIncome,0), 'Y', 0 "
                            + " FROM [EDIS].[dbo].[WarrantUnderlying] a "
                            + " LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingCredit] b on a.UnderlyingID=b.UnderlyingID "
                            + " LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID ", conn);
+
+            //從WarrantIssueCheck比對
+            string sql2 = "(SELECT [UnderlyingID] FROM [EDIS].[dbo].[WarrantIssueCheck] "
+                            + $" Where IsNull([CashDividendDate],'20301231') = '{GlobalVar.globalParameter.nextTradeDate1.ToString("yyyyMMdd")}' "
+                            + $" or IsNull([StockDividendDate],'20301231') = '{GlobalVar.globalParameter.nextTradeDate1.ToString("yyyyMMdd")}' "
+                            + $" or IsNull([PublicOfferingDate],'20301231') = '{GlobalVar.globalParameter.nextTradeDate1.ToString("yyyyMMdd")}' "
+                            + $" or DATEADD(month, 3, IsNull([DisposeEndDate],'19901231')) > '{DateTime.Today.ToString("yyyyMMdd")}' "
+                            + " or WatchCount >= 2 or WarningScore > 0)";
+
+            MSSQL.ExecSqlCmd($"UPDATE [WarrantUnderlyingSummary] SET Issuable='N' WHERE UnderlyingID in {sql2}", conn);
+
+            DataTable issuable = MSSQL.ExecSqlQry("Select UnderlyingID from EDIS.dbo.WarrantUnderlyingSummary where Issuable='Y'", conn);
+            var notIssuable2Issuable = from row in notIssuable.AsEnumerable()
+                                       from row2 in issuable.AsEnumerable()
+                                       where row[0].ToString() == row2[0].ToString()
+                                       select row;
+
+            foreach (DataRow row in notIssuable2Issuable)
+                MSSQL.ExecSqlCmd($"INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values( GETDATE(), 'Log', '{row[0].ToString()}可以發行認購', 'System')", conn);
+
+            conn.Close();
+
 
             //更新獎勵額度
             /*string sql = @"SELECT a.[UnderlyingID], a.[AvailableShares], IsNull(b.[UsedRewardNum],0) UsedRewardNum
@@ -296,20 +321,14 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
             //先預設都可以發行            
             //MSSQL.ExecSqlCmd("UPDATE [EDIS].[dbo].[WarrantUnderlyingSummary] SET [Issuable]='Y'", conn);
 
-            //從WarrantIssueCheck比對
-            string sql2 = @"SELECT [UnderlyingID]
-                                  ,IsNull([CashDividendDate],'2030-12-31') CashDividendDate
-                                  ,IsNull([StockDividendDate],'2030-12-31') StockDividendDate
-                                  ,IsNull([PublicOfferingDate],'2030-12-31') PublicOfferingDate
-                                  ,IsNull([DisposeEndDate],'1990-12-31') DisposeEndDate
-                                  ,[WatchCount]
-                                  ,[WarningScore]
-                              FROM [EDIS].[dbo].[WarrantIssueCheck]";
-            //DataView dv2 = DeriLib.Util.ExecSqlQry(sql2, GlobalVar.loginSet.edisSqlConnString);
-            DataTable dv2 = MSSQL.ExecSqlQry(sql2, conn);
-            conn.Close();
+            /*                    ,IsNull([CashDividendDate],'2030-12-31') CashDividendDate
+                                ,IsNull([StockDividendDate],'2030-12-31') StockDividendDate
+                                ,IsNull([PublicOfferingDate],'2030-12-31') PublicOfferingDate
+                                ,IsNull([DisposeEndDate],'1990-12-31') DisposeEndDate
+                                ,[WatchCount]
+                                ,[WarningScore]*/
 
-            string cmdText2 = "UPDATE [WarrantUnderlyingSummary] SET Issuable=@Issuable WHERE UnderlyingID=@UnderlyingID";
+            /*string cmdText2 = "UPDATE [WarrantUnderlyingSummary] SET Issuable=@Issuable WHERE UnderlyingID=@UnderlyingID";
             List<System.Data.SqlClient.SqlParameter> pars2 = new List<System.Data.SqlClient.SqlParameter>();
             pars2.Add(new SqlParameter("@UnderlyingID", SqlDbType.VarChar));
             pars2.Add(new SqlParameter("@Issuable", SqlDbType.VarChar));
@@ -338,8 +357,10 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
                     issuable = false;
                 else if (warningScore > 0)
                     issuable = false;
-                else
+                else {
+                    MessageBox.Show("True");
                     issuable = true;
+                }
 
                 string issuablesString = "Y";
                 if (!issuable)
@@ -350,7 +371,7 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
 
                 h2.ExecuteCommand();
             }
-            h2.Dispose();
+            h2.Dispose();*/
         }
 
         private void deleteApplyLists() {
