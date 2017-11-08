@@ -547,7 +547,7 @@ namespace WarrantAssistant
                                        + " left join (SELECT stkid, MAX([IssueVol]) as MAX, min(IssueVol) as min FROM[10.19.1.20].[EDIS].[dbo].[WARRANTS]"
                                                   + " where kgiwrt = '他家' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0 "
                                                   + " group by stkid ) as C on A.UnderlyingID = C.stkid "
-                                        + " WHERE B.count > 0 ";// and (((IVNew > C.MAX or IVNew < C.min) and Apply1500W = 'Y') or ((IV > C.MAX or IV < C.min) and Apply1500W = 'N'))";
+                                        + " WHERE B.count > 0 and (((IVNew > C.MAX or IVNew < C.min) and Apply1500W = 'Y') or ((IV > C.MAX or IV < C.min) and Apply1500W = 'N'))";
                             System.Data.DataTable badParam = MSSQL.ExecSqlQry(sql2, GlobalVar.loginSet.edisSqlConnString);
                             foreach (DataRow Row in badParam.Rows) {
                                 //WindowState = FormWindowState.Minimized;
