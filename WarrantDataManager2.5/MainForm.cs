@@ -3,14 +3,15 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Collections.Concurrent;
 
-namespace WarrantDataManager2._0
+namespace WarrantDataManager
 {
+    public enum WorkState { Successful = 0, Exception = 1, Failed = 2 }
     public partial class MainForm:Form
     {
         private delegate void ShowHandler(string message);
-        private delegate WorkState WorkInQueue();
+        public delegate WorkState WorkInQueue();
 
-        private SafeQueue workQueue = new SafeQueue();
+        //private SafeQueue workQueue = new SafeQueue();
         //private SafeQueue messageQueue = new SafeQueue();
         private ConcurrentQueue<string> messageQueue2 = new ConcurrentQueue<string>();
         private ConcurrentQueue<WorkInQueue> workQueue2 = new ConcurrentQueue<WorkInQueue>();
@@ -18,8 +19,9 @@ namespace WarrantDataManager2._0
         private Thread workThread;
         private Thread msgThread;
 
-        public void AddWork(Work work) {
-            workQueue.Enqueue(work);
+        public void AddWork(WorkInQueue work) {
+            //workQueue.Enqueue(work);
+            workQueue2.Enqueue(work);
         }
 
         public void AddMessage(string message) {
@@ -53,12 +55,21 @@ namespace WarrantDataManager2._0
         private void RoutineWork() {
             try {
                 for (;;) {
-                    while (workQueue.Count > 0) {
+                    while (workQueue2.Count > 0) {
                         try {
-                            //WorkInQueue workInQueue;
-                            //workQueue2.TryDequeue(out workInQueue);
-                            //workInQueue.Invoke();
-                            object obj = workQueue.Dequeue();
+                            WorkInQueue workInQueue = null;
+                            workQueue2.TryDequeue(out workInQueue);
+                            if (workInQueue != null) {
+                                WorkState workstate = workInQueue.Invoke();
+                                //workInQueue.Method.Name
+                                if (workstate == WorkState.Successful)
+                                    AddMessage("Work[" + workInQueue.Method.Name + "]" + "\t\t" + "Complete Sucessfully");
+                                else if (workstate == WorkState.Exception)
+                                    AddMessage("Work[" + workInQueue.Method.Name + "]" + "\t\t" + "Failed Due To Exception");
+                                else
+                                    AddMessage("Work[" + workInQueue.Method.Name + "]" + "\t\t" + "Failed Due To Some Error");
+                            }
+                            /*object obj = workQueue.Dequeue();
                             if (obj != null) {
                                 Work work = (Work) obj;
                                 WorkState workstate = work.DoWork();
@@ -69,7 +80,7 @@ namespace WarrantDataManager2._0
                                 else
                                     AddMessage("Work[" + work.workName + "]" + "\t\t" + "Failed Due To Some Error");
                                 work.Close();
-                            }
+                            }*/
                         } catch (ThreadAbortException tex) {
                             MessageBox.Show(tex.Message);
                         } catch (Exception ex) {
@@ -122,41 +133,53 @@ namespace WarrantDataManager2._0
         }
 
         private void UnderlyingDataRefresh_Click(object sender, EventArgs e) {
-            AddWork(new WarrantUnderlyingWork("UnderlyingDataRefresh", "標的資料更新"));
+            //AddWork(new WarrantUnderlyingWork("UnderlyingDataRefresh", "標的資料更新"));
+            AddWork(DataCollect.updateWarrantUnderlying);
         }
 
         private void WarrantDataRefresh_Click(object sender, EventArgs e) {
-            AddWork(new WarrantBasicWork("WarrantDataRefresh", "權證資料更新"));
+            //AddWork(new WarrantBasicWork("WarrantDataRefresh", "權證資料更新"));
+            AddWork(DataCollect.updateWarrantBasic);
         }
 
         private void IssueCreditRefresh_Click(object sender, EventArgs e) {
-            AddWork(new WarrantUnderlyingCreditWork("IssueCreditRefresh", "權證額度更新"));
+            //AddWork(new WarrantUnderlyingCreditWork("IssueCreditRefresh", "權證額度更新"));
+            AddWork(DataCollect.updateWarrantUnderlyingCredit);
         }
 
         private void IssueCheckRefresh_Click(object sender, EventArgs e) {
-            AddWork(new WarrantIssueCheckWork("IssueCheckRefresh", "發行檢查更新"));
+            //AddWork(new WarrantIssueCheckWork("IssueCheckRefresh", "發行檢查更新"));
+            AddWork(CMoneyData.loadData);
         }
 
         private void SummaryRefresh_Click(object sender, EventArgs e) {
-            AddWork(new WarrantUnderlyingSummaryWork("SummaryRefresh", "Summary更新"));
+            //AddWork(new WarrantUnderlyingSummaryWork("SummaryRefresh", "Summary更新"));
+            AddWork(DataCollect.updateWarrantUnderlyingSummary);
         }
 
         private void PricesRefresh_Click(object sender, EventArgs e) {
-            AddWork(new WarrantPricesWork("PricesRefresh", "價格更新"));
+            //AddWork(new WarrantPricesWork("PricesRefresh", "價格更新"));
+            AddWork(DataCollect.updateWarrantPrices);
         }
 
         private void UpdateAll_Click(object sender, EventArgs e) {
-            AddWork(new WarrantUnderlyingWork("UnderlyingDataRefresh", "標的資料更新"));
-            AddWork(new WarrantBasicWork("WarrantDataRefresh", "權證資料更新"));
-            AddWork(new WarrantUnderlyingCreditWork("IssueCreditRefresh", "權證額度更新"));
-            AddWork(new WarrantIssueCheckWork("IssueCheckRefresh", "發行檢查更新"));
-            AddWork(new WarrantUnderlyingSummaryWork("SummaryRefresh", "Summary更新"));
-            AddWork(new WarrantPricesWork("PricesRefresh", "價格更新"));
-            //AddWork(new CleanApplyList("CleanApplyList", "申請表清空"));
+            //AddWork(new WarrantUnderlyingWork("UnderlyingDataRefresh", "標的資料更新"));
+            //AddWork(new WarrantBasicWork("WarrantDataRefresh", "權證資料更新"));
+            //AddWork(new WarrantUnderlyingCreditWork("IssueCreditRefresh", "權證額度更新"));
+            //AddWork(new WarrantIssueCheckWork("IssueCheckRefresh", "發行檢查更新"));
+            //AddWork(new WarrantUnderlyingSummaryWork("SummaryRefresh", "Summary更新"));
+            //AddWork(new WarrantPricesWork("PricesRefresh", "價格更新"));
+            AddWork(DataCollect.updateWarrantUnderlying);
+            AddWork(DataCollect.updateWarrantBasic);
+            AddWork(DataCollect.updateWarrantUnderlyingCredit);
+            AddWork(CMoneyData.loadData);
+            AddWork(DataCollect.updateWarrantUnderlyingSummary);
+            AddWork(DataCollect.updateWarrantPrices);
         }
 
         private void CleanApplyList_Click(object sender, EventArgs e) {
-            AddWork(new CleanApplyList("CleanApplyList", "申請表清空"));
+            //AddWork(new CleanApplyList("CleanApplyList", "申請表清空"));
+            AddWork(DataCollect.updateApplyLists);
         }
 
 

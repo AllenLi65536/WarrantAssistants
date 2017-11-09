@@ -6,50 +6,80 @@ using System.Data.SqlClient;
 using EDLib.SQL;
 using System.Linq;
 
-namespace WarrantDataManager2._0
+namespace WarrantDataManager
 {
-    public class DataCollect
+    public static class DataCollect
     {
-        public CMADODB5.CMConnection cn = new CMADODB5.CMConnection();
-        public string arg = "5"; //%
-        public string srvLocation = "10.60.0.191";
-        public string cnPort = "";
-        public SqlConnection conn = new SqlConnection(GlobalVar.loginSet.edisSqlConnString);
+        public static CMADODB5.CMConnection cn = new CMADODB5.CMConnection();
+        public static string arg = "5"; //%
+        public static string srvLocation = "10.60.0.191";
+        public static string cnPort = "";
+        public static SqlConnection conn = new SqlConnection(LoginSet.edisSqlConnString);
 
-        public void updateWarrantUnderlying() {
-            deleteWarrantUnderlying();
-            insertWarrantUnderlying();
+        public static WorkState updateWarrantUnderlying() {
+            try {
+                deleteWarrantUnderlying();
+                insertWarrantUnderlying();
+                return WorkState.Successful;
+            } catch (Exception e) {
+                return WorkState.Exception;
+            }
         }
 
-        public void updateWarrantBasic() {
-            deleteWarrantBasic();
-            insertWarrantBasic();
+        public static WorkState updateWarrantBasic() {
+            try {
+                deleteWarrantBasic();
+                insertWarrantBasic();
+                return WorkState.Successful;
+            } catch (Exception e) {
+                return WorkState.Exception;
+            }
         }
 
-        public void updateWarrantUnderlyingCredit() {
-            deleteWarrantUnderlyingCredit();
-            insertWarrantUnderlyingCredit();
+        public static WorkState updateWarrantUnderlyingCredit() {
+            try {
+                deleteWarrantUnderlyingCredit();
+                insertWarrantUnderlyingCredit();
+                return WorkState.Successful;
+            } catch (Exception e) {
+                return WorkState.Exception;
+            }
         }
 
-        public void updateWarrantPrices() {
-            deleteWarrantPrices();
-            insertWarrantPrices();
+        public static WorkState updateWarrantPrices() {
+            try {
+                deleteWarrantPrices();
+                insertWarrantPrices();
+                return WorkState.Successful;
+            } catch (Exception e) {
+                return WorkState.Exception;
+            }
         }
 
-        public void updateWarrantUnderlyingSummary() {
-            deleteWarrantUnderlyingSummary();
-            insertWarrantUnderlyingSummary();
+        public static WorkState updateWarrantUnderlyingSummary() {
+            try {
+                deleteWarrantUnderlyingSummary();
+                insertWarrantUnderlyingSummary();
+                return WorkState.Successful;
+            } catch (Exception e) {
+                return WorkState.Exception;
+            }
         }
 
-        public void updateApplyLists() {
-            deleteApplyLists();
+        public static WorkState updateApplyLists() {
+            try {
+                deleteApplyLists();
+                return WorkState.Successful;
+            } catch (Exception e) {
+                return WorkState.Exception;
+            }
         }
 
-        private void deleteWarrantUnderlying() {
+        private static void deleteWarrantUnderlying() {
             MSSQL.ExecSqlCmd("DELETE FROM [WarrantUnderlying]", conn);
         }
 
-        private void insertWarrantUnderlying() {
+        private static void insertWarrantUnderlying() {
             try {
                 conn.Open();
                 //更新可發行標的代號，標的名稱，交易員代號，交易員名稱，標的全名
@@ -89,8 +119,8 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
                 conn.Close();
 
                 string sql = "SELECT [股票代號], isNull([上市上櫃],'1') 市場, IsNull([統一編號], '00000000') 統一編號 FROM [上市櫃公司基本資料] WHERE ";
-                //DataView dv = DeriLib.Util.ExecSqlQry("SELECT [UnderlyingIDCMoney] FROM [WarrantUnderlying] ORDER BY [UnderlyingIDCMoney]", GlobalVar.loginSet.edisSqlConnString);
-                DataTable dv = MSSQL.ExecSqlQry("SELECT [UnderlyingIDCMoney] FROM [WarrantUnderlying] ORDER BY [UnderlyingIDCMoney]", GlobalVar.loginSet.edisSqlConnString);
+                //DataView dv = DeriLib.Util.ExecSqlQry("SELECT [UnderlyingIDCMoney] FROM [WarrantUnderlying] ORDER BY [UnderlyingIDCMoney]", LoginSet.edisSqlConnString);
+                DataTable dv = MSSQL.ExecSqlQry("SELECT [UnderlyingIDCMoney] FROM [WarrantUnderlying] ORDER BY [UnderlyingIDCMoney]", LoginSet.edisSqlConnString);
 
                 string cStr = "";
                 foreach (DataRow dr in dv.Rows)
@@ -106,7 +136,7 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
                 pars.Add(new SqlParameter("@UnderlyingIDCMoney", SqlDbType.VarChar));
                 //pars.Add(new SqlParameter("@Market", SqlDbType.VarChar));
                 pars.Add(new SqlParameter("@UnifiedID", SqlDbType.VarChar));
-                SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, cmdText, pars);
+                SQLCommandHelper h = new SQLCommandHelper(LoginSet.edisSqlConnString, cmdText, pars);
 
                 for (; !rs.EOF; rs.MoveNext()) {
                     string commodityIDCMoney = rs.Fields["股票代號"].Value;
@@ -134,11 +164,11 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
             }
         }
 
-        private void deleteWarrantBasic() {
+        private static void deleteWarrantBasic() {
             MSSQL.ExecSqlCmd("DELETE FROM [WarrantBasic]", conn);
         }
 
-        private void insertWarrantBasic() {
+        private static void insertWarrantBasic() {
             MSSQL.ExecSqlCmd(@"INSERT INTO [EDIS].[dbo].[WarrantBasic]
                                SELECT a.wid
                                      ,a.wname
@@ -167,14 +197,14 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
                                 ORDER BY a.issuedate DESC, a.wid", conn);
         }
 
-        private void deleteWarrantUnderlyingCredit() {
+        private static void deleteWarrantUnderlyingCredit() {
             conn.Open();
             MSSQL.ExecSqlCmd("DELETE FROM [WarrantUnderlyingCredit]", conn);
             MSSQL.ExecSqlCmd("DELETE FROM [WarrantReward]", conn);
             conn.Close();
         }
 
-        private void insertWarrantUnderlyingCredit() {
+        private static void insertWarrantUnderlyingCredit() {
             string sql = @"INSERT INTO [WarrantReward]"
         + " select ID, sum(sum1), sum(count1)"
         + " from ((SELECT UnderlyingId as ID, SUM([exeRatio]*([FurthurIssueNum]/1000+[IssueNum]/1000)) as sum1, COUNT(WarrantID) as count1"
@@ -217,11 +247,11 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
             conn.Close();
         }
 
-        private void deleteWarrantPrices() {
+        private static void deleteWarrantPrices() {
             MSSQL.ExecSqlCmd("DELETE FROM [WarrantPrices]", conn);
         }
 
-        private void insertWarrantPrices() {
+        private static void insertWarrantPrices() {
             MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantPrices 
                                SELECT DISTINCT CASE WHEN (A.[CommodityId]='1000') THEN 'IX0001' ELSE A.[CommodityId] END
                                              ,isnull(A.[LastPrice],0)
@@ -233,11 +263,11 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
                                LEFT JOIN [10.60.0.37].[TsQuote].[dbo].[PBest5] B ON A.CommodityId=B.CommodityId", conn);
         }
 
-        private void deleteWarrantUnderlyingSummary() {
+        private static void deleteWarrantUnderlyingSummary() {
 
         }
 
-        private void insertWarrantUnderlyingSummary() {
+        private static void insertWarrantUnderlyingSummary() {
             //更新標的代號，標的名稱，交易員代號，市場，額度，累計損益
             /*SqlCommand cmd = new SqlCommand(@"Update EDIS.dbo.WarrantUnderlyingSummary  set UnderlyingID=i.UnderlyingID , UnderlyingName=i.[UnderlyingName], TraderID = i.[TraderID], Market= i.[Market], PutIssuable= i.canIssueP,
              *  IssueCredit=i.canIssue, IssuedPercent=i.IssuedPercent, AccNetIncome=i.accNI
@@ -292,14 +322,14 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
                            FROM [EDIS].[dbo].[WarrantUnderlyingCredit] a
                            LEFT JOIN [EDIS].[dbo].[WarrantReward] b on a.UnderlyingID=b.UnderlyingID
                            ORDER BY [UnderlyingID]";
-            //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
+            //DataView dv = DeriLib.Util.ExecSqlQry(sql, LoginSet.edisSqlConnString);
             DataTable dv = MSSQL.ExecSqlQry(sql, conn);
 
             string cmdText = "UPDATE [WarrantUnderlyingSummary] SET RewardIssueCredit=@RewardIssueCredit WHERE UnderlyingID=@UnderlyingID";
             List<System.Data.SqlClient.SqlParameter> pars = new List<System.Data.SqlClient.SqlParameter>();
             pars.Add(new SqlParameter("@UnderlyingID", SqlDbType.VarChar));
             pars.Add(new SqlParameter("@RewardIssueCredit", SqlDbType.Float));
-            SQLCommandHelper h = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, cmdText, pars);
+            SQLCommandHelper h = new SQLCommandHelper(LoginSet.edisSqlConnString, cmdText, pars);
 
             foreach (DataRow dr in dv.Rows) {
                 string underlyingID = dr["UnderlyingID"].ToString();
@@ -332,7 +362,7 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
             List<System.Data.SqlClient.SqlParameter> pars2 = new List<System.Data.SqlClient.SqlParameter>();
             pars2.Add(new SqlParameter("@UnderlyingID", SqlDbType.VarChar));
             pars2.Add(new SqlParameter("@Issuable", SqlDbType.VarChar));
-            SQLCommandHelper h2 = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, cmdText2, pars2);
+            SQLCommandHelper h2 = new SQLCommandHelper(LoginSet.edisSqlConnString, cmdText2, pars2);
 
             foreach (DataRow dr2 in dv2.Rows) {
                 bool issuable = true;
@@ -374,7 +404,7 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
             h2.Dispose();*/
         }
 
-        private void deleteApplyLists() {
+        private static void deleteApplyLists() {
             conn.Open();
             MSSQL.ExecSqlCmd("INSERT INTO [dbo].[ReIssueReward] ([UnderlyingId], [RewardQuotaUsed], [MDate])"
                 + " (select UnderlyingID, exeRatio * ReIssueNum, GETDATE() from ReIssueOfficial where UseReward = 'Y')", conn);

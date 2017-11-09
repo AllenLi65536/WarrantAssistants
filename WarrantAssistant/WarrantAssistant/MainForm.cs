@@ -166,7 +166,6 @@ namespace WarrantAssistant
                               FROM [EDIS].[dbo].[InformationLog]
                               WHERE InformationType='" + infoOrAnnounce + "'";
                 sql += "AND CONVERT(VARCHAR,Date,112) >='" + GlobalVar.globalParameter.lastTradeDate.ToString("yyyy-MM-dd") + "' ORDER BY MDate DESC";
-                //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
                 System.Data.DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
                 if (dt.Rows.Count == dv.Rows.Count)
@@ -258,8 +257,6 @@ namespace WarrantAssistant
         }
         private void 修改檔案名稱ToolStripMenuItem_Click(object sender, EventArgs e) {
             GlobalUtility.MenuItemClick<FrmRename>();
-            //MessageBox.Show("還沒做好唷別急^_^");
-            //GlobalUtility.MenuItemClick<FrmReIssueTotal>();
         }
 
         private void 代理人發行條件輸入ToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -539,23 +536,6 @@ namespace WarrantAssistant
                                 h.ExecuteCommand();
                                 h.Dispose();
                             }
-
-                            string sql2 = "SELECT [UnderlyingID] FROM [EDIS].[dbo].[ApplyOfficial] as A "
-                                       + " left join (Select CS8010, count(1) as count from [10.19.1.20].[VOLDB].[dbo].[ED_RelationUnderlying] "
-                                                  + $" where RecordDate = (select top 1 RecordDate from [10.19.1.20].[VOLDB].[dbo].[ED_RelationUnderlying])"
-                                                   + " group by CS8010) as B on A.UnderlyingID = B.CS8010 "
-                                       + " left join (SELECT stkid, MAX([IssueVol]) as MAX, min(IssueVol) as min FROM[10.19.1.20].[EDIS].[dbo].[WARRANTS]"
-                                                  + " where kgiwrt = '他家' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0 "
-                                                  + " group by stkid ) as C on A.UnderlyingID = C.stkid "
-                                        + " WHERE B.count > 0 and (((IVNew > C.MAX or IVNew < C.min) and Apply1500W = 'Y') or ((IV > C.MAX or IV < C.min) and Apply1500W = 'N'))";
-                            System.Data.DataTable badParam = MSSQL.ExecSqlQry(sql2, GlobalVar.loginSet.edisSqlConnString);
-                            foreach (DataRow Row in badParam.Rows) {
-                                //WindowState = FormWindowState.Minimized;
-                                //Show();
-                                //WindowState = FormWindowState.Normal;
-                                Activate();
-                                MessageBox.Show(Row["UnderlyingID"] + " 為關係人標的，波動度超過可發範圍，會被稽核該該叫，請修改條件。");
-                            }
                         }
 
                         if (type == "重設型")
@@ -591,6 +571,23 @@ namespace WarrantAssistant
                         } catch (Exception ex) {
                             MessageBox.Show("write" + ex.Message);
                         }
+                    }
+
+                    string sql2 = "SELECT [UnderlyingID] FROM [EDIS].[dbo].[ApplyOfficial] as A "
+                                       + " left join (Select CS8010, count(1) as count from [10.19.1.20].[VOLDB].[dbo].[ED_RelationUnderlying] "
+                                                  + $" where RecordDate = (select top 1 RecordDate from [10.19.1.20].[VOLDB].[dbo].[ED_RelationUnderlying])"
+                                                   + " group by CS8010) as B on A.UnderlyingID = B.CS8010 "
+                                       + " left join (SELECT stkid, MAX([IssueVol]) as MAX, min(IssueVol) as min FROM[10.19.1.20].[EDIS].[dbo].[WARRANTS]"
+                                                  + " where kgiwrt = '他家' and marketdate <= GETDATE() and lasttradedate >= GETDATE() and IssueVol<> 0 "
+                                                  + " group by stkid ) as C on A.UnderlyingID = C.stkid "
+                                        + " WHERE B.count > 0 and (((IVNew > C.MAX or IVNew < C.min) and Apply1500W = 'Y') or ((IV > C.MAX or IV < C.min) and Apply1500W = 'N'))";
+                    System.Data.DataTable badParam = MSSQL.ExecSqlQry(sql2, GlobalVar.loginSet.edisSqlConnString);
+                    foreach (DataRow Row in badParam.Rows) {
+                        //WindowState = FormWindowState.Minimized;
+                        //Show();
+                        //WindowState = FormWindowState.Normal;
+                        Activate();
+                        MessageBox.Show(Row["UnderlyingID"] + " 為關係人標的，波動度超過可發範圍，會被稽核該該叫，請修改條件。");
                     }
 
                     GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + "產發行上傳檔");
