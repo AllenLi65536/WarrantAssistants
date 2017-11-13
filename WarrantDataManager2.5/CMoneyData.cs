@@ -15,21 +15,21 @@ namespace WarrantDataManager
         private static Dictionary<string, CommodityData> data = new Dictionary<string, CommodityData>();
         private static List<string> tw50Stocks = new List<string>();
 
-        public static WorkState loadData() {
+        public static WorkState LoadData() {
             try {
-                getTW50Stcoks();
-                loadCommodityData();
-                getPricesAndPERatio();
-                getEarning();
-                getDividendDates();
-                getPublicOfferingAdjustDate();
-                getDisposeEndDate();
-                getWatchStock();
-                getWarningScore();
-                getAccNetIncome();
-                updateIssueCheck();
+                GetTW50Stcoks();
+                LoadCommodityData();
+                GetPricesAndPERatio();
+                GetEarning();
+                GetDividendDates();
+                GetPublicOfferingAdjustDate();
+                GetDisposeEndDate();
+                GetWatchStock();
+                GetWarningScore();
+                GetAccNetIncome();
+                UpdateIssueCheck();
                 return WorkState.Successful;
-            } catch (Exception e) {
+            } catch (Exception) {
                 return WorkState.Exception;
             }
         }
@@ -39,7 +39,7 @@ namespace WarrantDataManager
             refreshCommodityBasics();
         }*/
 
-        public static CommodityBasicList getCommodityBasics() {
+        public static CommodityBasicList GetCommodityBasics() {
             CommodityBasicList cBL = new CommodityBasicList();
 
             try {
@@ -85,7 +85,7 @@ namespace WarrantDataManager
             return cBL;
         }
 
-        private static void loadCommodityData() {
+        private static void LoadCommodityData() {
             try {
                 data.Clear();
                 string sql = "SELECT UnderlyingID, UnderlyingIDCMoney, UnderlyingName FROM [WarrantUnderlying] WHERE StockType='DS' or StockType='DR' ORDER BY UnderlyingID";
@@ -107,7 +107,7 @@ namespace WarrantDataManager
             }
         }
 
-        private static void refreshCommodityBasics() {
+        private static void RefreshCommodityBasics() {
             try {
                 string sql = "SELECT [股票代號], [股票名稱], isNull([上市上櫃],'1') 市場, IsNull([公司名稱], '') 公司名稱, IsNull([統一編號], '00000000') 統一編號 FROM [上市櫃公司基本資料] WHERE ";
 
@@ -154,7 +154,7 @@ namespace WarrantDataManager
             }
         }
 
-        private static void getTW50Stcoks() {
+        private static void GetTW50Stcoks() {
             try {
                 tw50Stocks.Clear();
 
@@ -200,7 +200,7 @@ namespace WarrantDataManager
 
         }
 
-        private static void getPricesAndPERatio() {
+        private static void GetPricesAndPERatio() {
             try {
                 string dStr = DateTime.Today.ToString("yyyyMMdd");
                 string qStr = DateTime.Today.AddMonths(-3).ToString("yyyyMMdd");
@@ -267,7 +267,7 @@ namespace WarrantDataManager
             }
         }
 
-        private static void getEarning() {
+        private static void GetEarning() {
             try {
                 string sql = "SELECT [年季], [股票代號], [合併淨損益(千)] FROM [季合併財報(損益單季)] WHERE [年季] IN (SELECT DISTINCT TOP 4 [年季] FROM [季合併財報(損益單季)] ORDER BY [年季] desc) AND ";
 
@@ -294,7 +294,7 @@ namespace WarrantDataManager
             }
         }
 
-        private static void getDividendDates() {
+        private static void GetDividendDates() {
             try {
                 string sql = @"SELECT [年度], [股票代號], IsNull([現金股利合計(元)], 0) 現金股利, IsNull([股票股利合計(元)], 0) 股票股利, IsNull([除息日],'') 除息日, isNull([除權日],'') 除權日
                                FROM [股利政策表] WHERE [年度] = '" + DateTime.Today.AddYears(-1).Year.ToString() + "' AND ";
@@ -326,7 +326,7 @@ namespace WarrantDataManager
             }
         }
 
-        private static void getPublicOfferingAdjustDate() {
+        private static void GetPublicOfferingAdjustDate() {
             try {
                 string sql = "SELECT [年度], [股票代號], IsNull([現增除權日],'') 現增除權日 FROM [股利政策表] WHERE [年度] = '" + DateTime.Today.AddYears(-1).Year.ToString() + "' AND ";
 
@@ -351,7 +351,7 @@ namespace WarrantDataManager
             }
         }
 
-        private static void getDisposeEndDate() {
+        private static void GetDisposeEndDate() {
             try {
                 string sql = "SELECT [年度], [股票代號], IsNull([處置時間迄],'') 處置結束日 FROM [處置股票] WHERE [年度] >= '" + DateTime.Today.AddMonths(-6).Year.ToString() + "' AND ";
 
@@ -377,7 +377,7 @@ namespace WarrantDataManager
             }
         }
 
-        private static void getWatchStock() {
+        private static void GetWatchStock() {
             try {
                 //找到前六個交易日的日期
                 //WARNING!! Problems happen around Chinese new year!!
@@ -415,7 +415,7 @@ namespace WarrantDataManager
             }
         }
 
-        private static void getWarningScore() {
+        private static void GetWarningScore() {
             try {
                 string sql = "SELECT [股票代號], [警示指標總符合數] FROM [月財務警示指標] WHERE [年月] = '" + DateTime.Today.ToString("yyyyMM") + "' AND ";
 
@@ -440,7 +440,7 @@ namespace WarrantDataManager
             }
         }
 
-        private static void getAccNetIncome() {
+        private static void GetAccNetIncome() {
             try {
                 string sql = "";
                 DateTime dQ1 = new DateTime(DateTime.Today.Year, 5, 15);
@@ -478,7 +478,7 @@ namespace WarrantDataManager
             }
         }
 
-        private static void updateIssueCheck() {
+        private static void UpdateIssueCheck() {
             try {
                 SQLCommandHelper deleteIssueCheck = new SQLCommandHelper(LoginSet.edisSqlConnString, "DELETE FROM [WarrantIssueCheck]", new List<System.Data.SqlClient.SqlParameter>());
                 deleteIssueCheck.ExecuteCommand();

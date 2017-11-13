@@ -105,66 +105,66 @@ namespace WarrantDataManager
 
                         //if (now.TimeOfDay.TotalSeconds > 60 && (!globalDataOK))
                         if (now.TimeOfDay.TotalMinutes > 425 && (!globalDataOK)) {
-                            GlobalUtility.loadGlobalParameters();
+                            GlobalUtility.LoadGlobalParameters();
                             globalDataOK = true;
                         }
 
                         //if (now.TimeOfDay.TotalSeconds > 60 && (!cleanApplyOK) && GlobalVar.globalParameter.isTodayTradeDate)
                         if (now.TimeOfDay.TotalMinutes > 1171 && (!cleanApplyOK) && GlobalVar.globalParameter.isTodayTradeDate) {
                             //GlobalVar.mainForm.AddWork(new CleanApplyList("CleanApplyList", "申請表清空"));
-                            GlobalVar.mainForm.AddWork(DataCollect.updateApplyLists);
+                            GlobalVar.mainForm.AddWork(DataCollect.UpdateApplyLists);
                             cleanApplyOK = true;
                         }
 
                         if (now.TimeOfDay.TotalMinutes > 450 && (!underlyingDataOK) && GlobalVar.globalParameter.isTodayTradeDate) {
                             //GlobalVar.mainForm.AddWork(new WarrantUnderlyingWork("UnderlyingDataRefresh", "標的資料更新"));
-                            GlobalVar.mainForm.AddWork(DataCollect.updateWarrantUnderlying);
+                            GlobalVar.mainForm.AddWork(DataCollect.UpdateWarrantUnderlying);
                             underlyingDataOK = true;
                         }
 
                         if (now.TimeOfDay.TotalMinutes > 450 && (!warrantDataOK) && GlobalVar.globalParameter.isTodayTradeDate) {
                             //GlobalVar.mainForm.AddWork(new WarrantBasicWork("WarrantDataRefresh", "權證資料更新"));
-                            GlobalVar.mainForm.AddWork(DataCollect.updateWarrantBasic);
+                            GlobalVar.mainForm.AddWork(DataCollect.UpdateWarrantBasic);
                             warrantDataOK = true;
                         }
 
                         if (now.TimeOfDay.TotalMinutes > 450 && (!underlyingCreditBeforeOK) && GlobalVar.globalParameter.isTodayTradeDate) {
                             //GlobalVar.mainForm.AddWork(new WarrantUnderlyingCreditWork("IssueCreditRefresh", "權證額度更新"));
-                            GlobalVar.mainForm.AddWork(DataCollect.updateWarrantUnderlyingCredit);
+                            GlobalVar.mainForm.AddWork(DataCollect.UpdateWarrantUnderlyingCredit);
                             underlyingCreditBeforeOK = true;
                         }
 
                         if (now.TimeOfDay.TotalMinutes > 450 && (!issueCheckOK) && GlobalVar.globalParameter.isTodayTradeDate) {
                             //GlobalVar.mainForm.AddWork(new WarrantIssueCheckWork("IssueCheckRefresh", "發行檢查更新"));
-                            GlobalVar.mainForm.AddWork(CMoneyData.loadData);
+                            GlobalVar.mainForm.AddWork(CMoneyData.LoadData);
                             issueCheckOK = true;
                         }
 
                         if (now.TimeOfDay.TotalMinutes > 450 && (!summaryOK) && GlobalVar.globalParameter.isTodayTradeDate) {
                             //GlobalVar.mainForm.AddWork(new WarrantUnderlyingSummaryWork("SummaryRefresh", "Summary更新"));
-                            GlobalVar.mainForm.AddWork(DataCollect.updateWarrantUnderlyingSummary);
+                            GlobalVar.mainForm.AddWork(DataCollect.UpdateWarrantUnderlyingSummary);
                             summaryOK = true;
                         }
 
                         if (now.TimeOfDay.TotalMinutes > 540 && (!pircesOK) && GlobalVar.globalParameter.isTodayTradeDate) {
                             //GlobalVar.mainForm.AddWork(new WarrantPricesWork("PricesRefresh", "價格更新"));
-                            GlobalVar.mainForm.AddWork(DataCollect.updateWarrantPrices);
+                            GlobalVar.mainForm.AddWork(DataCollect.UpdateWarrantPrices);
                             pircesOK = true;
                         }
 
                         if (now.TimeOfDay.TotalMinutes > 431 && (!underlyingCreditAfterOK) && GlobalVar.globalParameter.isTodayTradeDate) {
                             //GlobalVar.mainForm.AddWork(new WarrantUnderlyingCreditWork("IssueCreditRefresh", "權證額度更新"));
-                            GlobalVar.mainForm.AddWork(DataCollect.updateWarrantUnderlyingCredit);
+                            GlobalVar.mainForm.AddWork(DataCollect.UpdateWarrantUnderlyingCredit);
                             underlyingCreditAfterOK = true;
                         }
 
-                    } catch (ThreadAbortException tex) {
-                    } catch (Exception ex) {
+                    } catch (ThreadAbortException) {
+                    } catch (Exception) {
                     }
                     Thread.Sleep(20000);
                 }
-            } catch (ThreadAbortException tex) {
-            } catch (Exception ex) {
+            } catch (ThreadAbortException) {
+            } catch (Exception) {
             }
         }
 

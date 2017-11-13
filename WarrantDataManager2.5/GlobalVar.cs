@@ -10,42 +10,36 @@ namespace WarrantDataManager
         public static MainForm mainForm;
         public static AutoWork autoWork;
         //public static ErrProcess errProcess;
-        public static GlobalParameter globalParameter;        
+        public static GlobalParameter globalParameter;
     }
 
     public class GlobalUtility
     {
-        public static void Start() {           
-            loadGlobalParameters();
+        public static void Start() {
+            LoadGlobalParameters();
             //GlobalVar.errProcess = new ErrProcess();
             GlobalVar.autoWork = new AutoWork();
             //GlobalVar.warrantPriceUpdator = new WarrantPriceUpdator();
             //GlobalVar.warrantPriceProcess = new WarrantPriceProcess();
         }
-       
 
-        public static void loadGlobalParameters() {
+
+        public static void LoadGlobalParameters() {
             if (GlobalVar.globalParameter == null)
                 GlobalVar.globalParameter = new GlobalParameter();
 
             DataTable dt = MSSQL.ExecSqlQry("SELECT [InterestRate],[GivenRewardPercent] FROM [EDIS].[dbo].[Global]", LoginSet.edisSqlConnString);
             GlobalVar.globalParameter.interestRate = Convert.ToDouble(dt.Rows[0]["InterestRate"]);
             GlobalVar.globalParameter.givenRewardPercent = Convert.ToDouble(dt.Rows[0]["GivenRewardPercent"]);
-            //GlobalVar.globalParameter.isLevelA = Convert.ToBoolean(dt.Rows[0]["IsLevelA"]);
-
-            //GlobalVar.globalParameter.interestRate = 0.025;
-            //A集券商獎勵額度目前為1%
-            //GlobalVar.globalParameter.givenRewardPercent = 0.01;
-            //本季是否為A級券商
-            //GlobalVar.globalParameter.isLevelA = true;
-            checkIsLevelA();
-            checkIsTodayTradeDate();
-            getNextTradeDate();
-            getLastTradeDate();
-            getFirstTradeDateOfQuarter();
+           
+            CheckIsLevelA();
+            CheckIsTodayTradeDate();
+            GetNextTradeDate();
+            GetLastTradeDate();
+            GetFirstTradeDateOfQuarter();
         }
 
-        private static void checkIsLevelA() {
+        private static void CheckIsLevelA() {
             DataTable isA = MSSQL.ExecSqlQry(@"select top 1 FLGDAT_FLGVAR from EDAISYS.dbo.FLAGDATAS 
                                             where FLGDAT_FLGNAM = 'WRT_MARKET_RATING'
                                             order by FLGDAT_ORDERS desc",
@@ -59,7 +53,7 @@ namespace WarrantDataManager
             }
             //MessageBox.Show(GlobalVar.globalParameter.isLevelA.ToString());
         }
-        private static void checkIsTodayTradeDate() {
+        private static void CheckIsTodayTradeDate() {
             DataTable dv = MSSQL.ExecSqlQry("SELECT IsTrade FROM [TradeDate] WHERE CONVERT(VARCHAR, TradeDate, 112) = CONVERT(VARCHAR, GETDATE(), 112)", LoginSet.tsquoteSqlConnString);
             if (dv.Rows[0]["IsTrade"].ToString() == "Y")
                 GlobalVar.globalParameter.isTodayTradeDate = true;
@@ -67,7 +61,7 @@ namespace WarrantDataManager
                 GlobalVar.globalParameter.isTodayTradeDate = false;
         }
 
-        private static void getLastTradeDate() {
+        private static void GetLastTradeDate() {
             try {
                 string sql = "SELECT TOP 1 TradeDate FROM TradeDate WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)<CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate desc";
 
@@ -79,7 +73,7 @@ namespace WarrantDataManager
             }
         }
 
-        private static void getNextTradeDate() {
+        private static void GetNextTradeDate() {
             try {
                 string sql = "SELECT TOP 3 TradeDate FROM [TradeDate] WHERE IsTrade='Y' AND CONVERT(VARCHAR,TradeDate,112)>CONVERT(VARCHAR,GETDATE(),112) ORDER BY TradeDate";
                 DataTable dv = MSSQL.ExecSqlQry(sql, LoginSet.tsquoteSqlConnString);
@@ -92,7 +86,7 @@ namespace WarrantDataManager
             }
         }
 
-        private static void getFirstTradeDateOfQuarter() {
+        private static void GetFirstTradeDateOfQuarter() {
             DateTime dt = DateTime.Now;
             string startQuarter = dt.AddMonths(0 - (dt.Month - 1) % 3).AddDays(1 - dt.Day).ToString("yyyyMMdd");
 
@@ -101,7 +95,7 @@ namespace WarrantDataManager
             GlobalVar.globalParameter.firstTradeDateQ = Convert.ToDateTime(dv.Rows[0][0]);
         }
 
-        public static void close() {
+        public static void Close() {
             if (GlobalVar.autoWork != null)
                 GlobalVar.autoWork.Dispose();
         }

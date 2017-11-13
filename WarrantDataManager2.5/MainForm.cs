@@ -49,7 +49,7 @@ namespace WarrantDataManager
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
             if (workThread != null && workThread.IsAlive) { workThread.Abort(); }
             if (msgThread != null && msgThread.IsAlive) { msgThread.Abort(); }
-            GlobalUtility.close();
+            GlobalUtility.Close();
         }
 
         private void RoutineWork() {
@@ -57,30 +57,17 @@ namespace WarrantDataManager
                 for (;;) {
                     while (workQueue2.Count > 0) {
                         try {
-                            WorkInQueue workInQueue = null;
-                            workQueue2.TryDequeue(out workInQueue);
+                            workQueue2.TryDequeue(out WorkInQueue workInQueue);
                             if (workInQueue != null) {
                                 WorkState workstate = workInQueue.Invoke();
                                 //workInQueue.Method.Name
                                 if (workstate == WorkState.Successful)
-                                    AddMessage("Work[" + workInQueue.Method.Name + "]" + "\t\t" + "Complete Sucessfully");
+                                    AddMessage($"Work[{workInQueue.Method.Name}]\tComplete Sucessfully");
                                 else if (workstate == WorkState.Exception)
-                                    AddMessage("Work[" + workInQueue.Method.Name + "]" + "\t\t" + "Failed Due To Exception");
+                                    AddMessage($"Work[{workInQueue.Method.Name}]\tFailed Due To Exception");
                                 else
-                                    AddMessage("Work[" + workInQueue.Method.Name + "]" + "\t\t" + "Failed Due To Some Error");
-                            }
-                            /*object obj = workQueue.Dequeue();
-                            if (obj != null) {
-                                Work work = (Work) obj;
-                                WorkState workstate = work.DoWork();
-                                if (workstate == WorkState.Successful)
-                                    AddMessage("Work[" + work.workName + "]" + "\t\t" + "Complete Sucessfully");
-                                else if (workstate == WorkState.Exception)
-                                    AddMessage("Work[" + work.workName + "]" + "\t\t" + "Failed Due To Exception");
-                                else
-                                    AddMessage("Work[" + work.workName + "]" + "\t\t" + "Failed Due To Some Error");
-                                work.Close();
-                            }*/
+                                    AddMessage($"Work[{workInQueue.Method.Name}]\tFailed Due To Some Error");
+                            }                           
                         } catch (ThreadAbortException tex) {
                             MessageBox.Show(tex.Message);
                         } catch (Exception ex) {
@@ -96,15 +83,11 @@ namespace WarrantDataManager
 
         private void MessageWork() {
             try {
-                for (;;) {
-                    //while (messageQueue.Count > 0) {
+                for (;;) {                   
                     while (messageQueue2.Count > 0) {
                         try {
-                            string message = "";
-                            messageQueue2.TryDequeue(out message);
-                            //object obj = messageQueue.Dequeue();
-                            if (message != "") {
-                                //string message = obj.ToString();
+                            messageQueue2.TryDequeue(out string message);
+                            if (message != "") {                               
                                 if (this.InvokeRequired)
                                     this.BeginInvoke(new ShowHandler(PublicMessage), new object[] { message });
                                 else
@@ -134,32 +117,32 @@ namespace WarrantDataManager
 
         private void UnderlyingDataRefresh_Click(object sender, EventArgs e) {
             //AddWork(new WarrantUnderlyingWork("UnderlyingDataRefresh", "標的資料更新"));
-            AddWork(DataCollect.updateWarrantUnderlying);
+            AddWork(DataCollect.UpdateWarrantUnderlying);
         }
 
         private void WarrantDataRefresh_Click(object sender, EventArgs e) {
             //AddWork(new WarrantBasicWork("WarrantDataRefresh", "權證資料更新"));
-            AddWork(DataCollect.updateWarrantBasic);
+            AddWork(DataCollect.UpdateWarrantBasic);
         }
 
         private void IssueCreditRefresh_Click(object sender, EventArgs e) {
             //AddWork(new WarrantUnderlyingCreditWork("IssueCreditRefresh", "權證額度更新"));
-            AddWork(DataCollect.updateWarrantUnderlyingCredit);
+            AddWork(DataCollect.UpdateWarrantUnderlyingCredit);
         }
 
         private void IssueCheckRefresh_Click(object sender, EventArgs e) {
             //AddWork(new WarrantIssueCheckWork("IssueCheckRefresh", "發行檢查更新"));
-            AddWork(CMoneyData.loadData);
+            AddWork(CMoneyData.LoadData);
         }
 
         private void SummaryRefresh_Click(object sender, EventArgs e) {
             //AddWork(new WarrantUnderlyingSummaryWork("SummaryRefresh", "Summary更新"));
-            AddWork(DataCollect.updateWarrantUnderlyingSummary);
+            AddWork(DataCollect.UpdateWarrantUnderlyingSummary);
         }
 
         private void PricesRefresh_Click(object sender, EventArgs e) {
             //AddWork(new WarrantPricesWork("PricesRefresh", "價格更新"));
-            AddWork(DataCollect.updateWarrantPrices);
+            AddWork(DataCollect.UpdateWarrantPrices);
         }
 
         private void UpdateAll_Click(object sender, EventArgs e) {
@@ -169,17 +152,17 @@ namespace WarrantDataManager
             //AddWork(new WarrantIssueCheckWork("IssueCheckRefresh", "發行檢查更新"));
             //AddWork(new WarrantUnderlyingSummaryWork("SummaryRefresh", "Summary更新"));
             //AddWork(new WarrantPricesWork("PricesRefresh", "價格更新"));
-            AddWork(DataCollect.updateWarrantUnderlying);
-            AddWork(DataCollect.updateWarrantBasic);
-            AddWork(DataCollect.updateWarrantUnderlyingCredit);
-            AddWork(CMoneyData.loadData);
-            AddWork(DataCollect.updateWarrantUnderlyingSummary);
-            AddWork(DataCollect.updateWarrantPrices);
+            AddWork(DataCollect.UpdateWarrantUnderlying);
+            AddWork(DataCollect.UpdateWarrantBasic);
+            AddWork(DataCollect.UpdateWarrantUnderlyingCredit);
+            AddWork(CMoneyData.LoadData);
+            AddWork(DataCollect.UpdateWarrantUnderlyingSummary);
+            AddWork(DataCollect.UpdateWarrantPrices);
         }
 
         private void CleanApplyList_Click(object sender, EventArgs e) {
             //AddWork(new CleanApplyList("CleanApplyList", "申請表清空"));
-            AddWork(DataCollect.updateApplyLists);
+            AddWork(DataCollect.UpdateApplyLists);
         }
 
 
