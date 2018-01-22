@@ -91,8 +91,8 @@ namespace WarrantDataManager
                                    WHERE a.[WRTCAN_CAN_ISSUE]='1'", conn);*/
                 // LEFT JOIN [10.10.1.30].[EDIS].[dbo].[Underlying_TraderIssue] c ON a.[WRTCAN_STKID]=c.UID COLLATE Chinese_Taiwan_Stroke_CI_AS
                 MSSQL.ExecSqlCmd(@"INSERT INTO [EDIS].[dbo].[WarrantUnderlying] (UnderlyingID, UnderlyingIDCMoney, UnderlyingName, TraderID, TraderName, StockType, FullName) 
-select C.WRTCAN_STKID, C.WRTCAN_CMONEY_ID, C.WRTCAN_SHORT_NAME, C.TraderAssount, C.TraderName, C.WRTCAN_STOCKTYPE, C.WRTCAN_FULL_NAME from 
-(SELECT A.WRTCAN_STKID, A.WRTCAN_CMONEY_ID, A.WRTCAN_SHORT_NAME, ISNULL(B.TraderAccount,'7643') as TraderAssount, ISNULL(B.TraderName,'Aaron') as TraderName, A.WRTCAN_STOCKTYPE, A.WRTCAN_FULL_NAME,    
+select C.WRTCAN_STKID, C.WRTCAN_CMONEY_ID, C.WRTCAN_SHORT_NAME, C.TraderAccount, C.TraderName, C.WRTCAN_STOCKTYPE, C.WRTCAN_FULL_NAME from 
+(SELECT A.WRTCAN_STKID, A.WRTCAN_CMONEY_ID, A.WRTCAN_SHORT_NAME, ISNULL(B.TraderAccount,'7643') as TraderAccount, ISNULL(B.TraderName,'Aaron') as TraderName, A.WRTCAN_STOCKTYPE, A.WRTCAN_FULL_NAME,    
     CASE WHEN (WRTCAN_STOCKTYPE = 'DI' OR WRTCAN_STOCKTYPE = 'DE') AND (AUT.FLGDAT_FLGVAR is null OR AUT.FLGDAT_FLGVAR = 0 OR AUT.FLGDAT_FLGVAR < CONVERT(VARCHAR, GETDATE(), 112)) THEN '未授權'                       
     WHEN WRTCAN_STOCKTYPE = 'DS' AND A.WRTCAN_STKID IN('2883', '6005') THEN '未授權'
     WHEN (WRTCAN_STOCKTYPE = 'DS' OR WRTCAN_STOCKTYPE = 'DR') AND A.WRTCAN_SOURCE = 'STOCK_A' AND (C.FLGDAT_FLGVAR <> 'A' OR C.FLGDAT_FLGVAR is null) THEN '非A級券商'               
@@ -207,14 +207,14 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
         private static void InsertWarrantUnderlyingCredit() {
             string sql = @"INSERT INTO [WarrantReward]"
         + " select ID, sum(sum1), sum(count1)"
-        + " from ((SELECT UnderlyingId as ID, SUM([exeRatio]*([FurthurIssueNum]/1000+[IssueNum]/1000)) as sum1, COUNT(WarrantID) as count1"
+        + " from ((SELECT UnderlyingId as ID, SUM([exeRatio]*([IssueNum]/1000)) as sum1, COUNT(WarrantID) as count1"
                 + " FROM [EDIS].[dbo].[WarrantBasic] "
-                + " WHERE isReward='1' AND IssueDate > '" + GlobalVar.globalParameter.firstTradeDateQ.ToString("yyyyMMdd") + "'"
+                + $" WHERE isReward='1' AND IssueDate > '{GlobalVar.globalParameter.firstTradeDateQ.ToString("yyyyMMdd")}'"
                 + " GROUP BY UnderlyingId)"
             + " UNION "
                 + " (Select UnderlyingID as ID, Sum(ISNULL(RewardQuotaUsed, 0)) as sum1, count(RewardQuotaUsed) as count1"
                 + " FROM [EDIS].[dbo].[ReIssueReward]"
-                + " WHERE MDate >= '" + GlobalVar.globalParameter.firstTradeDateQ.ToString("yyyyMMdd") + "'"
+                + $" WHERE MDate >= '{GlobalVar.globalParameter.firstTradeDateQ.ToString("yyyyMMdd")}'"
                 + " GROUP BY UnderlyingID)) as A"
         + " Group By ID;";
 
@@ -229,20 +229,23 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
             string startQuarterDate = startQuarter.ToString("yyyy-MM-dd");*/
 
             conn.Open();
-            MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantUnderlyingCredit (UnderlyingID, MDate, DataDate, Market, AvailableShares, IssuedPercent, CanIssue, CanFurthurIssue)
+            MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantUnderlyingCredit (UnderlyingID, MDate, DataDate, Market, AvailableShares, IssuedPercent, CanIssue, CanFurthurIssue, CanIssueDelta)
                                SELECT distinct
-                                QUOTA.ISUQTA_STKID, QUOTA.ISUQTA_CREATME, QUOTA.ISUQTA_DATE, SUBSTRING(QUOTA.ISUQTA_MKTTYPE,4,3), (QUOTA.ISUQTA_FOR_WARRANT_SHARES/1000), QUOTA.ISUQTA_ISSUED_PERCENT,
-                                (CANDI.尚可發行額度- QUOTA.ISUQTA_ISSUED_PERCENT) / 100.0 * QUOTA.ISUQTA_FOR_WARRANT_SHARES / 1000.0,
-                                (CANDI.增額發行額度- QUOTA.ISUQTA_ISSUED_PERCENT) / 100.0 * QUOTA.ISUQTA_FOR_WARRANT_SHARES / 1000.0
-                               FROM [10.7.0.52].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] AS QUOTA,
-                               (SELECT
-                                    WRTCAN_STKID,
-                                    CASE WHEN WRTCAN_STOCKTYPE = 'DE' THEN 100 ELSE 22 END AS 尚可發行額度,
-                                    CASE WHEN WRTCAN_STOCKTYPE = 'DE' THEN 100 ELSE 30 END AS 增額發行額度
-                                FROM [10.7.0.52].[WAFT].[dbo].[CANDIDATE]
-WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CANDIDATE])) AS CANDI
-                                WHERE QUOTA.ISUQTA_DATE= ( SELECT MAX(ISUQTA_DATE) FROM [10.7.0.52].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] )
-                                AND QUOTA.ISUQTA_STKID = CANDI.WRTCAN_STKID", conn);//V_CANDIDATE
+                                A.ISUQTA_STKID, A.ISUQTA_CREATME, A.ISUQTA_DATE, SUBSTRING(A.ISUQTA_MKTTYPE,4,3), (A.ISUQTA_FOR_WARRANT_SHARES/1000), A.ISUQTA_ISSUED_PERCENT,
+                                (B.CanIssue- A.ISUQTA_ISSUED_PERCENT) / 100.0 * A.ISUQTA_FOR_WARRANT_SHARES / 1000.0,
+                                (B.CanFurthurIssue- A.ISUQTA_ISSUED_PERCENT) / 100.0 * A.ISUQTA_FOR_WARRANT_SHARES / 1000.0
+								, (B.CanIssue- A.ISUQTA_ISSUED_PERCENT) / 100.0 * A.ISUQTA_FOR_WARRANT_SHARES / 1000.0 - (B.CanIssue- Q1.ISUQTA_ISSUED_PERCENT) / 100.0 * Q1.ISUQTA_FOR_WARRANT_SHARES / 1000.0
+                               from [10.7.0.52].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] as A, 
+							    [10.7.0.52].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] as Q1, 						  
+								(select WRTCAN_STKID,
+                                    case when WRTCAN_STOCKTYPE = 'DE' then 100 else 22 end as CanIssue,
+                                    case when WRTCAN_STOCKTYPE = 'DE' then 100 else 30 end as CanFurthurIssue
+									FROM [10.7.0.52].[WAFT].[dbo].[CANDIDATE]
+									where WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CANDIDATE])) AS B
+                                where A.ISUQTA_DATE = (select MAX(ISUQTA_DATE) from [10.7.0.52].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] )
+								and Q1.ISUQTA_DATE = (select MAX(ISUQTA_DATE) from [10.7.0.52].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA]  where ISUQTA_DATE < (select MAX(ISUQTA_DATE) from [10.7.0.52].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] ))
+                                and A.ISUQTA_STKID = Q1.ISUQTA_STKID and A.ISUQTA_STKID = B.WRTCAN_STKID
+								order by A.ISUQTA_STKID", conn);//V_CANDIDATE
             MSSQL.ExecSqlCmd(sql, conn);
             conn.Close();
         }
@@ -263,6 +266,25 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
                                LEFT JOIN [10.60.0.37].[TsQuote].[dbo].[PBest5] B ON A.CommodityId=B.CommodityId", conn);
         }
 
+        private static void UpdateLastPrices() {
+            MSSQL.ExecSqlCmd(@"UPDATE [dbo].[WarrantPrices]
+   SET [MPrice] = B.MPrice
+      ,[MDateTime] =  GetDate()     
+from (SELECT [T730010] as ID  
+      ,Case when [T730050] <> 0 then [T730050]
+	  else T730060 END as Mprice	 
+	  --,[T730030]
+      --,[T730040] 	 
+  FROM [10.60.0.37].[DeriPosition].[dbo].[PTOS_HHPT73M] 
+Union SELECT [T730010]  
+      ,Case when [T730050] <> 0 then [T730050]
+	  else T730060 END
+	  --,[T730030]
+      --,[T730040]  	 
+  FROM [10.60.0.37].[DeriPosition].[dbo].[PTOS_OCPT73M] ) as B
+ WHERE CommodityID = B.ID COLLATE Chinese_Taiwan_Stroke_CI_AS", conn);
+        }
+
         private static void DeleteWarrantUnderlyingSummary() {
 
         }
@@ -278,19 +300,20 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
 
             conn.Open();
             DataTable notIssuable = MSSQL.ExecSqlQry("Select UnderlyingID, TraderID from EDIS.dbo.WarrantUnderlyingSummary where Issuable='N'", conn);
+            DataTable issuableAnnounce = MSSQL.ExecSqlQry($"SELECT [InformationContent], MUser FROM [dbo].[InformationLog] where MDate >= '{DateTime.Today.ToString("yyyyMMdd")}' and InformationType = 'AnnounceIssue' ", conn);
 
             MSSQL.ExecSqlCmd("DELETE FROM [WarrantUnderlyingSummary]", conn);
 
             if (GlobalVar.globalParameter.isLevelA)
-                MSSQL.ExecSqlCmd("INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssuedPercent, AccNetIncome, Issuable, RewardIssueCredit) "
-                          + $" SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), b.CanIssue, b.IssuedPercent, IsNull(c.AccNetIncome,0), 'Y', b.AvailableShares * {GlobalVar.globalParameter.givenRewardPercent} - IsNull(d.[UsedRewardNum],0) "
+                MSSQL.ExecSqlCmd("INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssueCreditDelta, IssuedPercent, AccNetIncome, Issuable, RewardIssueCredit) "
+                          + $" SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), Floor(b.CanIssue), b.CanIssueDelta, b.IssuedPercent, IsNull(c.AccNetIncome,0), 'Y', Floor(b.AvailableShares * {GlobalVar.globalParameter.givenRewardPercent} - IsNull(d.[UsedRewardNum],0)) "
                           + " FROM [EDIS].[dbo].[WarrantUnderlying] a "
                           + " LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingCredit] b on a.UnderlyingID=b.UnderlyingID "
                           + " LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID "
                           + " LEFT JOIN [EDIS].[dbo].[WarrantReward] d on a.UnderlyingID=d.UnderlyingID", conn);
             else
-                MSSQL.ExecSqlCmd("INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssuedPercent, AccNetIncome, Issuable, RewardIssueCredit) "
-                           + " SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), b.CanIssue, b.IssuedPercent, IsNull(c.AccNetIncome,0), 'Y', 0 "
+                MSSQL.ExecSqlCmd("INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssueCreditDelta, IssuedPercent, AccNetIncome, Issuable, RewardIssueCredit, issueCreditDelta) "
+                           + " SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), Floor(b.CanIssue), b.CanIssueDelta, b.IssuedPercent, IsNull(c.AccNetIncome,0), 'Y', 0 "
                            + " FROM [EDIS].[dbo].[WarrantUnderlying] a "
                            + " LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingCredit] b on a.UnderlyingID=b.UnderlyingID "
                            + " LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID ", conn);
@@ -311,8 +334,22 @@ WHERE WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.7.0.52].[WAFT].[dbo].[CAND
                                        where row[0].ToString() == row2[0].ToString()
                                        select row;
 
-            foreach (DataRow row in notIssuable2Issuable.OrderBy(x => x[1].ToString()))
+            foreach (DataRow row in notIssuable2Issuable.OrderBy(x => x[1].ToString())) {
                 MSSQL.ExecSqlCmd($"INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values( GETDATE(), 'Announce', '{row[0].ToString()}可以發行', '{row[1].ToString()}')", conn);
+                MSSQL.ExecSqlCmd($"INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values( GETDATE(), 'AnnounceIssue', '{row[0].ToString()}', '{row[1].ToString()}')", conn);
+            }
+
+            DataTable notIssuableAnnounce = MSSQL.ExecSqlQry("Select UnderlyingID from EDIS.dbo.WarrantUnderlyingSummary where Issuable='N'", conn);
+            var issuable2NotIssuable = from row in issuableAnnounce.AsEnumerable()
+                                       from row2 in notIssuableAnnounce.AsEnumerable()
+                                       where row[0].ToString() == row2[0].ToString()
+                                       select row;
+
+            foreach (var row in issuable2NotIssuable) {//.OrderBy(x => x[1].ToString())
+                MSSQL.ExecSqlCmd($"INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values( GETDATE(), 'Log', '{row[0].ToString()}不可發行', '{row[1].ToString()}')", conn);
+                MSSQL.ExecSqlCmd($"Delete from [InformationLog] where MDate >='{DateTime.Today.ToString("yyyyMMdd")}' and InformationType ='Announce' and InformationContent ='{row[0].ToString()}可以發行'", conn);
+                MSSQL.ExecSqlCmd($"Delete from [InformationLog] where MDate >='{DateTime.Today.ToString("yyyyMMdd")}' and InformationType ='AnnounceIssue' and InformationContent ='{row[0].ToString()}'", conn);
+            }
 
             conn.Close();
         }

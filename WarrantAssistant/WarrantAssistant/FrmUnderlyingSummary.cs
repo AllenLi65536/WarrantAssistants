@@ -27,6 +27,7 @@ namespace WarrantAssistant
             dataGridView1.Columns[7].HeaderText = "今日額度";
             dataGridView1.Columns[8].HeaderText = "獎勵額度";
             dataGridView1.Columns[9].HeaderText = "是否虧損";
+            dataGridView1.Columns[10].HeaderText = "額度變化";
 
             dataGridView1.Columns[2].Width = 80;
             dataGridView1.Columns[3].Width = 80;
@@ -35,9 +36,11 @@ namespace WarrantAssistant
             dataGridView1.Columns[7].Width = 80;
             dataGridView1.Columns[8].Width = 80;
             dataGridView1.Columns[9].Width = 80;
+            dataGridView1.Columns[10].Width = 80;
 
             dataGridView1.Columns[7].DefaultCellStyle.Format = "N0";            
             dataGridView1.Columns[8].DefaultCellStyle.Format = "N0";
+            dataGridView1.Columns[10].DefaultCellStyle.Format = "N0";
 
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = false;
@@ -48,7 +51,7 @@ namespace WarrantAssistant
         }
 
         private void LoadData() {
-            string sql = "SELECT [UnderlyingID], [UnderlyingName], [TraderID], [Market], [Issuable], [PutIssuable], IsNull([IssuedPercent],0) [IssuedPercent], IsNull([IssueCredit],0) [IssueCredit],  IsNull([RewardIssueCredit],0) [RewardIssueCredit], CASE WHEN [AccNetIncome]<0 THEN 'Y' ELSE 'N' END AccNetIncome FROM [EDIS].[dbo].[WarrantUnderlyingSummary] ORDER BY Market desc, UnderlyingID";
+            string sql = "SELECT [UnderlyingID], [UnderlyingName], [TraderID], [Market], [Issuable], [PutIssuable], IsNull([IssuedPercent],0) [IssuedPercent], IsNull([IssueCredit],0) [IssueCredit],  IsNull([RewardIssueCredit],0) [RewardIssueCredit], CASE WHEN [AccNetIncome]<0 THEN 'Y' ELSE 'N' END AccNetIncome, IssueCreditDelta FROM [EDIS].[dbo].[WarrantUnderlyingSummary] ORDER BY Market desc, UnderlyingID";
 
             dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
             dataGridView1.DataSource = dataTable;

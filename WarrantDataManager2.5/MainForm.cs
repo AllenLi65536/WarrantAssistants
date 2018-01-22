@@ -54,7 +54,7 @@ namespace WarrantDataManager
 
         private void RoutineWork() {
             try {
-                for (;;) {
+                for (; ; ) {
                     while (workQueue2.Count > 0) {
                         try {
                             workQueue2.TryDequeue(out WorkInQueue workInQueue);
@@ -62,12 +62,12 @@ namespace WarrantDataManager
                                 WorkState workstate = workInQueue.Invoke();
                                 //workInQueue.Method.Name
                                 if (workstate == WorkState.Successful)
-                                    AddMessage($"Work[{workInQueue.Method.Name}]\tComplete Sucessfully");
+                                    AddMessage($"Complete Sucessfully\t\t{workInQueue.Method.Name}");
                                 else if (workstate == WorkState.Exception)
-                                    AddMessage($"Work[{workInQueue.Method.Name}]\tFailed Due To Exception");
+                                    AddMessage($"Failed Due To Exception\t\t{workInQueue.Method.Name}");
                                 else
-                                    AddMessage($"Work[{workInQueue.Method.Name}]\tFailed Due To Some Error");
-                            }                           
+                                    AddMessage($"Failed Due To Some Error\t\t{workInQueue.Method.Name}");
+                            }
                         } catch (ThreadAbortException tex) {
                             MessageBox.Show(tex.Message);
                         } catch (Exception ex) {
@@ -83,11 +83,11 @@ namespace WarrantDataManager
 
         private void MessageWork() {
             try {
-                for (;;) {                   
+                for (; ; ) {
                     while (messageQueue2.Count > 0) {
                         try {
                             messageQueue2.TryDequeue(out string message);
-                            if (message != "") {                               
+                            if (message != "") {
                                 if (this.InvokeRequired)
                                     this.BeginInvoke(new ShowHandler(PublicMessage), new object[] { message });
                                 else

@@ -165,7 +165,7 @@ namespace WarrantAssistant
                                   ,[MUser]
                               FROM [EDIS].[dbo].[InformationLog]
                               WHERE InformationType='" + infoOrAnnounce + "'";
-                sql += "AND CONVERT(VARCHAR,Date,112) >='" + GlobalVar.globalParameter.lastTradeDate.ToString("yyyy-MM-dd") + "' ORDER BY MDate DESC";
+                sql += "AND CONVERT(VARCHAR,Date,112) >'" + GlobalVar.globalParameter.lastTradeDate.ToString("yyyyMMdd") + "' ORDER BY MDate DESC";
                 System.Data.DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
                 if (dt.Rows.Count == dv.Rows.Count)
