@@ -50,8 +50,13 @@ namespace WarrantAssistant
             //dataGridView1.DefaultCellStyle.SelectionForeColor = Color.Red;
         }
 
-        private void LoadData() {
-            string sql = "SELECT [UnderlyingID], [UnderlyingName], [TraderID], [Market], [Issuable], [PutIssuable], IsNull([IssuedPercent],0) [IssuedPercent], IsNull([IssueCredit],0) [IssueCredit],  IsNull([RewardIssueCredit],0) [RewardIssueCredit], CASE WHEN [AccNetIncome]<0 THEN 'Y' ELSE 'N' END AccNetIncome, IssueCreditDelta FROM [EDIS].[dbo].[WarrantUnderlyingSummary] ORDER BY Market desc, UnderlyingID";
+        private void LoadData(string ID = "") {
+            string sql;
+            if (ID == "")
+                sql = "SELECT [UnderlyingID], [UnderlyingName], [TraderID], [Market], [Issuable], [PutIssuable], IsNull([IssuedPercent],0) [IssuedPercent], IsNull([IssueCredit],0) [IssueCredit],  IsNull([RewardIssueCredit],0) [RewardIssueCredit], CASE WHEN [AccNetIncome]<0 THEN 'Y' ELSE 'N' END AccNetIncome, IssueCreditDelta FROM [EDIS].[dbo].[WarrantUnderlyingSummary] ORDER BY Market desc, UnderlyingID";
+            else
+                sql = "SELECT [UnderlyingID], [UnderlyingName], [TraderID], [Market], [Issuable], [PutIssuable], IsNull([IssuedPercent],0) [IssuedPercent], IsNull([IssueCredit],0) [IssueCredit],  IsNull([RewardIssueCredit],0) [RewardIssueCredit], CASE WHEN [AccNetIncome]<0 THEN 'Y' ELSE 'N' END AccNetIncome, IssueCreditDelta"
+                 + $" FROM [EDIS].[dbo].[WarrantUnderlyingSummary] where TraderID = '{TraderID.Text.TrimStart('0')}' ORDER BY Market desc, UnderlyingID";
 
             dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
             dataGridView1.DataSource = dataTable;
@@ -60,9 +65,12 @@ namespace WarrantAssistant
             }
         }
 
-        private void FrmUnderlyingSummary_Load(object sender, EventArgs e) {
+        private void FrmUnderlyingSummary_Load(object sender, EventArgs e) {          
             LoadData();
             InitialGrid();
+            foreach (var item in GlobalVar.globalParameter.traders)
+                TraderID.Items.Add(item);
+            TraderID.Items.Add("");
         }
 
         private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {
@@ -110,6 +118,10 @@ namespace WarrantAssistant
                     GlobalUtility.MenuItemClick<FrmIssueCheckPut>().SelectUnderlying(target);
                     break;
             }
+        }
+
+        private void TraderID_SelectedIndexChanged(object sender, EventArgs e) {
+            LoadData(TraderID.Text);            
         }
     }
 }

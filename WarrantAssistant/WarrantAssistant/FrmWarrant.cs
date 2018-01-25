@@ -19,14 +19,7 @@ namespace WarrantAssistant
             InitialGrid();
             foreach (var item in GlobalVar.globalParameter.traders)
                 toolStripComboBox1.Items.Add(item);
-
-            /*toolStripComboBox1.Items.Add("0005986");
-            toolStripComboBox1.Items.Add("0007643");
-            toolStripComboBox1.Items.Add("0008570");
-            //toolStripComboBox1.Items.Add("0008629");
-            toolStripComboBox1.Items.Add("0008730");
-            toolStripComboBox1.Items.Add("0010120");*/
-
+            toolStripComboBox1.Items.Add("");
         }
 
         private void InitialGrid() {
@@ -164,7 +157,7 @@ namespace WarrantAssistant
                                      ,[FurthurIssueNum]/1000 [FurthurIssueNum]
                                  FROM [EDIS].[dbo].[WarrantBasic] ";
 
-                sql += "WHERE [UnderlyingID]='" + toolStripTextBox1.Text + "' ORDER BY ExpiryDate";
+                sql += $"WHERE [UnderlyingID]='{toolStripTextBox1.Text}' ORDER BY ExpiryDate";
 
                 dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
                 dataGridView1.DataSource = dataTable;                
@@ -173,7 +166,7 @@ namespace WarrantAssistant
                 LoadData();
         }
 
-        private void loadDataByTrader() {
+        private void LoadDataByTrader() {
             string comboBoxContent = toolStripComboBox1.Text;
             if (comboBoxContent != "") {
                 string sql = @"SELECT [WarrantID]
@@ -195,11 +188,11 @@ namespace WarrantAssistant
                                      ,[FurthurIssueNum]/1000 [FurthurIssueNum]
                                  FROM [EDIS].[dbo].[WarrantBasic] ";
 
-                sql += "WHERE [TraderID]='" + toolStripComboBox1.Text + "' ORDER BY UnderlyingID, ExpiryDate";
+                sql += $"WHERE [TraderID]='{toolStripComboBox1.Text}' ORDER BY UnderlyingID, ExpiryDate";
 
                 dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
                 dataGridView1.DataSource = dataTable;
-                toolStripComboBox1.Text = "";
+                //toolStripComboBox1.Text = "";
             } else
                 LoadData();
         }
@@ -222,10 +215,14 @@ namespace WarrantAssistant
         private void toolStripComboBox1_KeyDown(object sender, KeyEventArgs e) {
             try {
                 if (e.KeyCode == Keys.Enter)
-                    loadDataByTrader();
+                    LoadDataByTrader();
             } catch (Exception ex) {
                 MessageBox.Show(ex.Message);
             }
+        }       
+
+        private void toolStripComboBox1_SelectedIndexChanged(object sender, EventArgs e) {
+            LoadDataByTrader();
         }
     }
 }
