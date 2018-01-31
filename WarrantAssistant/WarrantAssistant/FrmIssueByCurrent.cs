@@ -13,7 +13,7 @@ using System.Data.SqlClient;
 
 namespace WarrantAssistant
 {
-    public partial class FrmIssueByCurrent : Form
+    public partial class FrmIssueByCurrent:Form
     {
         private DataTable dt = new DataTable();
         string userID = GlobalVar.globalParameter.userID;
@@ -21,13 +21,11 @@ namespace WarrantAssistant
         string trader = "";
         string underlyingID = "";
 
-        public FrmIssueByCurrent()
-        {
+        public FrmIssueByCurrent() {
             InitializeComponent();
         }
 
-        private void FrmIssueByCurrent_Load(object sender, EventArgs e)
-        {
+        private void FrmIssueByCurrent_Load(object sender, EventArgs e) {
             foreach (var item in GlobalVar.globalParameter.traders)
                 toolStripComboBox1.Items.Add(item.TrimStart('0'));
 
@@ -35,10 +33,9 @@ namespace WarrantAssistant
             InitialGrid();
             LoadTraderSql();
             LoadData();
-            
+
         }
-        private void InitialGrid()
-        {
+        private void InitialGrid() {
             dt.Columns.Add("標的代號", typeof(string));
             dt.Columns.Add("標的名稱", typeof(string));
             dt.Columns.Add("權證代號", typeof(string));
@@ -99,8 +96,7 @@ namespace WarrantAssistant
             ultraGrid1.DisplayLayout.Override.HeaderClickAction = Infragistics.Win.UltraWinGrid.HeaderClickAction.SortMulti;
         }
 
-        private void LoadTraderSql()
-        {
+        private void LoadTraderSql() {
             trader = toolStripComboBox1.Text;
             sql = @"SELECT a.[UnderlyingID]
                                   ,c.[UnderlyingName]
@@ -124,8 +120,7 @@ namespace WarrantAssistant
             sql += " WHERE (c.[TraderID])='" + trader + "' ORDER BY a.UnderlyingID, a.[WarrantType] desc, a.IssueDate desc";
         }
 
-        private void LoadUnderSql()
-        {
+        private void LoadUnderSql() {
             underlyingID = toolStripTextBox1.Text;
             sql = @"SELECT a.[UnderlyingID]
                                   ,c.[UnderlyingName]
@@ -149,20 +144,16 @@ namespace WarrantAssistant
             sql += " WHERE a.[UnderlyingID]='" + underlyingID + "' ORDER BY a.[WarrantType] desc, a.IssueDate desc";
         }
 
-        private void SortTrader()
-        { 
-            ultraGrid1.DisplayLayout.Bands[0].Columns["標的代號"].SortIndicator=SortIndicator.Ascending;
+        private void SortTrader() {
+            ultraGrid1.DisplayLayout.Bands[0].Columns["標的代號"].SortIndicator = SortIndicator.Ascending;
         }
 
-        private void LoadData()
-        {
+        private void LoadData() {
             DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
-            if (dv.Count > 0)
-            {
+            if (dv.Count > 0) {
                 dt.Rows.Clear();
-                foreach (DataRowView drv in dv)
-                {
+                foreach (DataRowView drv in dv) {
                     DataRow dr = dt.NewRow();
 
                     string warrantType = drv["WarrantType"].ToString();
@@ -171,40 +162,29 @@ namespace WarrantAssistant
                     CallPutType cpType = CallPutType.Call;
                     double financialR = 0.0;
 
-                    if (warrantType == "浮動重設認購權證")
-                    {
+                    if (warrantType == "浮動重設認購權證") {
                         type = "重設型";
                         cp = "C";
                         cpType = CallPutType.Call;
-                    }
-                    else if (warrantType == "浮動重設認售權證")
-                    {
+                    } else if (warrantType == "浮動重設認售權證") {
                         type = "重設型";
                         cp = "P";
                         cpType = CallPutType.Put;
-                    }
-                    else if (warrantType == "重設型牛證認購")
-                    {
+                    } else if (warrantType == "重設型牛證認購") {
                         type = "牛熊證";
                         cp = "C";
                         cpType = CallPutType.Call;
                         financialR = 5.0;
-                    }
-                    else if (warrantType == "重設型熊證認售")
-                    {
+                    } else if (warrantType == "重設型熊證認售") {
                         type = "牛熊證";
                         cp = "P";
                         cpType = CallPutType.Put;
                         financialR = 5.0;
-                    }
-                    else if (warrantType == "一般型認售權證")
-                    {
+                    } else if (warrantType == "一般型認售權證") {
                         type = "一般型";
                         cp = "P";
                         cpType = CallPutType.Put;
-                    }
-                    else
-                    {
+                    } else {
                         type = "一般型";
                         cp = "C";
                         cpType = CallPutType.Call;
@@ -226,8 +206,7 @@ namespace WarrantAssistant
                     double price = 0.0;
                     double delta = 0.0;
 
-                    if (s != 0.0)
-                    {
+                    if (s != 0.0) {
                         if (type == "牛熊證")
                             price = Pricing.BullBearWarrantPrice(cpType, s, (resetR / 100), GlobalVar.globalParameter.interestRate, (iv / 100), t, (financialR / 100), cr);
                         else if (type == "重設型")
@@ -259,37 +238,37 @@ namespace WarrantAssistant
                     dr["到期日"] = expiry;
                     dr["今日理論價"] = Math.Round(price, 2);
                     dr["Delta"] = Math.Round(delta, 4);
-                    dr["交易員"] = drv["TraderID"].ToString().PadLeft(7,'0');
+                    dr["交易員"] = drv["TraderID"].ToString().PadLeft(7, '0');
 
                     dt.Rows.Add(dr);
                 }
-                
+
             }
 
         }
 
-        private void toolStripComboBox1_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter && toolStripComboBox1.Text != "")
-            {
+        private void toolStripComboBox1_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Enter && toolStripComboBox1.Text != "") {
                 LoadTraderSql();
                 LoadData();
-                toolStripComboBox1.Text = "";
+                //toolStripComboBox1.Text = "";
             }
         }
 
-        private void toolStripTextBox1_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter && toolStripTextBox1.Text != "")
-            {
+        private void toolStripComboBox1_SelectedIndexChanged(object sender, EventArgs e) {
+            LoadTraderSql();
+            LoadData();
+        }
+
+        private void toolStripTextBox1_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Enter && toolStripTextBox1.Text != "") {
                 LoadUnderSql();
                 LoadData();
                 toolStripTextBox1.Text = "";
             }
         }
 
-        private void ultraGrid1_InitializeRow(object sender, InitializeRowEventArgs e)
-        {
+        private void ultraGrid1_InitializeRow(object sender, InitializeRowEventArgs e) {
             DateTime expiry;
             string expiryStr = e.Row.Cells["到期日"].Value.ToString();
             expiry = Convert.ToDateTime(expiryStr);
@@ -302,20 +281,17 @@ namespace WarrantAssistant
                 e.Row.Cells["今日理論價"].Appearance.ForeColor = Color.Red;
         }
 
-        private void ultraGrid1_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Right)
-            {
+        private void ultraGrid1_MouseClick(object sender, MouseEventArgs e) {
+            if (e.Button == MouseButtons.Right) {
                 contextMenuStrip1.Show();
             }
         }
 
-        private void 加到申請編輯表ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
+        private void 加到申請編輯表ToolStripMenuItem_Click(object sender, EventArgs e) {
             string sqlTemp = "SELECT * FROM [EDIS].[dbo].[ApplyTempList] WHERE UserID='" + userID + "'";
             DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
             int count = dvTemp.Count;
-            string serialNum = DateTime.Today.ToString("yyyyMMdd") + userID + "01" + (count+1).ToString("0#");
+            string serialNum = DateTime.Today.ToString("yyyyMMdd") + userID + "01" + (count + 1).ToString("0#");
             string underlyingID = ultraGrid1.ActiveRow.Cells["標的代號"].Value.ToString();
             string underlyingName = ultraGrid1.ActiveRow.Cells["標的名稱"].Value.ToString();
             string WID = ultraGrid1.ActiveRow.Cells["權證代號"].Value.ToString();
@@ -341,22 +317,19 @@ namespace WarrantAssistant
             expiryDate = expiryDate.AddDays(-1);
             string sqlTemp2 = "SELECT TOP 1 TradeDate from TradeDate WHERE IsTrade='Y' AND TradeDate >= '" + expiryDate.ToString("yyyy-MM-dd") + "'";
             DataView dvTemp2 = DeriLib.Util.ExecSqlQry(sqlTemp2, GlobalVar.loginSet.tsquoteSqlConnString);
-            foreach (DataRowView drTemp in dvTemp2)
-            {
+            foreach (DataRowView drTemp in dvTemp2) {
                 expiryDate = Convert.ToDateTime(drTemp["TradeDate"]);
             }
             string expiryMonth = "";
             int month = expiryDate.Month;
-            if (month >= 10)
-            {
+            if (month >= 10) {
                 if (month == 10)
                     expiryMonth = "A";
                 if (month == 11)
                     expiryMonth = "B";
                 if (month == 12)
                     expiryMonth = "C";
-            }
-            else
+            } else
                 expiryMonth = month.ToString();
 
             string expiryYear = "";
@@ -366,28 +339,19 @@ namespace WarrantAssistant
             string warrantType = "";
             string tempType = "";
 
-            if (type == "牛熊證")
-            {
-                if (cp == "P")
-                {
+            if (type == "牛熊證") {
+                if (cp == "P") {
                     warrantType = "熊";
                     tempType = "4";
-                }
-                else
-                {
+                } else {
                     warrantType = "牛";
                     tempType = "3";
                 }
-            }
-            else
-            {
-                if (cp == "P")
-                {
+            } else {
+                if (cp == "P") {
                     warrantType = "售";
                     tempType = "2";
-                }
-                else
-                {
+                } else {
                     warrantType = "購";
                     tempType = "1";
                 }
@@ -448,23 +412,10 @@ namespace WarrantAssistant
             h.Dispose();
 
             GlobalUtility.LogInfo("Log", GlobalVar.globalParameter.userID + " " + WID + " 右鍵新增 " + underlyingID + underlyingName + " 一檔權證");
-            /*string sqlInfo = "INSERT INTO [InformationLog] ([MDate],[InformationType],[InformationContent],[MUser]) values(@MDate, @InformationType, @InformationContent, @MUser)";
-            List<SqlParameter> psInfo = new List<SqlParameter>();
-            psInfo.Add(new SqlParameter("@MDate", SqlDbType.DateTime));
-            psInfo.Add(new SqlParameter("@InformationType", SqlDbType.VarChar));
-            psInfo.Add(new SqlParameter("@InformationContent", SqlDbType.VarChar));
-            psInfo.Add(new SqlParameter("@MUser", SqlDbType.VarChar));
-
-            SQLCommandHelper hInfo = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, sqlInfo, psInfo);
-            hInfo.SetParameterValue("@MDate", DateTime.Now);
-            hInfo.SetParameterValue("@InformationType", "Log");
-            hInfo.SetParameterValue("@InformationContent", GlobalVar.globalParameter.userID +" "+ WID + " 右鍵新增 " + underlyingID + underlyingName + " 一檔權證");
-            hInfo.SetParameterValue("@MUser", GlobalVar.globalParameter.userID);
-            hInfo.ExecuteCommand();
-            hInfo.Dispose();*/
 
             MessageBox.Show("Done!");
         }
+
 
     }
 }
