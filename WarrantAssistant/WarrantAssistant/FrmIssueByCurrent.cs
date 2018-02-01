@@ -28,12 +28,11 @@ namespace WarrantAssistant
         private void FrmIssueByCurrent_Load(object sender, EventArgs e) {
             foreach (var item in GlobalVar.globalParameter.traders)
                 toolStripComboBox1.Items.Add(item.TrimStart('0'));
-
+                       
+            InitialGrid();            
             toolStripComboBox1.Text = userID.TrimStart('0');
-            InitialGrid();
-            LoadTraderSql();
-            LoadData();
-
+            //LoadTraderSql();
+            //LoadData();
         }
         private void InitialGrid() {
             dt.Columns.Add("標的代號", typeof(string));

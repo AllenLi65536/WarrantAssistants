@@ -132,7 +132,7 @@ namespace WarrantDataManager
 
         private void IssueCheckRefresh_Click(object sender, EventArgs e) {
             //AddWork(new WarrantIssueCheckWork("IssueCheckRefresh", "發行檢查更新"));
-            AddWork(CMoneyData.LoadData);
+            AddWork(CMoneyData.LoadCMoneyData);
         }
 
         private void SummaryRefresh_Click(object sender, EventArgs e) {
@@ -155,7 +155,7 @@ namespace WarrantDataManager
             AddWork(DataCollect.UpdateWarrantUnderlying);
             AddWork(DataCollect.UpdateWarrantBasic);
             AddWork(DataCollect.UpdateWarrantUnderlyingCredit);
-            AddWork(CMoneyData.LoadData);
+            AddWork(CMoneyData.LoadCMoneyData);
             AddWork(DataCollect.UpdateWarrantUnderlyingSummary);
             AddWork(DataCollect.UpdateWarrantPrices);
         }

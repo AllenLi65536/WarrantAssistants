@@ -15,7 +15,7 @@ namespace WarrantDataManager
         private static Dictionary<string, CommodityData> data = new Dictionary<string, CommodityData>();
         private static List<string> tw50Stocks = new List<string>();
 
-        public static WorkState LoadData() {
+        public static WorkState LoadCMoneyData() {
             try {
                 GetTW50Stcoks();
                 LoadCommodityData();
@@ -417,7 +417,8 @@ namespace WarrantDataManager
 
         private static void GetWarningScore() {
             try {
-                string sql = "SELECT [股票代號], [警示指標總符合數] FROM [月財務警示指標] WHERE [年月] = '" + DateTime.Today.ToString("yyyyMM") + "' AND ";
+                //string sql = "SELECT [股票代號], [警示指標總符合數] FROM [月財務警示指標] WHERE [年月] = '" + DateTime.Today.ToString("yyyyMM") + "' AND ";
+                string sql = "SELECT [股票代號], [警示指標總符合數] FROM [月財務警示指標] WHERE [年月] = (select MAX([年月]) from [月財務警示指標]) AND ";
 
                 string cStr = "";
                 foreach (string cID in data.Keys)

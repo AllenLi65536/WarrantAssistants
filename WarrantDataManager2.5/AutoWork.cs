@@ -136,7 +136,7 @@ namespace WarrantDataManager
 
                         if (now.TimeOfDay.TotalMinutes > 450 && (!issueCheckOK) && GlobalVar.globalParameter.isTodayTradeDate) {
                             //GlobalVar.mainForm.AddWork(new WarrantIssueCheckWork("IssueCheckRefresh", "發行檢查更新"));
-                            GlobalVar.mainForm.AddWork(CMoneyData.LoadData);
+                            GlobalVar.mainForm.AddWork(CMoneyData.LoadCMoneyData);
                             issueCheckOK = true;
                         }
 
