@@ -340,6 +340,17 @@ namespace WarrantAssistant
                 MessageBox.Show(Row["UnderlyingID"] + " 為關係人標的，波動度超過可發範圍，會被稽核稽稽歪歪，請修改條件。");
                 dataOK = false;
             }
+            if (!dataOK)
+                return false;
+
+            sql2 = "SELECT [UnderlyingID], TraderID"
+            + " FROM [EDIS].[dbo].[ApplyTempList]"
+            + $" WHERE  [UserID]='{userID}' and [ConfirmChecked]='Y' and [UserID] <> TraderID ";
+            badParam = MSSQL.ExecSqlQry(sql2, conn);
+            foreach (DataRow Row in badParam.Rows) {
+                if (DialogResult.No == MessageBox.Show(Row["UnderlyingID"] + $" 交易員代碼為{Row["TraderID"]} 與使用者不同，是否確認發行?", "確認發行", MessageBoxButtons.YesNo))
+                    return false;
+            }
 
             return dataOK;
         }
