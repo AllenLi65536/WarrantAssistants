@@ -6,6 +6,9 @@ using EDLib.SQL;
 using HtmlAgilityPack;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace WarrantAssistant
 {
@@ -15,13 +18,15 @@ namespace WarrantAssistant
             InitializeComponent();
         }
         private void ultraGrid1_InitializeLayout(object sender, Infragistics.Win.UltraWinGrid.InitializeLayoutEventArgs e) {
-            e.Layout.Override.CellAppearance.BackColor = Color.LightCyan;
-            //e.Layout.Bands[0].Columns["WName"]
-            //e.Layout.Bands[0].Columns["WName"].CellAppearance.ForeColor = Color.Gray;           
+            e.Layout.Override.CellAppearance.BackColor = Color.LightCyan;            
         }
+
+        string path;// = "C:\\WarrantDocuments";
+
         private void FrmRename_Load(object sender, EventArgs e) {
             toolStripLabel1.Text = "";
-
+            toolStrip1.Enabled = false;
+            
             //Get key and id
             DataTable dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='10'"
                 , GlobalVar.loginSet.warrantSysKeySqlConnString);
@@ -29,20 +34,40 @@ namespace WarrantAssistant
 
             dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='20'"
                 , GlobalVar.loginSet.warrantSysKeySqlConnString);
-            string id = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
+            string id = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();                      
 
-            string twseUrl = "http://siis.twse.com.tw/server-java/t150sa03?step=0&id=9200pd" + id + "&TYPEK=sii&key=" + key;
+            string twseUrl = $"http://siis.twse.com.tw/server-java/t150sa03?step=0&id=9200pd{id}&TYPEK=sii&key={key}";
 
             if (!ParseHtml(twseUrl, true))
                 return;
 
-            twseUrl = "http://siis.twse.com.tw/server-java/o_t150sa03?step=0&id=9200pd" + id + "&TYPEK=otc&key=" + key;
+            twseUrl = $"http://siis.twse.com.tw/server-java/o_t150sa03?step=0&id=9200pd{id}&TYPEK=otc&key={key}";
             ParseHtml(twseUrl, false);
+
+            // Get document path
+            dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDSC FROM EDAISYS.dbo.FLAGDATAS WHERE FLGDAT_FLGNAM = 'DOCUMENT_SETTING' and FLGDAT_FLGVAR='EXPORT_PATH'"
+               , GlobalVar.loginSet.warrantSysKeySqlConnString);
+            path = dv.Rows[0]["FLGDAT_FLGDSC"].ToString().TrimEnd('\\');
+            
+            toolStrip1.Enabled = true;
+        }
+
+        private string GetHtmlAsync(string url, Encoding encode) {
+            try {
+                using (WebResponse resp = WebRequest.Create(url).GetResponse()) // GetResponseAsync()
+                using (Stream dataStream = resp.GetResponseStream())
+                using (StreamReader reader = new StreamReader(dataStream, encode))
+                    return reader.ReadToEnd();
+
+            } catch (Exception err) {
+                Console.WriteLine(err);
+                return err.ToString();
+            }
         }
 
         private bool ParseHtml(string url, bool twse) {
             try {
-                string firstResponse = EDLib.Utility.GetHtml(url, System.Text.Encoding.Default);
+                string firstResponse = GetHtmlAsync(url, System.Text.Encoding.Default);
                 HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
                 doc.LoadHtml(firstResponse);
                 HtmlNodeCollection navNodeChild = doc.DocumentNode.SelectSingleNode("//table[1]/tr[1]/td/table").ChildNodes;
@@ -58,7 +83,7 @@ namespace WarrantAssistant
                 return true;
             } catch (Exception e) {
                 MessageBox.Show("可能要更新Key，或是還沒有資料");
-                MessageBox.Show(e.Message);
+                //MessageBox.Show(e.Message);
                 return false;
             }
         }
@@ -128,16 +153,16 @@ namespace WarrantAssistant
         private void Rename(string type) {
             string now = DateTime.Now.ToString("yyyyMMdd-HHmmss");
 
-            if (Directory.Exists("C:\\WarrantDocuments\\" + type + now))
-                Directory.Delete("C:\\WarrantDocuments\\" + type + now, true);
-            Directory.CreateDirectory("C:\\WarrantDocuments\\" + type + now);
-            if (Directory.Exists("C:\\WarrantDocuments\\" + type + "OTC" + now))
-                Directory.Delete("C:\\WarrantDocuments\\" + type + "OTC" + now, true);
-            Directory.CreateDirectory("C:\\WarrantDocuments\\" + type + "OTC" + now);
+            if (Directory.Exists($"{path}\\{type}{now}"))
+                Directory.Delete($"{path}\\{type}{now}", true);
+            Directory.CreateDirectory($"{path}\\{type}{now}");
+            if (Directory.Exists($"{path}\\{type}OTC{now}"))
+                Directory.Delete($"{path}\\{type}OTC{now}", true);
+            Directory.CreateDirectory($"{path}\\{type}OTC{now}");
 
             for (int i = 0; i < ultraDataSource1.Rows.Count; i++)
-                if (Directory.Exists("C:\\WarrantDocuments\\" + ultraDataSource1.Rows[i]["WName"])) {
-                    string[] files = Directory.GetFiles("C:\\WarrantDocuments\\" + ultraDataSource1.Rows[i]["WName"]);
+                if (Directory.Exists($"{path}\\{ultraDataSource1.Rows[i]["WName"]}")) {
+                    string[] files = Directory.GetFiles($"{path}\\{ultraDataSource1.Rows[i]["WName"]}");
                     foreach (string file in files) {
                         string toFile = null;
                         string fileName = Path.GetFileName(file);
@@ -146,17 +171,17 @@ namespace WarrantAssistant
                             case "Xml":
                                 if (fileExtension == ".xml") {
                                     if (ultraDataSource1.Rows[i]["Market"].ToString() == "TWSE" && !fileName.Contains("OTC"))
-                                        toFile = "C:\\WarrantDocuments\\Xml" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + ".xml";
+                                        toFile = $"{path}\\Xml{now}\\{ultraDataSource1.Rows[i]["SerialNumber"]}.xml";
                                     else if (ultraDataSource1.Rows[i]["Market"].ToString() == "OTC" && fileName.Contains("OTC"))
-                                        toFile = "C:\\WarrantDocuments\\XmlOTC" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + ".xml";
+                                        toFile = $"{path}\\XmlOTC{now}\\{ultraDataSource1.Rows[i]["SerialNumber"]}.xml";
                                 }
                                 break;
                             case "Renamed":
                                 if (fileExtension != ".xml") {
                                     if (ultraDataSource1.Rows[i]["Market"].ToString() == "TWSE" && !fileName.Contains("OTC"))
-                                        toFile = "C:\\WarrantDocuments\\Renamed" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + "-" + fileName;
+                                        toFile = $"{path}\\Renamed{now}\\{ultraDataSource1.Rows[i]["SerialNumber"]}-{fileName}";
                                     else if (ultraDataSource1.Rows[i]["Market"].ToString() == "OTC" && fileName.Contains("OTC"))
-                                        toFile = "C:\\WarrantDocuments\\RenamedOTC" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + "-" + fileName;
+                                        toFile = $"{path}\\RenamedOTC{now}\\{ultraDataSource1.Rows[i]["SerialNumber"]}-{fileName}";
                                 }
                                 break;
                             case "RenamedB":
@@ -164,9 +189,9 @@ namespace WarrantAssistant
                                 && !fileName.StartsWith("14") && !fileName.StartsWith("15") && !fileName.StartsWith("16")
                                 && !fileName.StartsWith("19") && !fileName.StartsWith("20") && !fileName.StartsWith("21")) {
                                     if (ultraDataSource1.Rows[i]["Market"].ToString() == "TWSE" && !fileName.Contains("OTC"))
-                                        toFile = "C:\\WarrantDocuments\\RenamedB" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + "-" + Path.GetFileName(file);
+                                        toFile = $"{path}\\RenamedB{now}\\{ultraDataSource1.Rows[i]["SerialNumber"]}-{Path.GetFileName(file)}";
                                     else if (ultraDataSource1.Rows[i]["Market"].ToString() == "OTC" && fileName.Contains("OTC"))
-                                        toFile = "C:\\WarrantDocuments\\RenamedBOTC" + now + "\\" + ultraDataSource1.Rows[i]["SerialNumber"] + "-" + Path.GetFileName(file);
+                                        toFile = $"{path}\\RenamedBOTC{now}\\{ultraDataSource1.Rows[i]["SerialNumber"]}-{Path.GetFileName(file)}";
                                 }
                                 break;
                         }
@@ -174,10 +199,10 @@ namespace WarrantAssistant
                             File.Copy(file, toFile, true);
                     }
                 }
-            if (!Directory.EnumerateFileSystemEntries("C:\\WarrantDocuments\\" + type + now).Any())
-                Directory.Delete("C:\\WarrantDocuments\\" + type + now);
-            if (!Directory.EnumerateFileSystemEntries("C:\\WarrantDocuments\\" + type + "OTC" + now).Any())
-                Directory.Delete("C:\\WarrantDocuments\\" + type + "OTC" + now);
+            if (!Directory.EnumerateFileSystemEntries($"{path}\\{type}{now}").Any())
+                Directory.Delete($"{path}\\{type}{now}");
+            if (!Directory.EnumerateFileSystemEntries($"{path}\\{type}OTC{now}").Any())
+                Directory.Delete($"{path}\\{type}OTC{now}");
 
             switch (type) {
                 case "Xml":
@@ -190,10 +215,6 @@ namespace WarrantAssistant
                     toolStripLabel1.Text = DateTime.Now + "修改發行檔名B完成";
                     break;
             }
-        }
-
-        private void toolStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e) {
-
         }
 
     }
