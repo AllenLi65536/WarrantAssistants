@@ -123,7 +123,7 @@ namespace WarrantAssistant
         private void UpdateData() {
             try {
                 string cmdText = "UPDATE [ApplyTotalList] SET WarrantName=@WarrantName, CR=@CR, IssueNum=@IssueNum, EquivalentNum=@EquivalentNum, Result=@Result, UseReward=@UseReward WHERE SerialNum=@SerialNum";
-                List<System.Data.SqlClient.SqlParameter> pars = new List<System.Data.SqlClient.SqlParameter>();
+                List<System.Data.SqlClient.SqlParameter> pars = new List<SqlParameter>();
                 pars.Add(new SqlParameter("@WarrantName", SqlDbType.VarChar));
                 pars.Add(new SqlParameter("@CR", SqlDbType.Float));
                 pars.Add(new SqlParameter("@IssueNum", SqlDbType.Float));
@@ -155,7 +155,7 @@ namespace WarrantAssistant
                 h.Dispose();
 
                 string cmdText2 = "UPDATE [ApplyOfficial] SET R=@R, IssueNum=@IssueNum, UseReward=@UseReward WHERE SerialNumber=@SerialNumber";
-                List<System.Data.SqlClient.SqlParameter> pars2 = new List<System.Data.SqlClient.SqlParameter>();
+                List<SqlParameter> pars2 = new List<SqlParameter>();
 
                 pars2.Add(new SqlParameter("@R", SqlDbType.Float));
                 pars2.Add(new SqlParameter("@IssueNum", SqlDbType.Float));

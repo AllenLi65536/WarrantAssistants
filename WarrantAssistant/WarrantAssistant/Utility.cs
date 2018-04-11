@@ -152,11 +152,13 @@ namespace WarrantAssistant
         {
             try
             {
-                SqlConnection conn = new SqlConnection();
-                conn.ConnectionString = connString;
-                cmd = new SqlCommand();
-                cmd.Connection = conn;
-                cmd.CommandText = commandString;
+                SqlConnection conn = new SqlConnection {
+                    ConnectionString = connString
+                };
+                cmd = new SqlCommand {
+                    Connection = conn,
+                    CommandText = commandString
+                };
                 foreach (SqlParameter parameter in parameterList)
                     cmd.Parameters.Add(parameter);
 

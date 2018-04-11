@@ -7,6 +7,8 @@ using System.Data.SqlClient;
 using Infragistics.Win.UltraWinGrid;
 using HtmlAgilityPack;
 using EDLib.SQL;
+using System.Threading.Tasks;
+using System.Net;
 
 namespace WarrantAssistant
 {
@@ -67,11 +69,11 @@ namespace WarrantAssistant
             if (isEdit) {
                 ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.Yes;
                 ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.True;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.True;                          
+                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.True;
             } else {
                 ultraGrid1.DisplayLayout.Bands[0].Override.AllowAddNew = Infragistics.Win.UltraWinGrid.AllowAddNew.No;
                 ultraGrid1.DisplayLayout.Bands[0].Override.AllowUpdate = Infragistics.Win.DefaultableBoolean.False;
-                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;                
+                ultraGrid1.DisplayLayout.Bands[0].Override.AllowDelete = Infragistics.Win.DefaultableBoolean.False;
             }
             toolStripButtonEdit.Visible = !isEdit;
             toolStripButtonConfirm.Visible = isEdit;
@@ -278,34 +280,24 @@ namespace WarrantAssistant
             }
         }
 
-        private void toolStripButtonEdit_Click(object sender, EventArgs e) {
+        private async void toolStripButtonEdit_Click(object sender, EventArgs e) {
             toolStripLabel1.Text = "";
+            toolStrip1.Enabled = false;
             dt.Rows.Clear();
             isEdit = true;
             SetButton();
 
-            //Get key and id
-            DataTable dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='10'"
-                , GlobalVar.loginSet.warrantSysKeySqlConnString);
-            string key = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
+            //Get key and id            
+            string key = GlobalUtility.GetKey();
+            string id = GlobalUtility.GetID();
 
-            dv = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='20'"
-                , GlobalVar.loginSet.warrantSysKeySqlConnString);
-            string id = dv.Rows[0]["FLGDAT_FLGDTA"].ToString();
-
-            string twseUrl = "http://siis.twse.com.tw/server-java/t150sa10?step=0&id=9200pd" + id + "&TYPEK=sii&key=" + key;
-            //dt.Rows.Clear();
-
-            //parse TWSE 7-1 html
-            if (!ParseHtml(twseUrl))
-                return;
-
-            //parse OTC 7-1 html
-            twseUrl = "http://siis.twse.com.tw/server-java/o_t150sa10?step=0&id=9200pd" + id + "&TYPEK=otc&key=" + key;
-            if (!ParseHtml(twseUrl))
+            //parse TWSE and OTC 7-1 html
+            if (!await ParseHtml($"http://siis.twse.com.tw/server-java/t150sa10?step=0&id=9200pd{id}&TYPEK=sii&key={key}", true)
+                & !await ParseHtml($"http://siis.twse.com.tw/server-java/o_t150sa10?step=0&id=9200pd{id}&TYPEK=otc&key={key}", false))
                 return;
 
             GlobalUtility.LogInfo("Info", GlobalVar.globalParameter.userID + " 下載7-1試算表");
+            toolStrip1.Enabled = true;
         }
 
         private void toolStripButtonConfirm_Click(object sender, EventArgs e) {
@@ -346,13 +338,9 @@ namespace WarrantAssistant
                 e.Cancel = true;
         }
 
-        private void toolStripLabel1_Click(object sender, EventArgs e) {
-
-        }
-
-        private bool ParseHtml(string url) {
+        private async Task<bool> ParseHtml(string url, bool isTwse) {
             try {
-                string firstResponse = EDLib.Utility.GetHtml(url, System.Text.Encoding.Default);
+                string firstResponse = await GlobalUtility.GetHtmlAsync(url, System.Text.Encoding.Default);//EDLib.Utility.GetHtml(url, System.Text.Encoding.Default);
                 HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
                 doc.LoadHtml(firstResponse);
                 HtmlNodeCollection navNodeChild = doc.DocumentNode.SelectSingleNode("//table[1]").ChildNodes; // /td[1]/table[1]/tr[2]
@@ -396,9 +384,18 @@ namespace WarrantAssistant
                     dt.Rows.Add(dr);
                 }
                 return true;
+            } catch (WebException) {
+                if (isTwse)
+                    MessageBox.Show("可能要更新Key，或是網頁有問題");
+                return false;
+            } catch (NullReferenceException) {
+                if (isTwse)
+                    MessageBox.Show("TWSE 沒有資料");
+                else
+                    MessageBox.Show("OTC 沒有資料");
+                return false;
             } catch (Exception e) {
-                //MessageBox.Show(e.Message);
-                MessageBox.Show("可能要更新Key或是還沒有資料");
+                MessageBox.Show(e.ToString());
                 return false;
             }
         }

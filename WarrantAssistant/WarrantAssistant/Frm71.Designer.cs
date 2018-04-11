@@ -32,11 +32,11 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButtonEdit = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonConfirm = new System.Windows.Forms.ToolStripButton();
+            this.Edit2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButtonCancel = new System.Windows.Forms.ToolStripButton();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.ultraGrid1 = new Infragistics.Win.UltraWinGrid.UltraGrid();
-            this.Edit2 = new System.Windows.Forms.ToolStripButton();
             this.toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.ultraGrid1)).BeginInit();
             this.SuspendLayout();
@@ -78,6 +78,16 @@
             this.toolStripButtonConfirm.Text = "確認上傳";
             this.toolStripButtonConfirm.Click += new System.EventHandler(this.toolStripButtonConfirm_Click);
             // 
+            // Edit2
+            // 
+            this.Edit2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.Edit2.Image = ((System.Drawing.Image)(resources.GetObject("Edit2.Image")));
+            this.Edit2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.Edit2.Name = "Edit2";
+            this.Edit2.Size = new System.Drawing.Size(36, 22);
+            this.Edit2.Text = "編輯";
+            this.Edit2.Click += new System.EventHandler(this.Edit2_Click);
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -98,7 +108,6 @@
             // 
             this.toolStripLabel1.Name = "toolStripLabel1";
             this.toolStripLabel1.Size = new System.Drawing.Size(0, 22);
-            this.toolStripLabel1.Click += new System.EventHandler(this.toolStripLabel1_Click);
             // 
             // ultraGrid1
             // 
@@ -120,16 +129,6 @@
             this.ultraGrid1.TabIndex = 1;
             this.ultraGrid1.InitializeRow += new Infragistics.Win.UltraWinGrid.InitializeRowEventHandler(this.ultraGrid1_InitializeRow);
             this.ultraGrid1.Error += new Infragistics.Win.UltraWinGrid.ErrorEventHandler(this.ultraGrid1_Error);
-            // 
-            // Edit2
-            // 
-            this.Edit2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.Edit2.Image = ((System.Drawing.Image)(resources.GetObject("Edit2.Image")));
-            this.Edit2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.Edit2.Name = "Edit2";
-            this.Edit2.Size = new System.Drawing.Size(36, 22);
-            this.Edit2.Text = "編輯";
-            this.Edit2.Click += new System.EventHandler(this.Edit2_Click);
             // 
             // Frm71
             // 

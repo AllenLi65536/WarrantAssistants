@@ -212,7 +212,7 @@ namespace WarrantAssistant
         private void UpdateData() {
             try {
                 string cmdText = "UPDATE [ApplyOfficial] SET K=@K, T=@T, HV=@HV, IV=@IV, ResetR=@ResetR, BarrierR=@BarrierR, FinancialR=@FinancialR, Type=@Type, CP=@CP, Apply1500W=@Apply1500W, MDate=@MDate WHERE SerialNumber=@SerialNumber";
-                List<System.Data.SqlClient.SqlParameter> pars = new List<System.Data.SqlClient.SqlParameter>();
+                List<SqlParameter> pars = new List<SqlParameter>();
                 pars.Add(new SqlParameter("@K", SqlDbType.Float));
                 pars.Add(new SqlParameter("@T", SqlDbType.Int));
                 pars.Add(new SqlParameter("@HV", SqlDbType.Float));

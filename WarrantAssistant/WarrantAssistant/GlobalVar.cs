@@ -8,6 +8,7 @@ using System.Net;
 using System.IO;
 using System.Windows.Forms;
 using EDLib.SQL;
+using System.Threading.Tasks;
 
 namespace WarrantAssistant
 {
@@ -29,6 +30,25 @@ namespace WarrantAssistant
             //GlobalVar.warrantPriceUpdator = new WarrantPriceUpdator();
             //GlobalVar.warrantPriceProcess = new WarrantPriceProcess();
         }
+
+        public static async Task<string> GetHtmlAsync(string url, Encoding encode) {
+            using (WebResponse resp = await WebRequest.Create(url).GetResponseAsync())
+            using (Stream dataStream = resp.GetResponseStream())
+            using (StreamReader reader = new StreamReader(dataStream, encode))
+                return reader.ReadToEnd();
+        }
+
+        public static string GetKey() {
+            DataTable dt = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='10'"
+               , GlobalVar.loginSet.warrantSysKeySqlConnString);
+            return dt.Rows[0]["FLGDAT_FLGDTA"].ToString();
+        }
+        public static string GetID() {
+            DataTable dt = MSSQL.ExecSqlQry("SELECT FLGDAT_FLGDTA FROM EDAISYS.dbo.V_FLAGDATAS WHERE FLGDAT_FLGNAM = 'WRT_ISSUE_QUOTA' and FLGDAT_ORDERS='20'"
+                , GlobalVar.loginSet.warrantSysKeySqlConnString);
+            return dt.Rows[0]["FLGDAT_FLGDTA"].ToString();
+        }
+
         public static T MenuItemClick<T>() where T : Form, new() {
             foreach (Form iForm in System.Windows.Forms.Application.OpenForms) {
                 if (iForm.GetType() == typeof(T)) {
@@ -160,9 +180,9 @@ namespace WarrantAssistant
 
             GlobalVar.globalParameter.traders = new List<string>();
             dt = MSSQL.ExecSqlQry("Select UserID from Trader", "SERVER=10.101.10.5;DATABASE=WMM3;UID=hedgeuser;PWD=hedgeuser");
-            foreach (DataRow row in dt.Rows) 
+            foreach (DataRow row in dt.Rows)
                 GlobalVar.globalParameter.traders.Add(row[0].ToString());
-            
+
         }
         private static void CheckIsTodayTradeDate() {
             //DataView dv = DeriLib.Util.ExecSqlQry("SELECT IsTrade FROM [TradeDate] WHERE CONVERT(VARCHAR, TradeDate, 112) = CONVERT(VARCHAR, GETDATE(), 112)", GlobalVar.loginSet.tsquoteSqlConnString);

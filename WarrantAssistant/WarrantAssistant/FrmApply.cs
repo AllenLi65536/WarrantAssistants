@@ -1056,9 +1056,9 @@ namespace WarrantAssistant
                 LoadData();
             } else {
                 if (DateTime.Now.TimeOfDay.TotalMinutes > 630)
-                    MessageBox.Show("超過交易所申報時間，欲改條件請洽行政組");
+                    MessageBox.Show("超過交易所申報時間，欲改條件請洽管理組");
                 else if (DateTime.Now.TimeOfDay.TotalMinutes > 570) {
-                    DialogResult result = MessageBox.Show("超過約定的9:30了，已經告知組長及行政?", "逾時申請", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    DialogResult result = MessageBox.Show("超過約定的9:30了，已經告知組長及管理組?", "逾時申請", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                     if (result == DialogResult.Yes) {
                         OfficiallyApply();
                         LoadData();

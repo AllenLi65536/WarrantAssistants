@@ -61,7 +61,8 @@ namespace WarrantDataManager
                 DeleteWarrantUnderlyingSummary();
                 InsertWarrantUnderlyingSummary();
                 return WorkState.Successful;
-            } catch (Exception) {
+            } catch (Exception e) {
+                MessageBox.Show(e.Message);
                 return WorkState.Exception;
             }
         }
@@ -312,8 +313,8 @@ Union SELECT [T730010]
                           + " LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID "
                           + " LEFT JOIN [EDIS].[dbo].[WarrantReward] d on a.UnderlyingID=d.UnderlyingID", conn);
             else
-                MSSQL.ExecSqlCmd("INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssueCreditDelta, IssuedPercent, AccNetIncome, Issuable, RewardIssueCredit, issueCreditDelta) "
-                           + " SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), Floor(b.CanIssue), b.CanIssueDelta, b.IssuedPercent, IsNull(c.AccNetIncome,0), 'Y', 0 "
+                MSSQL.ExecSqlCmd("INSERT INTO EDIS.dbo.WarrantUnderlyingSummary (UnderlyingID, UnderlyingName, TraderID, Market, PutIssuable, IssueCredit, IssueCreditDelta, IssuedPercent, AccNetIncome, Issuable, RewardIssueCredit) "
+                           + " SELECT a.[UnderlyingID], a.[UnderlyingName], a.[TraderID], a.[Market], IsNull(c.CanIssuePut,'Y'), Floor(b.CanIssue), b.CanIssueDelta, b.IssuedPercent, IsNull(c.AccNetIncome,0), 'Y', 0"
                            + " FROM [EDIS].[dbo].[WarrantUnderlying] a "
                            + " LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingCredit] b on a.UnderlyingID=b.UnderlyingID "
                            + " LEFT JOIN [EDIS].[dbo].[WarrantIssueCheck] c on a.UnderlyingID=c.UnderlyingID ", conn);
