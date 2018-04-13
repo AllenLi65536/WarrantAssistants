@@ -82,6 +82,8 @@ namespace WarrantAssistant
                         else
                             LoadUltraGrid2();
 
+                    } catch (ThreadAbortException) {
+                        return;
                     } catch (Exception ex) {
                         MessageBox.Show("In main form routine work in for loop " + ex.Message);
                     }

@@ -345,11 +345,7 @@ namespace WarrantAssistant
                 doc.LoadHtml(firstResponse);
                 HtmlNodeCollection navNodeChild = doc.DocumentNode.SelectSingleNode("//table[1]").ChildNodes; // /td[1]/table[1]/tr[2]
 
-                int loopend = navNodeChild.Count;
-                /*if (twse)
-                    loopend = navNodeChild.Count - 4;
-                else
-                    loopend = navNodeChild.Count - 8;*/
+                int loopend = navNodeChild.Count;                
 
                 for (int i = 5; i < loopend; i += 2) {
                     //MessageBox.Show(navNodeChild[i].InnerText);

@@ -269,7 +269,7 @@ namespace WarrantDataManager
 
         private static void GetEarning() {
             try {
-                string sql = "SELECT [年季], [股票代號], [合併淨損益(千)] FROM [季合併財報(損益單季)] WHERE [年季] IN (SELECT DISTINCT TOP 4 [年季] FROM [季合併財報(損益單季)] ORDER BY [年季] desc) AND ";
+                string sql = "SELECT [年季], [股票代號], isnull([合併總損益(千)], 0) as [合併總損益(千)] FROM [季合併財報(損益單季)] WHERE [年季] IN (SELECT DISTINCT TOP 4 [年季] FROM [季合併財報(損益單季)] ORDER BY [年季] desc) AND "; // 合併淨損益(千)
 
                 string cStr = "";
                 foreach (string cID in data.Keys)
@@ -283,7 +283,7 @@ namespace WarrantDataManager
                 for (; !rs.EOF; rs.MoveNext()) {
                     string quarter = rs.Fields["年季"].Value;
                     string stockID = rs.Fields["股票代號"].Value;
-                    double earning = Convert.ToDouble(rs.Fields["合併淨損益(千)"].Value);
+                    double earning = Convert.ToDouble(rs.Fields["合併總損益(千)"].Value);
 
                     data[stockID].commodityEarning.addQuarterEarning(earning);
                 }
@@ -450,15 +450,15 @@ namespace WarrantDataManager
                 DateTime dY = new DateTime(DateTime.Today.Year, 3, 31);
 
                 if (DateTime.Today < dY)
-                    sql = "SELECT [股票代號], [股票名稱], IsNull([稅後純益累計(千)], 0) 稅後純益 FROM [季合併為主財報(損益累計)] WHERE [年季] = '" + (DateTime.Today.Year - 1).ToString() + "03' AND ";
+                    sql = $"SELECT [股票代號], [股票名稱], IsNull([合併總損益累計(千)], 0) 稅後純益 FROM [季合併為主財報(損益累計)] WHERE [年季] = '{(DateTime.Today.Year - 1).ToString()}03' AND "; // [稅後純益累計(千)]
                 else if (DateTime.Today < dQ1)
-                    sql = "SELECT [股票代號], [股票名稱], IsNull([稅後純益累計(千)], 0) 稅後純益 FROM [季合併為主財報(損益累計)] WHERE [年季] = '" + (DateTime.Today.Year - 1).ToString() + "04' AND ";
+                    sql = $"SELECT [股票代號], [股票名稱], IsNull([合併總損益累計(千)], 0) 稅後純益 FROM [季合併為主財報(損益累計)] WHERE [年季] = '{(DateTime.Today.Year - 1).ToString()}04' AND ";
                 else if (DateTime.Today < dQ2)
-                    sql = "SELECT [股票代號], [股票名稱], IsNull([稅後純益累計(千)], 0) 稅後純益 FROM [季合併為主財報(損益累計)] WHERE [年季] = '" + DateTime.Today.Year.ToString() + "01' AND ";
+                    sql = $"SELECT [股票代號], [股票名稱], IsNull([合併總損益累計(千)], 0) 稅後純益 FROM [季合併為主財報(損益累計)] WHERE [年季] = '{DateTime.Today.Year.ToString()}01' AND ";
                 else if (DateTime.Today < dQ3)
-                    sql = "SELECT [股票代號], [股票名稱], IsNull([稅後純益累計(千)], 0) 稅後純益 FROM [季合併為主財報(損益累計)] WHERE [年季] = '" + DateTime.Today.Year.ToString() + "02' AND ";
+                    sql = $"SELECT [股票代號], [股票名稱], IsNull([合併總損益累計(千)], 0) 稅後純益 FROM [季合併為主財報(損益累計)] WHERE [年季] = '{DateTime.Today.Year.ToString()}02' AND ";
                 else
-                    sql = "SELECT [股票代號], [股票名稱], IsNull([稅後純益累計(千)], 0) 稅後純益 FROM [季合併為主財報(損益累計)] WHERE [年季] = '" + DateTime.Today.Year.ToString() + "03' AND ";
+                    sql = $"SELECT [股票代號], [股票名稱], IsNull([合併總損益累計(千)], 0) 稅後純益 FROM [季合併為主財報(損益累計)] WHERE [年季] = '{DateTime.Today.Year.ToString()}03' AND ";
 
                 string cStr = "";
                 foreach (string cID in data.Keys)
