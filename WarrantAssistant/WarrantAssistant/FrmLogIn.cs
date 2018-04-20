@@ -16,7 +16,7 @@ namespace WarrantAssistant
 
         public bool TryIPLogin() {
             string IP = EDLib.Utility.GetLocalIPAddress();
-            string sqlTemp = "SELECT [UserGroup],[UserLevel],[UserName],[Deputy],[UserID] FROM [EDIS].[dbo].[User] WHERE IP = '" + IP + "'";
+            string sqlTemp = $"SELECT [UserGroup],[UserLevel],[UserName],[Deputy],[UserID] FROM [EDIS].[dbo].[User] WHERE IP = '{IP}'";
             //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp , GlobalVar.loginSet.edisSqlConnString);
             DataView dvTemp = EDLib.SQL.MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString).DefaultView;
             if (dvTemp.Count > 0) {

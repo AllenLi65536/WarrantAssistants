@@ -105,8 +105,8 @@ namespace WarrantDataManager
     {
         public static string edisSqlConnString = "SERVER=10.10.1.30;DATABASE=EDIS;UID=WarrantWeb;PWD=WarrantWeb";
         public static string tsquoteSqlConnString = "SERVER=10.60.0.37;DATABASE=TsQuote;UID=WarrantWeb;PWD=WarrantWeb";
-        public static string warrantSysSqlConnString = "SERVER=10.7.0.52;DATABASE=WAFT;UID=warpap;PWD=warpap";
-        public static string edaisysConnString = "SERVER=10.7.0.52;DATABASE=EDAISYS;UID=eduser;PWD=eduser";
+        public static string warrantSysSqlConnString = "SERVER=BSSDB;DATABASE=WAFT;UID=warpap;PWD=warpap";
+        public static string edaisysConnString = "SERVER=BSSDB;DATABASE=EDAISYS;UID=eduser;PWD=eduser";
     }
 
     public class GlobalParameter

@@ -269,7 +269,7 @@ namespace WarrantDataManager
 
         private static void GetEarning() {
             try {
-                string sql = "SELECT [年季], [股票代號], isnull([合併總損益(千)], 0) as [合併總損益(千)] FROM [季合併財報(損益單季)] WHERE [年季] IN (SELECT DISTINCT TOP 4 [年季] FROM [季合併財報(損益單季)] ORDER BY [年季] desc) AND "; // 合併淨損益(千)
+                string sql = "SELECT [年季], [股票代號], isnull([合併總損益(千)], 0) as 合併總損益 FROM [季合併財報(損益單季)] WHERE [年季] IN (SELECT DISTINCT TOP 4 [年季] FROM [季合併財報(損益單季)] ORDER BY [年季] desc) AND "; // 合併淨損益(千)
 
                 string cStr = "";
                 foreach (string cID in data.Keys)
@@ -283,7 +283,7 @@ namespace WarrantDataManager
                 for (; !rs.EOF; rs.MoveNext()) {
                     string quarter = rs.Fields["年季"].Value;
                     string stockID = rs.Fields["股票代號"].Value;
-                    double earning = Convert.ToDouble(rs.Fields["合併總損益(千)"].Value);
+                    double earning = Convert.ToDouble(rs.Fields["合併總損益"].Value);
 
                     data[stockID].commodityEarning.addQuarterEarning(earning);
                 }
