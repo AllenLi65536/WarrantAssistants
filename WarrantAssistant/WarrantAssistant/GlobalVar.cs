@@ -152,8 +152,8 @@ namespace WarrantAssistant
                 edis20SqlConnString = "SERVER=10.19.1.20;DATABASE=EDIS;UID=WarrantWeb;PWD=WarrantWeb",
                 edisSqlConnString = "SERVER=10.10.1.30;DATABASE=EDIS;UID=WarrantWeb;PWD=WarrantWeb",
                 tsquoteSqlConnString = "SERVER=10.60.0.37;DATABASE=TsQuote;UID=WarrantWeb;PWD=WarrantWeb",
-                warrantSysSqlConnString = "SERVER=BSSDB;DATABASE=WAFT;UID=eduser;PWD=eduser",
-                warrantSysKeySqlConnString = "SERVER=BSSDB;DATABASE=EDAISYS;UID=eduser;PWD=eduser"
+                warrantSysSqlConnString = "SERVER=10.100.10.131;DATABASE=WAFT;UID=eduser;PWD=eduser",
+                warrantSysKeySqlConnString = "SERVER=10.100.10.131;DATABASE=EDAISYS;UID=eduser;PWD=eduser"
             };
         }
 

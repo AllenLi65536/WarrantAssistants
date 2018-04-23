@@ -86,8 +86,8 @@ namespace WarrantDataManager
                 //更新可發行標的代號，標的名稱，交易員代號，交易員名稱，標的全名
                 /*MSSQL.ExecSqlCmd(@"INSERT INTO [EDIS].[dbo].[WarrantUnderlying] (UnderlyingID, UnderlyingIDCMoney, UnderlyingName, TraderID, TraderName, StockType, FullName) 
                                    SELECT a.[WRTCAN_STKID], a.[WRTCAN_CMONEY_ID], b.[FLGDAT_FLGDTA], ISNULL(c.[TraderAccount],'7643'), ISNULL(c.[TraderName],'Aaron'), a.[WRTCAN_STOCKTYPE], a.[WRTCAN_FULL_NAME] 
-                                   FROM [BSSDB].[WAFT].[dbo].[V_CANDIDATE] a 
-                                   LEFT JOIN [BSSDB].[WAFT].[dbo].[V_FLAGDATA_STOCK_UNDERLYING_NAME_LIST] b ON a.[WRTCAN_STKID]=b.[FLGDAT_FLGVAR] 
+                                   FROM [10.100.10.131].[WAFT].[dbo].[V_CANDIDATE] a 
+                                   LEFT JOIN [10.100.10.131].[WAFT].[dbo].[V_FLAGDATA_STOCK_UNDERLYING_NAME_LIST] b ON a.[WRTCAN_STKID]=b.[FLGDAT_FLGVAR] 
                                    LEFT JOIN [10.19.1.20].[EDIS].[dbo].[Underlying_Trader] c ON a.[WRTCAN_STKID]=c.UID COLLATE Chinese_Taiwan_Stroke_CI_AS
                                    WHERE a.[WRTCAN_CAN_ISSUE]='1'", conn);*/
                 // LEFT JOIN [10.10.1.30].[EDIS].[dbo].[Underlying_TraderIssue] c ON a.[WRTCAN_STKID]=c.UID COLLATE Chinese_Taiwan_Stroke_CI_AS
@@ -99,13 +99,13 @@ select C.WRTCAN_STKID, C.WRTCAN_CMONEY_ID, C.WRTCAN_SHORT_NAME, C.TraderAccount,
     WHEN (WRTCAN_STOCKTYPE = 'DS' OR WRTCAN_STOCKTYPE = 'DR') AND A.WRTCAN_SOURCE = 'STOCK_A' AND (C.FLGDAT_FLGVAR <> 'A' OR C.FLGDAT_FLGVAR is null) THEN '非A級券商'               
     ELSE '1'
     END as CHECK_CAN_ISSUE
-FROM [BSSDB].[WAFT].[dbo].[CANDIDATE] as A WITH(NOLOCK)
-LEFT JOIN  [BSSDB].EDAISYS.dbo.FLAGDATAS as AUT WITH(NOLOCK)
+FROM [10.100.10.131].[WAFT].[dbo].[CANDIDATE] as A WITH(NOLOCK)
+LEFT JOIN  [10.100.10.131].EDAISYS.dbo.FLAGDATAS as AUT WITH(NOLOCK)
     ON WRTCAN_INSNBR = AUT.FLGDAT_FLGNBR AND AUT.FLGDAT_FLGNAM = 'WRT_AUTHORIZATION_MAINTAIN' AND AUT.FLGDAT_FLGNBR = A.WRTCAN_INSNBR 
-LEFT JOIN  [BSSDB].EDAISYS.dbo.FLAGDATAS as C WITH (NOLOCK)
+LEFT JOIN  [10.100.10.131].EDAISYS.dbo.FLAGDATAS as C WITH (NOLOCK)
      ON C.FLGDAT_FLGNAM = 'WRT_MARKET_RATING' and  convert(varchar(10), GETDATE(), 112) between C.FLGDAT_FLGNBR and C.FLGDAT_ORDERS
 LEFT JOIN [10.19.1.20].[EDIS].[dbo].[Underlying_Trader] as B ON A.[WRTCAN_STKID]=B.UID COLLATE Chinese_Taiwan_Stroke_CI_AS
-WHERE A.WRTCAN_DATE = ( SELECT MAX(WRTCAN_DATE) FROM  [BSSDB].WAFT.dbo.CANDIDATE WHERE WRTCAN_VER = 1) AND A.WRTCAN_VER = 1)as C
+WHERE A.WRTCAN_DATE = ( SELECT MAX(WRTCAN_DATE) FROM  [10.100.10.131].WAFT.dbo.CANDIDATE WHERE WRTCAN_VER = 1) AND A.WRTCAN_VER = 1)as C
 WHERE C.CHECK_CAN_ISSUE = '1'", conn);
 
 
@@ -115,8 +115,8 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
                 //先從權證系統找市場                
                 MSSQL.ExecSqlCmd(@"UPDATE [EDIS].[dbo].[WarrantUnderlying] 
                                    SET [Market]=substring(B.[ISUQTA_MKTTYPE],4,3) 
-                                   FROM [BSSDB].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] B 
-                                   WHERE [UnderlyingID]=B.[ISUQTA_STKID] COLLATE Chinese_Taiwan_Stroke_CI_AS AND B.[ISUQTA_DATE]=(SELECT MAX([ISUQTA_DATE]) FROM [BSSDB].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA])", conn);
+                                   FROM [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] B 
+                                   WHERE [UnderlyingID]=B.[ISUQTA_STKID] COLLATE Chinese_Taiwan_Stroke_CI_AS AND B.[ISUQTA_DATE]=(SELECT MAX([ISUQTA_DATE]) FROM [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA])", conn);
                 conn.Close();
 
                 string sql = "SELECT [股票代號], isNull([上市上櫃],'1') 市場, IsNull([統一編號], '00000000') 統一編號 FROM [上市櫃公司基本資料] WHERE ";
@@ -236,15 +236,15 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
                                 (B.CanIssue- A.ISUQTA_ISSUED_PERCENT) / 100.0 * A.ISUQTA_FOR_WARRANT_SHARES / 1000.0,
                                 (B.CanFurthurIssue- A.ISUQTA_ISSUED_PERCENT) / 100.0 * A.ISUQTA_FOR_WARRANT_SHARES / 1000.0
 								, (B.CanIssue- A.ISUQTA_ISSUED_PERCENT) / 100.0 * A.ISUQTA_FOR_WARRANT_SHARES / 1000.0 - (B.CanIssue- Q1.ISUQTA_ISSUED_PERCENT) / 100.0 * Q1.ISUQTA_FOR_WARRANT_SHARES / 1000.0
-                               from [BSSDB].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] as A, 
-							    [BSSDB].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] as Q1, 						  
+                               from [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] as A, 
+							    [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] as Q1, 						  
 								(select WRTCAN_STKID,
                                     case when WRTCAN_STOCKTYPE = 'DE' then 100 else 22 end as CanIssue,
                                     case when WRTCAN_STOCKTYPE = 'DE' then 100 else 30 end as CanFurthurIssue
-									FROM [BSSDB].[WAFT].[dbo].[CANDIDATE]
-									where WRTCAN_DATE = (select max(WRTCAN_DATE) from [BSSDB].[WAFT].[dbo].[CANDIDATE])) AS B
-                                where A.ISUQTA_DATE = (select MAX(ISUQTA_DATE) from [BSSDB].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] )
-								and Q1.ISUQTA_DATE = (select MAX(ISUQTA_DATE) from [BSSDB].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA]  where ISUQTA_DATE < (select MAX(ISUQTA_DATE) from [BSSDB].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] ))
+									FROM [10.100.10.131].[WAFT].[dbo].[CANDIDATE]
+									where WRTCAN_DATE = (select max(WRTCAN_DATE) from [10.100.10.131].[WAFT].[dbo].[CANDIDATE])) AS B
+                                where A.ISUQTA_DATE = (select MAX(ISUQTA_DATE) from [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] )
+								and Q1.ISUQTA_DATE = (select MAX(ISUQTA_DATE) from [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA]  where ISUQTA_DATE < (select MAX(ISUQTA_DATE) from [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] ))
                                 and A.ISUQTA_STKID = Q1.ISUQTA_STKID and A.ISUQTA_STKID = B.WRTCAN_STKID
 								order by A.ISUQTA_STKID", conn);//V_CANDIDATE
             MSSQL.ExecSqlCmd(sql, conn);
