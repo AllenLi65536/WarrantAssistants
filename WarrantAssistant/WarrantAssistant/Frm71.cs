@@ -287,8 +287,14 @@ namespace WarrantAssistant
             isEdit = true;
             SetButton();
 
-            //Get key and id            
-            string key = GlobalUtility.GetKey();
+            string key = null;
+            //Get key and id  
+            try {
+                key = GlobalUtility.GetKey();
+            } catch (Exception ex) {
+                MessageBox.Show($"GetKey from BSSDB failed {ex}");
+                return;
+            }
             string id = GlobalUtility.GetID();
 
             //parse TWSE and OTC 7-1 html

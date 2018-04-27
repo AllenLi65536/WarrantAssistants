@@ -14,7 +14,7 @@ namespace WarrantDataManager
         private bool underlyingCreditBeforeOK = true;
         private bool issueCheckOK = true;
         private bool summaryOK = true;
-        private bool pircesOK = true;
+        private bool pricesOK = true;
         private bool cleanApplyOK = true;
 
         public AutoWork() {
@@ -64,7 +64,7 @@ namespace WarrantDataManager
                             underlyingCreditBeforeOK = false;
                             issueCheckOK = false;
                             summaryOK = false;
-                            pircesOK = false;
+                            pricesOK = false;
                         }
                         if (now.TimeOfDay.TotalMinutes > 1170 && now.TimeOfDay.TotalMinutes < 1171)
                             cleanApplyOK = false;
@@ -72,34 +72,34 @@ namespace WarrantDataManager
                         /*價格更新頻率*/
 
                         if (now.TimeOfDay.TotalMinutes > 553 && now.TimeOfDay.TotalMinutes < 554)
-                            pircesOK = false;
+                            pricesOK = false;
 
                         if (now.TimeOfDay.TotalMinutes > 568 && now.TimeOfDay.TotalMinutes < 569)
-                            pircesOK = false;
+                            pricesOK = false;
 
                         if (now.TimeOfDay.TotalMinutes > 638 && now.TimeOfDay.TotalMinutes < 639)
-                            pircesOK = false;
+                            pricesOK = false;
 
                         if (now.TimeOfDay.TotalMinutes > 643 && now.TimeOfDay.TotalMinutes < 644)
-                            pircesOK = false;
+                            pricesOK = false;
 
                         if (now.TimeOfDay.TotalMinutes > 648 && now.TimeOfDay.TotalMinutes < 649)
-                            pircesOK = false;
+                            pricesOK = false;
 
                         if (now.TimeOfDay.TotalMinutes > 653 && now.TimeOfDay.TotalMinutes < 654)
-                            pircesOK = false;
+                            pricesOK = false;
 
                         if (now.TimeOfDay.TotalMinutes > 658 && now.TimeOfDay.TotalMinutes < 659)
-                            pircesOK = false;
+                            pricesOK = false;
 
                         if (now.TimeOfDay.TotalMinutes > 810 && now.TimeOfDay.TotalMinutes < 811)
-                            pircesOK = false;
+                            pricesOK = false;
 
                         if (now.TimeOfDay.TotalMinutes > 812 && now.TimeOfDay.TotalMinutes < 813)
-                            pircesOK = false;
+                            pricesOK = false;
 
                         if (now.TimeOfDay.TotalMinutes > 814 && now.TimeOfDay.TotalMinutes < 815)
-                            pircesOK = false;
+                            pricesOK = false;
 
                         /*價格更新頻率End*/
 
@@ -146,10 +146,10 @@ namespace WarrantDataManager
                             summaryOK = true;
                         }
 
-                        if (now.TimeOfDay.TotalMinutes > 540 && (!pircesOK) && GlobalVar.globalParameter.isTodayTradeDate) {
+                        if (now.TimeOfDay.TotalMinutes > 540 && (!pricesOK) && GlobalVar.globalParameter.isTodayTradeDate) {
                             //GlobalVar.mainForm.AddWork(new WarrantPricesWork("PricesRefresh", "價格更新"));
                             GlobalVar.mainForm.AddWork(DataCollect.UpdateWarrantPrices);
-                            pircesOK = true;
+                            pricesOK = true;
                         }
 
                         if (now.TimeOfDay.TotalMinutes > 431 && (!underlyingCreditAfterOK) && GlobalVar.globalParameter.isTodayTradeDate) {
