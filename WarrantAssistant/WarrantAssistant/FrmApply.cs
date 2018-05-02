@@ -264,7 +264,7 @@ namespace WarrantAssistant
 
                         double jumpSize = 0.0;
                         double multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);
-                        
+
                         jumpSize = delta * multiplier;
 
                         double vol_ = vol;
@@ -358,7 +358,7 @@ namespace WarrantAssistant
         private void UpdateData() {
             try {
 
-                MSSQL.ExecSqlCmd("DELETE FROM [ApplyTempList] WHERE UserID='" + userID + "'", conn);
+                MSSQL.ExecSqlCmd($"DELETE FROM [ApplyTempList] WHERE UserID='{userID}'", conn);
 
                 string sql = @"INSERT INTO [ApplyTempList] (SerialNum, UnderlyingID, K, T, R, HV, IV, IssueNum, ResetR, BarrierR, FinancialR, Type, CP, UseReward, ConfirmChecked, Apply1500W, UserID, MDate, TempName, TempType, TraderID, IVNew, Adj) "
                 + "VALUES(@SerialNum, @UnderlyingID, @K, @T, @R, @HV, @IV, @IssueNum, @ResetR, @BarrierR, @FinancialR, @Type, @CP, @UseReward, @ConfirmChecked, @Apply1500W, @UserID, @MDate, @TempName ,@TempType, @TraderID, @IVNew, @Adj)";
@@ -752,7 +752,7 @@ namespace WarrantAssistant
                 ValueList v3;
                 v3 = e.Layout.ValueLists.Add("MyValueList3");
                 foreach (var item in GlobalVar.globalParameter.traders)
-                    v3.ValueListItems.Add(item, item);                
+                    v3.ValueListItems.Add(item, item);
             }
             e.Layout.Bands[0].Columns["交易員"].ValueList = e.Layout.ValueLists["MyValueList3"];
 
@@ -790,7 +790,7 @@ namespace WarrantAssistant
 
             DialogResult result = MessageBox.Show("將全部刪除，確定?", "刪除資料", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (result == DialogResult.Yes) {
-                MSSQL.ExecSqlCmd($"DELETE FROM [ApplyTempList] WHERE UserID='{userID}'", conn);               
+                MSSQL.ExecSqlCmd($"DELETE FROM [ApplyTempList] WHERE UserID='{userID}'", conn);
             }
             LoadData();
             SetButton();
@@ -954,12 +954,67 @@ namespace WarrantAssistant
             if (e.Cell.Column.Key == "重設比") {
                 double underlyingPrice = e.Cell.Row.Cells["股價"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["股價"].Value);
                 double resetR = e.Cell.Row.Cells["重設比"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["重設比"].Value) / 100;
-                double k = Math.Round(underlyingPrice * resetR, 2);
-                e.Cell.Row.Cells["履約價"].Value = k;
+                if (resetR != 0)
+                    e.Cell.Row.Cells["履約價"].Value = Math.Round(underlyingPrice * resetR, 2);
+            }
+
+            if (e.Cell.Column.Key == "財務費用") {
+                string warrantType = e.Cell.Row.Cells["類型"].Value == DBNull.Value ? "1" : e.Cell.Row.Cells["類型"].Value.ToString();
+
+                if (warrantType != "2")
+                    return;                
+                
+                double price = 0.0;
+                double jumpSize = 0.0;
+
+                string underlyingID = e.Cell.Row.Cells["標的代號"].Value == DBNull.Value ? "" : e.Cell.Row.Cells["標的代號"].Value.ToString();
+                double underlyingPrice = e.Cell.Row.Cells["股價"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["股價"].Value);
+                double k = e.Cell.Row.Cells["履約價"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["履約價"].Value);
+                double financialR = e.Cell.Row.Cells["財務費用"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["財務費用"].Value) / 100;
+                int t = e.Cell.Row.Cells["期間(月)"].Value == DBNull.Value ? 0 : Convert.ToInt32(e.Cell.Row.Cells["期間(月)"].Value);
+                double cr = e.Cell.Row.Cells["行使比例"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["行使比例"].Value);
+                double vol = e.Cell.Row.Cells["IV"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["IV"].Value) / 100;
+                double adj = e.Cell.Row.Cells["Adj"].Value == DBNull.Value ? 0 : Convert.ToDouble(e.Cell.Row.Cells["Adj"].Value);
+
+                double resetR = Math.Round(k / underlyingPrice, 2);
+                string cpType = e.Cell.Row.Cells["CP"].Value == DBNull.Value ? "1" : e.Cell.Row.Cells["CP"].Value.ToString();
+                CallPutType cp = cpType == "2" ? CallPutType.Put : CallPutType.Call;
+
+                if (underlyingPrice != 0.0 && underlyingID != "") {                   
+                    e.Cell.Row.Cells["重設比"].Value = resetR * 100;
+                    price = Pricing.BullBearWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol, t, financialR, cr);
+
+                    jumpSize = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);
+                }
+
+                e.Cell.Row.Cells["發行價格"].Value = Math.Round(price, 2);
+                e.Cell.Row.Cells["Delta"].Value = 1;
+                e.Cell.Row.Cells["跳動價差"].Value = Math.Round(jumpSize, 4);
+
+                double shares = e.Cell.Row.Cells["張數"].Value == DBNull.Value ? 10000 : Convert.ToDouble(e.Cell.Row.Cells["張數"].Value);
+                double vol_ = vol;
+                double price_ = price;
+                double lowerLimit = 0.0;
+                double totalValue = price_ * shares * 1000;
+                double volLimit = 2 * vol_;
+                while (totalValue < 15000000 && vol_ != 0.0 && price != 0.0 && vol_ < volLimit) {
+                    vol_ += 0.01;
+                    if (warrantType == "牛熊證")
+                        price_ = Pricing.BullBearWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol_, t, financialR, cr);
+                   
+                    totalValue = price_ * shares * 1000;
+                }
+                lowerLimit = price_ - (underlyingPrice + adj) * 0.1 * cr;
+                lowerLimit = Math.Max(0.01, lowerLimit);
+
+                e.Cell.Row.Cells["IV*"].Value = vol_ * 100;
+                e.Cell.Row.Cells["發行價格*"].Value = Math.Round(price_, 2);
+                e.Cell.Row.Cells["跌停價*"].Value = Math.Round(lowerLimit, 2);
+
             }
 
             if (e.Cell.Column.Key == "履約價" || e.Cell.Column.Key == "期間(月)" || e.Cell.Column.Key == "行使比例" || e.Cell.Column.Key == "IV"
-                || e.Cell.Column.Key == "財務費用" || e.Cell.Column.Key == "類型" || e.Cell.Column.Key == "CP" || e.Cell.Column.Key == "張數" || e.Cell.Column.Key == "Adj") {
+                || e.Cell.Column.Key == "類型" || e.Cell.Column.Key == "CP" || e.Cell.Column.Key == "張數" || e.Cell.Column.Key == "Adj") {
                 double price = 0.0;
                 double delta = 0.0;
                 double jumpSize = 0.0;
@@ -1009,14 +1064,17 @@ namespace WarrantAssistant
                         resetR = Math.Round(k / underlyingPrice, 2);
                         e.Cell.Row.Cells["重設比"].Value = resetR * 100;
                         price = Pricing.ResetWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol, t, cr);
-                    } else
+                    } else {
                         price = Pricing.NormalWarrantPrice(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, t, cr);
-
+                        e.Cell.Row.Cells["重設比"].Value = 0;
+                        e.Cell.Row.Cells["界限比"].Value = 0;
+                        e.Cell.Row.Cells["財務費用"].Value = 0;
+                    }
                     if (warrantType == "牛熊證")
                         delta = 1.0;
                     else
                         delta = Pricing.Delta(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
-                    multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);                   
+                    multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);
                 }
 
                 jumpSize = delta * multiplier;
