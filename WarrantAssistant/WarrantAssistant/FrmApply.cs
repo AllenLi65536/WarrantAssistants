@@ -7,7 +7,7 @@ using Infragistics.Win;
 using Infragistics.Win.UltraWinGrid;
 using System.Data.SqlClient;
 using EDLib.SQL;
-
+using System.Text.RegularExpressions;
 
 namespace WarrantAssistant
 {
@@ -561,7 +561,7 @@ namespace WarrantAssistant
 
                 string sql3 = $"DELETE FROM [EDIS].[dbo].[ApplyTotalList] WHERE [UserID]='{userID}' AND [ApplyKind]='1'";
                 string sql4 = @"INSERT INTO [EDIS].[dbo].[ApplyTotalList] ([ApplyKind],[SerialNum],[Market],[UnderlyingID],[WarrantName],[CR] ,[IssueNum],[EquivalentNum],[Credit],[RewardCredit],[Type],[CP],[UseReward],[MarketTmr],[TraderID],[MDate],UserID)
-                                SELECT '1',a.SerialNumber, b.Market, a.UnderlyingID, a.TempName, a.R, a.IssueNum, ROUND(a.R*a.IssueNum, 2), b.IssueCredit, b.RewardIssueCredit, a.Type, a.CP, a.UseReward,'N', a.TraderID, GETDATE(), a.UserID
+                                SELECT '1',a.SerialNumber, isnull(b.Market, 'TSE'), a.UnderlyingID, a.TempName, a.R, a.IssueNum, ROUND(a.R*a.IssueNum, 2), b.IssueCredit, b.RewardIssueCredit, a.Type, a.CP, a.UseReward,'N', a.TraderID, GETDATE(), a.UserID
                                 FROM [EDIS].[dbo].[ApplyOfficial] a
                                 LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingSummary] b ON a.UnderlyingID=b.UnderlyingID"
                   + $" WHERE a.[UserID]='{userID}'";
@@ -914,7 +914,11 @@ namespace WarrantAssistant
                 string underlyingName = "";
                 string traderID = "";
                 double underlyingPrice = 0.0;
-                string sqlTemp = @"SELECT a.[UnderlyingName]
+                string sqlTemp;
+                DataTable dvTemp;
+                //if (char.IsDigit(underlyingID[0]) || underlyingID == "IX0001") { 
+                //if (Regex.IsMatch(underlyingID, @"^\d")) {
+                sqlTemp = @"SELECT a.[UnderlyingName]
 	                                      ,IsNull(IsNull(b.MPrice, IsNull(b.BPrice,b.APrice)),0) MPrice
                                           ,a.TraderID TraderID
                                       FROM [EDIS].[dbo].[WarrantUnderlying] a
@@ -922,12 +926,21 @@ namespace WarrantAssistant
                 sqlTemp += $"WHERE  CAST(UnderlyingID as varbinary(100)) = CAST('{underlyingID}' as varbinary(100))";
 
                 //DataView dvTemp = DeriLib.Util.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
-                DataTable dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+                dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
                 foreach (DataRow drTemp in dvTemp.Rows) {
                     underlyingName = drTemp["UnderlyingName"].ToString();
                     traderID = drTemp["TraderID"].ToString().PadLeft(7, '0');
                     underlyingPrice = Convert.ToDouble(drTemp["MPrice"]);
                 }
+                /*} else {
+                    sqlTemp = $@"select IsNull(IsNull(MPrice, IsNull(BPrice,APrice)),0) MPrice 
+                                from [EDIS].[dbo].[WarrantPrices]
+                                where CAST(CommodityID as varbinary(100)) = CAST('{underlyingID}' as varbinary(100))";
+                    dvTemp = MSSQL.ExecSqlQry(sqlTemp, GlobalVar.loginSet.edisSqlConnString);
+                    underlyingPrice = Convert.ToDouble(dvTemp.Rows[0]["MPrice"]);
+                    traderID = "0006387";
+                    underlyingName = "大台指";
+                }*/
 
                 e.Cell.Row.Cells["獎勵"].Value = false;
                 e.Cell.Row.Cells["1500W"].Value = false;
@@ -962,8 +975,8 @@ namespace WarrantAssistant
                 string warrantType = e.Cell.Row.Cells["類型"].Value == DBNull.Value ? "1" : e.Cell.Row.Cells["類型"].Value.ToString();
 
                 if (warrantType != "2")
-                    return;                
-                
+                    return;
+
                 double price = 0.0;
                 double jumpSize = 0.0;
 
@@ -980,7 +993,7 @@ namespace WarrantAssistant
                 string cpType = e.Cell.Row.Cells["CP"].Value == DBNull.Value ? "1" : e.Cell.Row.Cells["CP"].Value.ToString();
                 CallPutType cp = cpType == "2" ? CallPutType.Put : CallPutType.Call;
 
-                if (underlyingPrice != 0.0 && underlyingID != "") {                   
+                if (underlyingPrice != 0.0 && underlyingID != "") {
                     e.Cell.Row.Cells["重設比"].Value = resetR * 100;
                     price = Pricing.BullBearWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol, t, financialR, cr);
 
@@ -1001,7 +1014,7 @@ namespace WarrantAssistant
                     vol_ += 0.01;
                     if (warrantType == "牛熊證")
                         price_ = Pricing.BullBearWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol_, t, financialR, cr);
-                   
+
                     totalValue = price_ * shares * 1000;
                 }
                 lowerLimit = price_ - (underlyingPrice + adj) * 0.1 * cr;

@@ -159,7 +159,8 @@ namespace WarrantAssistant
                     double availableShares = 0.0;
                     double lastDayUsedShares = 0.0;
                     double todayApplyShares = 0.0;
-                    if (underlyingID == "IX0001") {
+                    //if (underlyingID == "IX0001") {
+                    if (char.IsLetter(underlyingID[0])) {
                         availableShares = 0.0;
                         lastDayUsedShares = 0.0;
                         todayApplyShares = 0.0;
@@ -188,7 +189,8 @@ namespace WarrantAssistant
                     string applyStatus = "";
                     tempAvailable = todayAvailable - todayApplyShares / 1000 + attempShares;
 
-                    if (underlyingID == "IX0001") {
+                    //if (underlyingID == "IX0001") {
+                    if (char.IsLetter(underlyingID[0])) {
                         result = attempShares;
                         applyStatus = "Y";
                     } else if (applyTime.Substring(0, 2) == "09") {

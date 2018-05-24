@@ -373,9 +373,8 @@ namespace WarrantAssistant
                                 else
                                     tempType = "1";
                             }
-
-                            string writestr = "";
-                            writestr = warrantName + underlyingID + issueNumS + crS + tS + tempType + useReward + marketTmr;
+                                                       
+                            string writestr = warrantName + underlyingID + issueNumS + crS + tS + tempType + useReward + marketTmr;
 
                             if (market == "TSE") {
                                 //tseWriter.WriteFile(writestr);
@@ -398,9 +397,9 @@ namespace WarrantAssistant
                     }
                 }
 
-                string infoStr = "TSE 共" + tseCount + "檔，增額" + tseReissue + "檔，獎勵" + tseReward + "檔。\nOTC共" + otcCount + "檔，增額" + otcReissue + "檔，獎勵" + otcReward + "檔。";
+                string infoStr = $"TSE 共{tseCount}檔，增額{tseReissue}檔，獎勵{tseReward}檔。\nOTC共{otcCount}檔，增額{otcReissue}檔，獎勵{otcReward}檔。";
 
-                GlobalUtility.LogInfo("Info", "今日共申請" + (tseCount + otcCount) + "檔權證發行/增額");
+                GlobalUtility.LogInfo("Info", $"今日共申請{(tseCount + otcCount)}檔權證發行/增額");
 
                 MessageBox.Show("轉TXT檔完成!\n" + infoStr);
 

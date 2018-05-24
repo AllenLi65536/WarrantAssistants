@@ -109,10 +109,14 @@ WHERE A.WRTCAN_DATE = ( SELECT MAX(WRTCAN_DATE) FROM  [10.100.10.131].WAFT.dbo.C
 WHERE C.CHECK_CAN_ISSUE = '1'", conn);
 
 
+                MSSQL.ExecSqlCmd(@"Insert into [EDIS].[dbo].[WarrantUnderlying] (UnderlyingID, UnderlyingIDCMoney, UnderlyingName, TraderID, TraderName, StockType, FullName) 
+                                    SELECT [CommodityID], [CommodityID], '大台指', '6387', 'Eric', 'DI', '大台指'  FROM[EDIS].[dbo].[WarrantPrices]
+                                    where CommodityId like 'TXF%' and len(CommodityId) = 5", conn);
+
                 //先預設市場是TSE，以免有些比對不到
                 MSSQL.ExecSqlCmd("UPDATE [EDIS].[dbo].[WarrantUnderlying] SET [Market]='TSE'", conn);
 
-                //先從權證系統找市場                
+                //先從權證系統找市場
                 MSSQL.ExecSqlCmd(@"UPDATE [EDIS].[dbo].[WarrantUnderlying] 
                                    SET [Market]=substring(B.[ISUQTA_MKTTYPE],4,3) 
                                    FROM [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] B 
