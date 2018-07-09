@@ -193,7 +193,7 @@ namespace WarrantAssistant
                     if (char.IsLetter(underlyingID[0])) {
                         result = attempShares;
                         applyStatus = "Y";
-                    } else if (applyTime.Substring(0, 2) == "09") {
+                    } else if (applyTime.Substring(0, 2) == "09" || applyTime.Substring(0, 2) == "10") {
                         if (tempAvailable >= attempShares) {
                             result = attempShares;
                             applyStatus = "Y";
@@ -210,20 +210,6 @@ namespace WarrantAssistant
                     } else if (applyTime.Substring(0, 2) == "22") {
                         result = 0;
                         applyStatus = "X 沒額度";
-                    } else if (applyTime.Substring(0, 2) == "10") {
-                        if (tempAvailable >= attempShares) {
-                            result = attempShares;
-                            applyStatus = "Y";
-                        } else if (tempAvailable > 0) {
-                            result = tempAvailable;
-                            applyStatus = "排隊中";
-                        } else {
-                            result = 0;
-                            if (todayAvailable >= 0.6 * attempShares)
-                                applyStatus = "排隊中";
-                            else
-                                applyStatus = "X 沒額度";
-                        }
                     }
 
                     double accUsed = (lastDayUsedShares + todayApplyShares) / availableShares;
@@ -353,7 +339,7 @@ namespace WarrantAssistant
                 doc.LoadHtml(firstResponse);
                 HtmlNodeCollection navNodeChild = doc.DocumentNode.SelectSingleNode("//table[1]").ChildNodes; // /td[1]/table[1]/tr[2]
 
-                int loopend = navNodeChild.Count;                
+                int loopend = navNodeChild.Count;
 
                 for (int i = 5; i < loopend; i += 2) {
                     //MessageBox.Show(navNodeChild[i].InnerText);

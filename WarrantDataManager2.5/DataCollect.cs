@@ -110,7 +110,7 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
 
 
                 MSSQL.ExecSqlCmd(@"Insert into [EDIS].[dbo].[WarrantUnderlying] (UnderlyingID, UnderlyingIDCMoney, UnderlyingName, TraderID, TraderName, StockType, FullName) 
-                                    SELECT [CommodityID], [CommodityID], '大台指', '6387', 'Eric', 'DI', '大台指'  FROM[EDIS].[dbo].[WarrantPrices]
+                                    SELECT [CommodityID], [CommodityID], CommodityID, '6387', 'Eric', 'DI', CommodityID  FROM[EDIS].[dbo].[WarrantPrices]
                                     where CommodityId like 'TXF%' and len(CommodityId) = 5", conn);
 
                 //先預設市場是TSE，以免有些比對不到
@@ -120,7 +120,7 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
                 MSSQL.ExecSqlCmd(@"UPDATE [EDIS].[dbo].[WarrantUnderlying] 
                                    SET [Market]=substring(B.[ISUQTA_MKTTYPE],4,3) 
                                    FROM [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] B 
-                                   WHERE [UnderlyingID]=B.[ISUQTA_STKID] COLLATE Chinese_Taiwan_Stroke_CI_AS AND B.[ISUQTA_DATE]=(SELECT MAX([ISUQTA_DATE]) FROM [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA])", conn);
+                                   WHERE [UnderlyingID]=B.[ISUQTA_STKID] COLLATE Chinese_Taiwan_Stroke_CI_AS AND B.[ISUQTA_DATE]=(SELECT MAX([ISUQTA_DATE]) FROM [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] WHERE [UnderlyingID]=B.[ISUQTA_STKID])", conn);
                 conn.Close();
 
                 string sql = "SELECT [股票代號], isNull([上市上櫃],'1') 市場, IsNull([統一編號], '00000000') 統一編號 FROM [上市櫃公司基本資料] WHERE ";
@@ -260,7 +260,7 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
         }
 
         private static void InsertWarrantPrices() {
-            MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantPrices 
+            /*MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantPrices 
                                SELECT DISTINCT CASE WHEN (A.[CommodityId]='1000') THEN 'IX0001' ELSE A.[CommodityId] END
                                              ,isnull(A.[LastPrice],0)
                                              ,A.[tradedate]
@@ -269,6 +269,15 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
                                              ,B.[MDate]
                                FROM [10.60.0.37].[TsQuote].[dbo].[vwprice2] A
                                LEFT JOIN [10.60.0.37].[TsQuote].[dbo].[PBest5] B ON A.CommodityId=B.CommodityId", conn);
+                               */
+            MSSQL.ExecSqlCmd(@"INSERT INTO EDIS.dbo.WarrantPrices 
+                                SELECT DISTINCT CASE WHEN ([CommodityId]='1000') THEN 'IX0001' ELSE [CommodityId] END
+                                             ,isnull([LastPrice],0)
+                                             ,[tradedate]
+                                             ,isnull([BuyPriceBest1],0)
+                                             ,isnull([SellPriceBest1],0)
+                                             ,tradedate
+                               FROM [10.60.0.37].[TsQuote].[dbo].[vwprice2] ", conn);
         }
 
         private static void UpdateLastPrices() {
