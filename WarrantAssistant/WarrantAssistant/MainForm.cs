@@ -454,7 +454,7 @@ namespace WarrantAssistant
                         string date = DateTime.Today.ToString("yyyyMMdd");
                         string underlyingID = dr["UnderlyingID"].ToString();
                         string traderID = dr["TraderID"].ToString().TrimStart('0');
-                        if (traderID == "8730" || traderID == "10120")
+                        if (traderID == "10120" || traderID == "10329")
                             traderID = "7643";
                         string warrantName = dr["WarrantName"].ToString();
                         string type = dr["Type"].ToString();
