@@ -95,7 +95,7 @@ namespace WarrantDataManager
 select C.WRTCAN_STKID, C.WRTCAN_CMONEY_ID, C.WRTCAN_SHORT_NAME, C.TraderAccount, C.TraderName, C.WRTCAN_STOCKTYPE, C.WRTCAN_FULL_NAME from 
 (SELECT A.WRTCAN_STKID, A.WRTCAN_CMONEY_ID, A.WRTCAN_SHORT_NAME, ISNULL(B.TraderAccount,'7643') as TraderAccount, ISNULL(B.TraderName,'Aaron') as TraderName, A.WRTCAN_STOCKTYPE, A.WRTCAN_FULL_NAME,    
     CASE WHEN (WRTCAN_STOCKTYPE = 'DI' OR WRTCAN_STOCKTYPE = 'DE') AND (AUT.FLGDAT_FLGVAR is null OR AUT.FLGDAT_FLGVAR = 0 OR AUT.FLGDAT_FLGVAR < CONVERT(VARCHAR, GETDATE(), 112)) THEN '未授權'                       
-    WHEN WRTCAN_STOCKTYPE = 'DS' AND A.WRTCAN_STKID IN('2883', '6005') THEN '未授權'
+    WHEN WRTCAN_STOCKTYPE = 'DS' AND A.WRTCAN_STKID IN('2883', '6005', '2823') THEN '未授權'
     WHEN (WRTCAN_STOCKTYPE = 'DS' OR WRTCAN_STOCKTYPE = 'DR') AND A.WRTCAN_SOURCE = 'STOCK_A' AND (C.FLGDAT_FLGVAR <> 'A' OR C.FLGDAT_FLGVAR is null) THEN '非A級券商'               
     ELSE '1'
     END as CHECK_CAN_ISSUE
@@ -120,7 +120,7 @@ WHERE C.CHECK_CAN_ISSUE = '1'", conn);
                 MSSQL.ExecSqlCmd(@"UPDATE [EDIS].[dbo].[WarrantUnderlying] 
                                    SET [Market]=substring(B.[ISUQTA_MKTTYPE],4,3) 
                                    FROM [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] B 
-                                   WHERE [UnderlyingID]=B.[ISUQTA_STKID] COLLATE Chinese_Taiwan_Stroke_CI_AS AND B.[ISUQTA_DATE]=(SELECT MAX([ISUQTA_DATE]) FROM [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] WHERE [UnderlyingID]=B.[ISUQTA_STKID])", conn);
+                                   WHERE [UnderlyingID]=B.[ISUQTA_STKID] COLLATE Chinese_Taiwan_Stroke_CI_AS AND B.[ISUQTA_DATE]=(SELECT MAX([ISUQTA_DATE]) FROM [10.100.10.131].[EXTSRC].[dbo].[V_WRT_ISSUE_QUOTA] WHERE [UnderlyingID]=B.[ISUQTA_STKID] COLLATE Chinese_Taiwan_Stroke_CI_AS)", conn);
                 conn.Close();
 
                 string sql = "SELECT [股票代號], isNull([上市上櫃],'1') 市場, IsNull([統一編號], '00000000') 統一編號 FROM [上市櫃公司基本資料] WHERE ";

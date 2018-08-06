@@ -214,7 +214,7 @@ namespace WarrantAssistant
 
                     double accUsed = (lastDayUsedShares + todayApplyShares) / availableShares;
                     double reIssueResult = 0.0;
-                    if (accUsed <= 0.3)
+                    if (accUsed <= 0.3 || underlyingID.StartsWith("00"))
                         reIssueResult = attempShares;
 
                     h.SetParameterValue("@Issuer", issuer);
