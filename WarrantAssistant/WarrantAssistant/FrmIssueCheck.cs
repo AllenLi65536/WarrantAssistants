@@ -35,8 +35,8 @@ namespace WarrantAssistant
             dataGridView1.SelectionMode = DataGridViewSelectionMode.RowHeaderSelect;
         }
 
-        private void LoadData() {
-            string sql = @"SELECT [UnderlyingID]
+        private void LoadData(string traderID = "%") {
+            string sql = $@"SELECT [UnderlyingID]
                                  ,[UnderlyingName]
                                  ,[CashDividend] as CashDividend
                                  ,[StockDividend] as StockDividend
@@ -47,7 +47,8 @@ namespace WarrantAssistant
                                  ,[WatchCount]
                                  ,[WarningScore]
                                  ,[AccNetIncome]
-                              FROM [EDIS].[dbo].[WarrantIssueCheck]";
+                              FROM [EDIS].[dbo].[WarrantIssueCheck]as A left join [10.19.1.20].[EDIS].[dbo].[Underlying_Trader] as B on A.UnderlyingID = B.UID
+                              where B.TraderAccount like '{traderID.TrimStart('0')}'";
             dataTable = EDLib.SQL.MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
             dataGridView1.DataSource = dataTable;
             foreach (DataRow row in dataTable.Rows) {
@@ -59,6 +60,9 @@ namespace WarrantAssistant
         private void FrmIssueCheck_Load(object sender, EventArgs e) {
             LoadData();
             InitialGrid();
+            foreach (var item in GlobalVar.globalParameter.traders)
+                TraderID.Items.Add(item);
+            TraderID.Items.Add("");
         }
 
         private void dataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e) {
@@ -114,5 +118,11 @@ namespace WarrantAssistant
             }
         }
 
+        private void TraderID_SelectedIndexChanged(object sender, EventArgs e) {
+            if (TraderID.Text == "")
+                LoadData();
+            else
+                LoadData(TraderID.Text);
+        }
     }
 }
