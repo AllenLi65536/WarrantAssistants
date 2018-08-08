@@ -105,7 +105,7 @@ namespace WarrantAssistant
             band0.Columns["1500W"].Width = 50;
             band0.Columns["發行價格"].Width = 60;
             band0.Columns["Adj"].Width = 60;
-            band0.Columns["發行原因"].Width = 150;
+            band0.Columns["發行原因"].Width = 50;
             band0.Columns["標的名稱"].Width = 70;
             band0.Columns["股價"].Width = 60;
             band0.Columns["Delta"].Width = 70;
