@@ -57,8 +57,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\DeriLib.dll</HintPath>
     </Reference>
-    <Reference Include="EDLib">
-      <HintPath>..\..\..\..\WarrantAssistant\WarrantAssistant\packages\EDLib.1.1.7\lib\net40\EDLib.dll</HintPath>
+    <Reference Include="EDLib, Version=1.0.6792.21514, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\EDLib.1.2.0\lib\net40\EDLib.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.7.4.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.7.4\lib\Net45\HtmlAgilityPack.dll</HintPath>
