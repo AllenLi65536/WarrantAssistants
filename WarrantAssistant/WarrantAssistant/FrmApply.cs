@@ -60,6 +60,8 @@ namespace WarrantAssistant
             dt.Columns.Add("標的名稱", typeof(string));
             dt.Columns.Add("股價", typeof(double));
             dt.Columns.Add("Delta", typeof(double));
+            //joufan
+            dt.Columns.Add("Theta", typeof(double));
             dt.Columns.Add("跳動價差", typeof(double));
             dt.Columns.Add("IV*", typeof(double));
             dt.Columns.Add("發行價格*", typeof(double));
@@ -109,6 +111,8 @@ namespace WarrantAssistant
             band0.Columns["標的名稱"].Width = 70;
             band0.Columns["股價"].Width = 60;
             band0.Columns["Delta"].Width = 70;
+            //joufan
+            band0.Columns["Theta"].Width = 70;
             band0.Columns["跳動價差"].Width = 70;
             band0.Columns["市場"].Width = 40;
             band0.Columns["IV*"].Width = 60;
@@ -123,6 +127,8 @@ namespace WarrantAssistant
             band0.Columns["標的名稱"].CellAppearance.BackColor = Color.LightGray;
             band0.Columns["股價"].CellAppearance.BackColor = Color.LightGray;
             band0.Columns["Delta"].CellAppearance.BackColor = Color.LightGray;
+            //joufan
+            band0.Columns["Theta"].CellAppearance.BackColor = Color.LightGray;
             band0.Columns["跳動價差"].CellAppearance.BackColor = Color.LightGray;
             band0.Columns["IV*"].CellAppearance.BackColor = Color.LightBlue;
             band0.Columns["發行價格*"].CellAppearance.BackColor = Color.LightBlue;
@@ -246,6 +252,7 @@ namespace WarrantAssistant
 
                         double price = 0.0;
                         double delta = 0.0;
+                        double theta = 0.0; //joufan
                         if (underlyingPrice != 0) {
                             if (warrantType == "牛熊證")
                                 price = Pricing.BullBearWarrantPrice(cp, underlyingPrice + adj, resetR, GlobalVar.globalParameter.interestRate, vol, t, financialR, cr);
@@ -257,9 +264,13 @@ namespace WarrantAssistant
                             if (warrantType == "牛熊證")
                                 delta = 1.0;
                             else
+                            {
                                 delta = Pricing.Delta(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
+                                theta = Pricing.Theta(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
+                            }
 
                         }
+                          
                         dr["發行價格"] = Math.Round(price, 2);
 
                         double jumpSize = 0.0;
@@ -289,6 +300,7 @@ namespace WarrantAssistant
                         dr["跌停價*"] = Math.Round(lowerLimit, 2);
 
                         dr["Delta"] = Math.Round(delta, 4);
+                        dr["Theta"] = Math.Round(theta, 4); //joufan
                         dr["跳動價差"] = Math.Round(jumpSize, 4);
 
                         dt.Rows.Add(dr);
@@ -697,6 +709,8 @@ namespace WarrantAssistant
                 bands0.Columns["標的名稱"].CellActivation = Activation.NoEdit;
                 bands0.Columns["股價"].CellActivation = Activation.NoEdit;
                 bands0.Columns["Delta"].CellActivation = Activation.NoEdit;
+                //joufan
+                bands0.Columns["Theta"].CellActivation = Activation.NoEdit;
                 bands0.Columns["跳動價差"].CellActivation = Activation.NoEdit;
                 bands0.Columns["市場"].CellActivation = Activation.NoEdit;
                 bands0.Columns["約當張數"].CellActivation = Activation.NoEdit;
@@ -1030,6 +1044,7 @@ namespace WarrantAssistant
                 || e.Cell.Column.Key == "類型" || e.Cell.Column.Key == "CP" || e.Cell.Column.Key == "張數" || e.Cell.Column.Key == "Adj") {
                 double price = 0.0;
                 double delta = 0.0;
+                double theta = 0.0; //joufan
                 double jumpSize = 0.0;
                 double multiplier = 0.0;
 
@@ -1086,7 +1101,11 @@ namespace WarrantAssistant
                     if (warrantType == "牛熊證")
                         delta = 1.0;
                     else
+                    {
                         delta = Pricing.Delta(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
+                        theta = Pricing.Theta(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
+                    }
+                        
                     multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);
                 }
 
@@ -1094,6 +1113,7 @@ namespace WarrantAssistant
 
                 e.Cell.Row.Cells["發行價格"].Value = Math.Round(price, 2);
                 e.Cell.Row.Cells["Delta"].Value = Math.Round(delta, 4);
+                e.Cell.Row.Cells["Theta"].Value = Math.Round(theta, 4); //joufan
                 e.Cell.Row.Cells["跳動價差"].Value = Math.Round(jumpSize, 4);
 
                 double vol_ = vol;

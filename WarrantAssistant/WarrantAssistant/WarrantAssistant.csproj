@@ -57,21 +57,30 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\DeriLib.dll</HintPath>
     </Reference>
-    <Reference Include="EDLib, Version=1.0.6640.26620, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\EDLib.1.1.7\lib\net40\EDLib.dll</HintPath>
+    <Reference Include="EDLib">
+      <HintPath>..\..\..\..\WarrantAssistant\WarrantAssistant\packages\EDLib.1.1.7\lib\net40\EDLib.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.7.4.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.7.4\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
-    <Reference Include="Infragistics4.Shared.v16.2, Version=16.2.20162.2111, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+    <Reference Include="Infragistics4.Shared.v16.2, Version=16.2.20162.2182, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Infragistics\2016.2\Windows Forms\CLR4.0\Bin\Infragistics4.Shared.v16.2.dll</HintPath>
     </Reference>
-    <Reference Include="Infragistics4.Win.Misc.v16.2, Version=16.2.20162.2111, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
-    <Reference Include="Infragistics4.Win.UltraWinDataSource.v16.2, Version=16.2.20162.2111, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL" />
-    <Reference Include="Infragistics4.Win.UltraWinGrid.v16.2, Version=16.2.20162.2111, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+    <Reference Include="Infragistics4.Win.Misc.v16.2, Version=16.2.20162.2182, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Infragistics\2016.2\Windows Forms\CLR4.0\Bin\Infragistics4.Win.Misc.v16.2.dll</HintPath>
+    </Reference>
+    <Reference Include="Infragistics4.Win.UltraWinDataSource.v16.2, Version=16.2.20162.2182, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Infragistics\2016.2\Windows Forms\CLR4.0\Bin\Infragistics4.Win.UltraWinDataSource.v16.2.dll</HintPath>
+    </Reference>
+    <Reference Include="Infragistics4.Win.UltraWinGrid.v16.2, Version=16.2.20162.2182, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Infragistics\2016.2\Windows Forms\CLR4.0\Bin\Infragistics4.Win.UltraWinGrid.v16.2.dll</HintPath>
     </Reference>
-    <Reference Include="Infragistics4.Win.v16.2, Version=16.2.20162.2111, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+    <Reference Include="Infragistics4.Win.v16.2, Version=16.2.20162.2182, Culture=neutral, PublicKeyToken=7dd5c3163f2cd0cb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files (x86)\Infragistics\2016.2\Windows Forms\CLR4.0\Bin\Infragistics4.Win.v16.2.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
