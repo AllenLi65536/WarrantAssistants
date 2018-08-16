@@ -55,7 +55,7 @@ namespace WarrantAssistant
             dt.Columns.Add("確認", typeof(bool));
             dt.Columns["確認"].ReadOnly = false;
             dt.Columns.Add("Adj", typeof(double));
-            dt.Columns.Add("發行原因", typeof(string));
+            //dt.Columns.Add("發行原因", typeof(string));
             dt.Columns.Add("發行價格", typeof(double));
             dt.Columns.Add("標的名稱", typeof(string));
             dt.Columns.Add("股價", typeof(double));
@@ -83,7 +83,7 @@ namespace WarrantAssistant
             band0.Columns["類型"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.DropDownList;
             band0.Columns["CP"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.DropDownList;
             band0.Columns["交易員"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.DropDownList;
-            band0.Columns["發行原因"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.DropDownList;
+            //band0.Columns["發行原因"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.DropDownList;
             //ultraGrid1.DisplayLayout.Bands[0].Columns["確認"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
             //ultraGrid1.DisplayLayout.Bands[0].Columns["刪除"].Style = Infragistics.Win.UltraWinGrid.ColumnStyle.CheckBox;
 
@@ -107,7 +107,7 @@ namespace WarrantAssistant
             band0.Columns["1500W"].Width = 50;
             band0.Columns["發行價格"].Width = 60;
             band0.Columns["Adj"].Width = 60;
-            band0.Columns["發行原因"].Width = 50;
+            //band0.Columns["發行原因"].Width = 50;
             band0.Columns["標的名稱"].Width = 70;
             band0.Columns["股價"].Width = 60;
             band0.Columns["Delta"].Width = 70;
@@ -191,15 +191,14 @@ namespace WarrantAssistant
 	                              ,b.Market
 	                              ,(a.IssueNum*a.R) as EquivalentNum
 	                              ,IsNull(b.[IssueCredit],0) IssueCredit
-	                              ,IsNull(b.[RewardIssueCredit],0) RewardIssueCredit
-                                  ,CASE WHEN a.CP='C' THEN d.Reason ELSE d.ReasonP END Reason
+	                              ,IsNull(b.[RewardIssueCredit],0) RewardIssueCredit                                  
                                   ,IsNull(a.[Adj],0) Adj
                               FROM [EDIS].[dbo].[ApplyTempList] a ";
                 sql += @"LEFT JOIN [EDIS].[dbo].[WarrantUnderlyingSummary] b on a.UnderlyingID=b.UnderlyingID
                    LEFT JOIN [EDIS].[dbo].[WarrantPrices] c on a.UnderlyingID=c.CommodityID 
                     left join [Underlying_TraderIssue] d on d.UID = a.UnderlyingID 
                    WHERE a.UserID='" + userID + "' ";//or (a.UnderlyingID = 'IX0001' and d.UID ='TWA00')
-                sql += "ORDER BY a.MDate";
+                sql += "ORDER BY a.MDate"; //,CASE WHEN a.CP='C' THEN d.Reason ELSE d.ReasonP END Reason
 
                 //DataView dv = DeriLib.Util.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
                 DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
@@ -236,7 +235,7 @@ namespace WarrantAssistant
                         dr["交易員"] = drv["TraderID"].ToString();
                         dr["獎勵"] = drv["UseReward"];
                         dr["確認"] = drv["ConfirmChecked"];
-                        dr["發行原因"] = drv["Reason"] == DBNull.Value ? 0 : Convert.ToInt32(drv["Reason"]);
+                        //dr["發行原因"] = drv["Reason"] == DBNull.Value ? 0 : Convert.ToInt32(drv["Reason"]);
                         dr["1500W"] = drv["Apply1500W"];
                         dr["標的名稱"] = drv["UnderlyingName"].ToString();
                         double underlyingPrice = Convert.ToDouble(drv["MPrice"]);
@@ -261,16 +260,15 @@ namespace WarrantAssistant
                             else
                                 price = Pricing.NormalWarrantPrice(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, t, cr);
 
-                            if (warrantType == "牛熊證")
+                            if (warrantType == "牛熊證") {
                                 delta = 1.0;
-                            else
-                            {
+                                theta = -k * financialR * cr / 365.0;
+                            } else {
                                 delta = Pricing.Delta(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
                                 theta = Pricing.Theta(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
                             }
-
                         }
-                          
+
                         dr["發行價格"] = Math.Round(price, 2);
 
                         double jumpSize = 0.0;
@@ -311,7 +309,7 @@ namespace WarrantAssistant
             }
         }
 
-        private bool CheckReason() {
+        /*private bool CheckReason() {
             bool undoneReason = true;
             string sql2 = "SELECT [UnderlyingID]"
              + " FROM [EDIS].[dbo].[ApplyTempList] as A left join Underlying_TraderIssue as B on A.UnderlyingID = B.UID " //or(A.UnderlyingID = 'IX0001' and B.UID ='TWA00')
@@ -323,9 +321,8 @@ namespace WarrantAssistant
                 MessageBox.Show(Row["UnderlyingID"] + " 未輸入發行原因");
                 undoneReason = false;
             }
-
             return undoneReason;
-        }
+        }*/
         private bool CheckData() {
             bool dataOK = true;
             string sql2 = "SELECT [UnderlyingID]"
@@ -448,7 +445,7 @@ namespace WarrantAssistant
                             applyCount++;
                         }
 
-                        List<SqlParameter> reasonL = new List<SqlParameter>();
+                        /*List<SqlParameter> reasonL = new List<SqlParameter>();
                         SQLCommandHelper underlyReason;
                         reasonL.Add(new SqlParameter("@UnderlyingID", SqlDbType.VarChar));
                         reasonL.Add(new SqlParameter("@Reason", SqlDbType.Int));
@@ -456,9 +453,9 @@ namespace WarrantAssistant
                             underlyReason = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, "Update [Underlying_TraderIssue] set Reason = @Reason where UID = @UnderlyingID", reasonL);
                         else
                             underlyReason = new SQLCommandHelper(GlobalVar.loginSet.edisSqlConnString, "Update [Underlying_TraderIssue] set ReasonP = @Reason where UID = @UnderlyingID", reasonL);
-
+                            
                         int reason = r.Cells["發行原因"].Value == DBNull.Value ? 0 : Convert.ToInt32(r.Cells["發行原因"].Value);
-
+                        */
                         bool apply1500Wbool = r.Cells["1500W"].Value == DBNull.Value ? false : Convert.ToBoolean(r.Cells["1500W"].Value);
                         string apply1500W = "N";
                         if (apply1500Wbool)
@@ -539,11 +536,11 @@ namespace WarrantAssistant
                         h.SetParameterValue("@Adj", adj);
 
                         h.ExecuteCommand();
-                        underlyReason.SetParameterValue("@Reason", reason);
+                        /*underlyReason.SetParameterValue("@Reason", reason);
                         //if (underlyingID == "IX0001")
                         //   underlyingID = "TWA00";
                         underlyReason.SetParameterValue("@UnderlyingID", underlyingID);
-                        underlyReason.ExecuteCommand();
+                        underlyReason.ExecuteCommand();*/
                         i++;
                     }
                 }
@@ -654,7 +651,7 @@ namespace WarrantAssistant
                 bands0.Columns["財務費用"].CellActivation = Activation.AllowEdit;
                 bands0.Columns["類型"].CellActivation = Activation.AllowEdit;
                 bands0.Columns["CP"].CellActivation = Activation.AllowEdit;
-                bands0.Columns["發行原因"].CellActivation = Activation.AllowEdit;
+                //bands0.Columns["發行原因"].CellActivation = Activation.AllowEdit;
                 bands0.Columns["交易員"].CellActivation = Activation.AllowEdit;
                 bands0.Columns["1500W"].CellActivation = Activation.AllowEdit;
                 bands0.Columns["發行價格"].CellActivation = Activation.AllowEdit;
@@ -705,7 +702,7 @@ namespace WarrantAssistant
                 bands0.Columns["交易員"].CellActivation = Activation.NoEdit;
                 bands0.Columns["獎勵"].CellActivation = Activation.AllowEdit;
                 bands0.Columns["發行價格"].CellActivation = Activation.NoEdit;
-                bands0.Columns["發行原因"].CellActivation = Activation.NoEdit;
+                //bands0.Columns["發行原因"].CellActivation = Activation.NoEdit;
                 bands0.Columns["標的名稱"].CellActivation = Activation.NoEdit;
                 bands0.Columns["股價"].CellActivation = Activation.NoEdit;
                 bands0.Columns["Delta"].CellActivation = Activation.NoEdit;
@@ -780,7 +777,7 @@ namespace WarrantAssistant
                 v.ValueListItems.Add(4, "提供投資人槓桿避險工具");
                 v.ValueListItems.Add(5, "持續針對不同的履約條件、存續期間及認購認售等發行新條件，提供投資人更多元投資選擇");
             }
-            e.Layout.Bands[0].Columns["發行原因"].ValueList = e.Layout.ValueLists["MyValueList4"];
+            // e.Layout.Bands[0].Columns["發行原因"].ValueList = e.Layout.ValueLists["MyValueList4"];
 
         }
 
@@ -1098,14 +1095,14 @@ namespace WarrantAssistant
                         e.Cell.Row.Cells["界限比"].Value = 0;
                         e.Cell.Row.Cells["財務費用"].Value = 0;
                     }
-                    if (warrantType == "牛熊證")
+                    if (warrantType == "牛熊證") {
                         delta = 1.0;
-                    else
-                    {
+                        theta = -k * financialR * cr / 365.0;
+                    } else {
                         delta = Pricing.Delta(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
                         theta = Pricing.Theta(cp, underlyingPrice + adj, k, GlobalVar.globalParameter.interestRate, vol, (t * 30.0) / GlobalVar.globalParameter.dayPerYear, GlobalVar.globalParameter.interestRate) * cr;
                     }
-                        
+
                     multiplier = EDLib.Tick.UpTickSize(underlyingID, underlyingPrice + adj);
                 }
 
