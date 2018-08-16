@@ -120,5 +120,32 @@ namespace WarrantAssistant
 
             return delta;
         }
+
+        public static double Theta(CallPutType cp,
+                                  double spotPrice,
+                                  double strikePrice,
+                                  double interestRate,
+                                  double volatility,
+                                  double timeToExpiry,
+                                  double costOfCarry)
+        {
+            double theta = 0.0;
+            double d1 = (Math.Log(spotPrice / strikePrice) + (costOfCarry + volatility * volatility * 0.5) * timeToExpiry) / (volatility * Math.Sqrt(timeToExpiry));
+            double d2 = d1 - volatility * Math.Sqrt(timeToExpiry);
+            if (cp == CallPutType.Call)
+            {
+                theta = spotPrice * volatility * Math.Exp((costOfCarry - interestRate) * timeToExpiry) * StandardGaussianDensity(d1) / (2 * Math.Sqrt(timeToExpiry))
+                    - (interestRate - costOfCarry) * spotPrice * Math.Exp((costOfCarry - interestRate) * timeToExpiry) * StandardGaussianProbability(d1)
+                    + interestRate * strikePrice * Math.Exp((-interestRate * timeToExpiry) * StandardGaussianProbability(d2));
+            }
+            else
+            {
+                theta = spotPrice * volatility * Math.Exp((costOfCarry - interestRate) * timeToExpiry) * StandardGaussianDensity(d1) / (2 * Math.Sqrt(timeToExpiry))
+                    + (interestRate - costOfCarry) * spotPrice * Math.Exp((costOfCarry - interestRate) * timeToExpiry) * StandardGaussianProbability(-d1)
+                    - interestRate * strikePrice * Math.Exp((-interestRate * timeToExpiry) * StandardGaussianProbability(-d2));
+            }
+
+            return theta/252;
+        }
     }
 }
