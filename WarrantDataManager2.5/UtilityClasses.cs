@@ -68,7 +68,13 @@ namespace WarrantDataManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show("[" + DateTime.Now.ToString("HH:mm:ss.fff") + "][SQLCommandHelper][" + ex.Message + "]");
+                MessageBox.Show($"[{DateTime.Now.ToString("HH:mm:ss.fff")}][SQLCommandHelper][{ex.Message}]  ");
+                string temp = "";
+                for(int i = 0; i < cmd.Parameters.Count; i++) 
+                    temp += $"{cmd.Parameters[i].Value} ";
+                
+                MessageBox.Show($"{cmd.CommandText} {temp}");
+                
             }
         }
         #region IDisposable成員

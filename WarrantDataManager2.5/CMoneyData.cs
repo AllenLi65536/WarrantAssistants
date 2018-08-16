@@ -167,7 +167,8 @@ namespace WarrantDataManager
                 }*/
                 
                 for (; !rs.EOF; rs.MoveNext())
-                    tw50Stocks.Add(Convert.ToString(rs.Fields["標的代號"].Value));
+                    if (Convert.ToString(rs.Fields["標的代號"].Value).Length <= 6)
+                        tw50Stocks.Add(Convert.ToString(rs.Fields["標的代號"].Value));
 
 
                 /*string URL = "http://www.twse.com.tw/ch/trading/indices/twco/tai50i.php";
