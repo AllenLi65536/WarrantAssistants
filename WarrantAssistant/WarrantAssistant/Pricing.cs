@@ -145,7 +145,7 @@ namespace WarrantAssistant
                     - interestRate * strikePrice * Math.Exp((-interestRate * timeToExpiry) * StandardGaussianProbability(-d2));
             }
 
-            return theta;
+            return theta/252;
         }
     }
 }
