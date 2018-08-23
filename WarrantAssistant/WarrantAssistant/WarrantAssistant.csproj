@@ -57,7 +57,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\DeriLib.dll</HintPath>
     </Reference>
-    <Reference Include="EDLib, Version=1.0.6792.21514, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="EDLib, Version=1.0.6807.27746, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\EDLib.1.2.0\lib\net40\EDLib.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.7.4.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
