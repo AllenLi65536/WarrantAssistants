@@ -162,12 +162,12 @@ namespace WarrantAssistant
 
         private void LoadUltraGrid(System.Data.DataTable dt, string infoOrAnnounce) {
             try {
-                string sql = @"SELECT [MDate]
+                string sql = $@"SELECT [MDate]
                                   ,[InformationContent]
                                   ,[MUser]
                               FROM [EDIS].[dbo].[InformationLog]
-                              WHERE InformationType='" + infoOrAnnounce + "'";
-                sql += "AND CONVERT(VARCHAR,Date,112) >'" + GlobalVar.globalParameter.lastTradeDate.ToString("yyyyMMdd") + "' ORDER BY MDate DESC";
+                              WHERE InformationType='{infoOrAnnounce}'";
+                sql += $"AND CONVERT(VARCHAR,Date,112) >'{GlobalVar.globalParameter.lastTradeDate.ToString("yyyyMMdd")}' and (MUser like'0%' or MUser = '{GlobalVar.globalParameter.userID.TrimStart('0')}') ORDER BY MDate DESC";
                 System.Data.DataTable dv = MSSQL.ExecSqlQry(sql, GlobalVar.loginSet.edisSqlConnString);
 
                 if (dt.Rows.Count == dv.Rows.Count)
